@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cln35bqs21un4"]
+
+[sub_resource type="Environment" id="Environment_jmqwl"]
+
+[sub_resource type="Environment" id="Environment_fuuef"]
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_jmqwl")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+environment = SubResource("Environment_fuuef")
