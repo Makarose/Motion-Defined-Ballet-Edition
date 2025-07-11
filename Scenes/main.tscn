@@ -1,13 +1,28 @@
-[gd_scene load_steps=3 format=3 uid="uid://cln35bqs21un4"]
-
-[sub_resource type="Environment" id="Environment_jmqwl"]
+[gd_scene load_steps=5 format=3 uid="uid://cln35bqs21un4"]
 
 [sub_resource type="Environment" id="Environment_fuuef"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_opltv"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_q85hf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7eohw"]
+albedo_color = Color(1, 0.33, 0.33, 0.560784)
+
 [node name="Main" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_jmqwl")
-
 [node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1.19591, 0, 0, 0, 1, 0, 0, 2)
 environment = SubResource("Environment_fuuef")
+fov = 45.6722
+
+[node name="Box" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.56, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.637352)
+visible = false
+mesh = SubResource("BoxMesh_opltv")
+
+[node name="BlockerDancer" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.213036, 0, 0, 0, 0.278996, 0, 0, 0, 0.244817, 0, 0, 0.637352)
+mesh = SubResource("CylinderMesh_q85hf")
+skeleton = NodePath("../Box")
+surface_material_override/0 = SubResource("StandardMaterial3D_7eohw")
