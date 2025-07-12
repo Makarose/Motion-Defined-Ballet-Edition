@@ -1,13 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://cln35bqs21un4"]
+[gd_scene load_steps=6 format=3 uid="uid://cln35bqs21un4"]
 
-[sub_resource type="Environment" id="Environment_u41te"]
-ambient_light_source = 2
-ambient_light_color = Color(0.774234, 0.895741, 0.999291, 1)
-ambient_light_energy = 5.0
+[ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/UI.tscn" id="1_d8f8u"]
 
 [sub_resource type="Environment" id="Environment_fuuef"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_opltv"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_q85hf"]
 
@@ -18,43 +13,37 @@ albedo_color = Color(1, 0.33, 0.33, 0.560784)
 
 [node name="Main" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_u41te")
+[node name="Control" parent="." instance=ExtResource("1_d8f8u")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.999491, -0.0319167, 0, 0.0319167, 0.999491, 3.96249, -0.275467, 1.85779)
+transform = Transform3D(1, 0, 0, 0, 0.990193, 0.139709, 0, -0.139709, 0.990193, 3.88979, 0.558878, 0.609345)
 environment = SubResource("Environment_fuuef")
-fov = 42.1875
-
-[node name="Box" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.56, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.637352)
-mesh = SubResource("BoxMesh_opltv")
+fov = 43.724
 
 [node name="BlockerDancer" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.213036, 0, 0, 0, 0.214387, 0, 0, 0, 0.244817, 4.31016, -0.44368, -0.332345)
+transform = Transform3D(0.213036, 0, 0, 0, 0.214387, 0, 0, 0, 0.244817, 4.31016, 0.192564, -1.99192)
 mesh = SubResource("CylinderMesh_q85hf")
-skeleton = NodePath("../Box")
+skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_7eohw")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.42968, 0, 0, 0, 1.31539, 0, 0, 0, 0.244817, 4.0096, -0.00593692, -0.697384)
-visible = false
+[node name="BackWall" type="MeshInstance3D" parent="."]
+transform = Transform3D(7.73625, 0, 0, 0, 2.80288, 0, 0, 0, 0.244817, 4.0096, 0.627385, -2.64062)
 mesh = SubResource("QuadMesh_a87ou")
 skeleton = NodePath("../BlockerDancer")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.42968, 0, 0, 0, -5.74977e-08, 0.244817, 0, -1.31539, -1.07013e-08, 4.0122, -0.62573, -0.0745021)
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(6.24279, 0, 0, 0, -1.6559e-07, 0.244817, 0, -3.78824, -1.07013e-08, 4.0122, 0, -1.5201)
 mesh = SubResource("QuadMesh_a87ou")
 skeleton = NodePath("../BlockerDancer")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-transform = Transform3D(2.73168e-15, 5.74977e-08, 0.244817, 1.42968, -5.74977e-08, 0, 6.24935e-08, 1.31539, -1.07013e-08, 3.32584, 0.0909075, -0.0745021)
+transform = Transform3D(2.73168e-15, 5.40471e-08, 0.39292, 1.42968, -5.40471e-08, 0, 6.24935e-08, 1.23645, -1.71751e-08, 3.37807, -0.0583832, -0.208901)
 visible = false
 mesh = SubResource("QuadMesh_a87ou")
 skeleton = NodePath("../BlockerDancer")
 
 [node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
-transform = Transform3D(2.73168e-15, 5.74977e-08, -0.244817, 1.42968, -5.74977e-08, 0, -6.24935e-08, -1.31539, -1.07013e-08, 4.70551, 0.0909075, -0.0745021)
+transform = Transform3D(2.11907e-15, 5.68283e-08, -0.244817, 1.10906, -5.68283e-08, 0, -4.84787e-08, -1.30008, -1.07013e-08, 4.70551, 0.0909075, -0.240967)
 visible = false
 mesh = SubResource("QuadMesh_a87ou")
 skeleton = NodePath("../BlockerDancer")
