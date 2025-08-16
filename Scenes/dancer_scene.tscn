@@ -1,6 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://cln35bqs21un4"]
+[gd_scene load_steps=11 format=3 uid="uid://cln35bqs21un4"]
 
-[ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/UI.tscn" id="1_d8f8u"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_wh1t5"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_cegqf"]
+sky_material = SubResource("ProceduralSkyMaterial_wh1t5")
+
+[sub_resource type="Environment" id="Environment_o85u1"]
+background_mode = 2
+sky = SubResource("Sky_cegqf")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="Environment" id="Environment_fuuef"]
 
@@ -11,9 +22,47 @@ albedo_color = Color(1, 0.33, 0.33, 0.560784)
 
 [sub_resource type="QuadMesh" id="QuadMesh_a87ou"]
 
-[node name="Main" type="Node3D"]
+[sub_resource type="Animation" id="Animation_bytrn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BlockerDancer:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(4.30132, 0.192564, -1.99192)]
+}
 
-[node name="Control" parent="." instance=ExtResource("1_d8f8u")]
+[sub_resource type="Animation" id="Animation_4qif1"]
+resource_name = "cylinder"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BlockerDancer:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.533333, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(3.50599, 0.192564, -1.99192), Vector3(4.30132, 0.192564, -1.99192), Vector3(3.50599, 0.192564, -1.99192)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6lit8"]
+_data = {
+"RESET": SubResource("Animation_bytrn"),
+"cylinder": SubResource("Animation_4qif1")
+}
+
+[node name="DancerScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_o85u1")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.990193, 0.139709, 0, -0.139709, 0.990193, 3.88979, 0.558878, 0.609345)
@@ -21,7 +70,7 @@ environment = SubResource("Environment_fuuef")
 fov = 43.724
 
 [node name="BlockerDancer" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.213036, 0, 0, 0, 0.214387, 0, 0, 0, 0.244817, 4.31016, 0.192564, -1.99192)
+transform = Transform3D(0.213036, 0, 0, 0, 0.214387, 0, 0, 0, 0.244817, 4.30132, 0.192564, -1.99192)
 mesh = SubResource("CylinderMesh_q85hf")
 skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_7eohw")
@@ -50,3 +99,9 @@ skeleton = NodePath("../BlockerDancer")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.875228, 0.48371, 0, -0.48371, 0.875228, 4.05467, 2.60954, 3.92184)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_6lit8")
+}
+autoplay = "cylinder"

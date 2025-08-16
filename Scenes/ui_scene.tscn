@@ -1,0 +1,118 @@
+[gd_scene load_steps=3 format=3 uid="uid://crbl3op3bapp6"]
+
+[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_scrkw"]
+line_spacing = 5.0
+font_size = 50
+font_color = Color(0, 0, 0, 1)
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_vertical_guides_ = [1817.0, 538.0]
+metadata/_edit_horizontal_guides_ = [982.0]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainTitle" type="PanelContainer" parent="CanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1820.0
+offset_top = 48.0
+offset_right = -100.0
+offset_bottom = 128.0
+grow_horizontal = 0
+theme = ExtResource("1_rnxuq")
+
+[node name="MarginContainerTitle" type="MarginContainer" parent="CanvasLayer/MainTitle"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Title" type="Label" parent="CanvasLayer/MainTitle/MarginContainerTitle"]
+layout_mode = 2
+text = "Motion Defined: Ballet Edition"
+label_settings = SubResource("LabelSettings_scrkw")
+horizontal_alignment = 1
+
+[node name="Definitions" type="PanelContainer" parent="CanvasLayer"]
+offset_left = 100.0
+offset_top = 178.0
+offset_right = 600.0
+offset_bottom = 978.0
+size_flags_stretch_ratio = 0.0
+theme = ExtResource("1_rnxuq")
+
+[node name="MarginContainerTextMain" type="MarginContainer" parent="CanvasLayer/Definitions"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain"]
+layout_mode = 2
+
+[node name="MarginContainerTitle" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Title" type="Label" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme = ExtResource("1_rnxuq")
+theme_type_variation = &"HeaderLarge"
+theme_override_constants/line_spacing = 0
+text = "Title"
+horizontal_alignment = 1
+
+[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Text" type="Label" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText"]
+custom_minimum_size = Vector2(500, 700)
+layout_mode = 2
+theme = ExtResource("1_rnxuq")
+text = "Definition of the move searched for goes here."
+autowrap_mode = 2
+justification_flags = 161
+
+[node name="Search" type="PanelContainer" parent="CanvasLayer"]
+offset_left = 680.0
+offset_top = 879.0
+offset_right = 1820.0
+offset_bottom = 985.0
+size_flags_stretch_ratio = 0.0
+theme = ExtResource("1_rnxuq")
+
+[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Search"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Text" type="Label" parent="CanvasLayer/Search/MarginContainerText"]
+custom_minimum_size = Vector2(500, 80)
+layout_mode = 2
+theme = ExtResource("1_rnxuq")
+theme_type_variation = &"HeaderLarge"
+text = "Search:"
+vertical_alignment = 1
+autowrap_mode = 2
+justification_flags = 161

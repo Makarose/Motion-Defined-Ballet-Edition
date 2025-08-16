@@ -1,0 +1,22 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bwkglkrll8mi0"]
+
+[ext_resource type="FontFile" uid="uid://dad288bvgy4nc" path="res://XTypewriter-Regular.ttf" id="1_c071d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2sd4j"]
+bg_color = Color(0.4544, 0.62054, 0.71, 0.85098)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[resource]
+HeaderLarge/font_sizes/font_size = 40
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 30
+Label/fonts/font = ExtResource("1_c071d")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_2sd4j")
