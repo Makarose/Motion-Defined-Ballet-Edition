@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="BalletMove" load_steps=2 format=3 uid="uid://dlf6qrws6i6f2"]
+
+[ext_resource type="Script" path="res://Scripts/ballet_move.gd" id="1_ifvdx"]
+
+[resource]
+script = ExtResource("1_ifvdx")
+name = "Saute"
+definition = "A jump taking off from two feet and landing on two feet."

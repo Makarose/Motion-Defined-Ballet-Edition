@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="BalletMove" load_steps=2 format=3 uid="uid://cd671jfyx6un6"]
+
+[ext_resource type="Script" path="res://Scripts/ballet_move.gd" id="1_ka5t2"]
+
+[resource]
+script = ExtResource("1_ka5t2")
+name = "Pirouette"
+definition = "A full rotation of the body."

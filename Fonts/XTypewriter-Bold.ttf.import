@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://bxgputtgmpctk"
-path="res://.godot/imported/XTypewriter-Bold.ttf-d9419abeff660b27d553adfdf12123bb.fontdata"
+path="res://.godot/imported/XTypewriter-Bold.ttf-9ba53e6d9e85af56cee79bf51c73c078.fontdata"
 
 [deps]
 
-source_file="res://XTypewriter-Bold.ttf"
-dest_files=["res://.godot/imported/XTypewriter-Bold.ttf-d9419abeff660b27d553adfdf12123bb.fontdata"]
+source_file="res://Fonts/XTypewriter-Bold.ttf"
+dest_files=["res://.godot/imported/XTypewriter-Bold.ttf-9ba53e6d9e85af56cee79bf51c73c078.fontdata"]
 
 [params]
 

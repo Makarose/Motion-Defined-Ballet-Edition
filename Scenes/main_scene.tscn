@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://dyr2srv21e1ql"]
+[gd_scene load_steps=6 format=3 uid="uid://dyr2srv21e1ql"]
 
+[ext_resource type="Script" path="res://Scenes/main_scene.gd" id="1_e5dl6"]
 [ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/ui_scene.tscn" id="1_fnjpc"]
 [ext_resource type="PackedScene" uid="uid://cln35bqs21un4" path="res://Scenes/dancer_scene.tscn" id="2_2ww8a"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_j3esb"]
@@ -8,6 +9,7 @@
 viewport_path = NodePath("DancerViewport")
 
 [node name="MainScene" type="Node2D"]
+script = ExtResource("1_e5dl6")
 metadata/_edit_vertical_guides_ = [683.0, 1817.0]
 metadata/_edit_horizontal_guides_ = [181.0]
 
