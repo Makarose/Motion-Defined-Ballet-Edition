@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/ballet_move.gd" id="1_ipguh"]
 [ext_resource type="Script" path="res://Scripts/ballet_move_database.gd" id="2_bky2k"]
 [ext_resource type="Resource" uid="uid://cd671jfyx6un6" path="res://Definition Resources/pirouette.tres" id="2_nkdjm"]
-[ext_resource type="Resource" uid="uid://8jbmjwg50bxc" path="res://Definition Resources/plies.tres" id="3_kchqs"]
+[ext_resource type="Resource" uid="uid://8jbmjwg50bxc" path="res://Definition Resources/plie.tres" id="3_kchqs"]
 [ext_resource type="Resource" uid="uid://dlf6qrws6i6f2" path="res://Definition Resources/saute.tres" id="4_l70os"]
 
 [resource]

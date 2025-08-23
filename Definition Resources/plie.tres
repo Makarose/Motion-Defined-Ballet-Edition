@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="BalletMove" load_steps=2 format=3 uid="uid://8jbmjwg50bxc"]
 
-[ext_resource type="Script" path="res://Scripts/ballet_move.gd" id="1_s58qe"]
+[ext_resource type="Script" path="res://Scripts/ballet_move.gd" id="1_w24xy"]
 
 [resource]
-script = ExtResource("1_s58qe")
-name = "Plie"
+script = ExtResource("1_w24xy")
+name = "Plié"
 definition = "Bending of the knees."

@@ -72,6 +72,7 @@ theme = ExtResource("1_rnxuq")
 theme_type_variation = &"HeaderLarge"
 theme_override_font_sizes/normal_font_size = 40
 bbcode_enabled = true
+scroll_active = false
 
 [node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
 layout_mode = 2
@@ -114,12 +115,14 @@ theme = ExtResource("1_rnxuq")
 theme_type_variation = &"HeaderLarge"
 theme_override_font_sizes/normal_font_size = 40
 text = "Search:"
+scroll_active = false
 autowrap_mode = 2
 
 [node name="SelectedMove" type="RichTextLabel" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 40
+scroll_active = false
 
 [node name="LineEdit" type="LineEdit" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
