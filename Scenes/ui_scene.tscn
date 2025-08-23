@@ -65,14 +65,13 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Title" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
+[node name="TitleLabel" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme = ExtResource("1_rnxuq")
 theme_type_variation = &"HeaderLarge"
 theme_override_font_sizes/normal_font_size = 40
 bbcode_enabled = true
-text = "[center]Title[/center]"
 
 [node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
 layout_mode = 2
@@ -86,7 +85,7 @@ custom_minimum_size = Vector2(500, 700)
 layout_mode = 2
 theme = ExtResource("1_rnxuq")
 theme_override_font_sizes/normal_font_size = 40
-text = "Definition of the move searched for goes here."
+text = "Seach for a move and the definition will be shown here."
 autowrap_mode = 2
 
 [node name="Search" type="PanelContainer" parent="CanvasLayer"]
