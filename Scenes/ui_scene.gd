@@ -3,6 +3,7 @@ extends Control
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var selected_label: RichTextLabel = $CanvasLayer/Search/MarginContainerText/VBoxContainer/SelectedMove
+@onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 
 var database: BalletMoveDatabase
 
@@ -25,7 +26,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-# Called whenever the search bqr text changes
+# Called whenever the search bar text changes
 func _on_search_text_changed(new_text: String) -> void:
 	item_list.clear()
 	selected_label.set_text("") #clear by default
@@ -51,6 +52,12 @@ func _on_item_selected(index: int) -> void:
 	search_bar.text = selected_move
 	selected_label.set_text(selected_move) # update label
 	item_list.visible = false	
+	
+	# find it's definition from the database
+	for balletmove in database.moves:
+		if balletmove.name == selected_move:
+			definition_label.set_text(balletmove.definition)
+			break
 	
 	# Optional: do something with the selected move
 	print("Selected move:", selected_move)
