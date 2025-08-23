@@ -1,12 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=3 format=3 uid="uid://crbl3op3bapp6"]
 
 [ext_resource type="Script" path="res://Scenes/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_scrkw"]
-line_spacing = 5.0
-font_size = 50
-font_color = Color(0, 0, 0, 1)
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -17,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_q043w")
 metadata/_edit_vertical_guides_ = [1817.0, 538.0]
-metadata/_edit_horizontal_guides_ = [982.0]
+metadata/_edit_horizontal_guides_ = [996.0]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -39,17 +34,17 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Title" type="Label" parent="CanvasLayer/MainTitle/MarginContainerTitle"]
+[node name="Title" type="RichTextLabel" parent="CanvasLayer/MainTitle/MarginContainerTitle"]
 layout_mode = 2
-text = "Motion Defined: Ballet Edition"
-label_settings = SubResource("LabelSettings_scrkw")
-horizontal_alignment = 1
+theme_override_font_sizes/normal_font_size = 60
+bbcode_enabled = true
+text = "[center]Motion Defined: Ballet Edition[/center]"
 
 [node name="Definitions" type="PanelContainer" parent="CanvasLayer"]
 offset_left = 100.0
 offset_top = 178.0
-offset_right = 600.0
-offset_bottom = 978.0
+offset_right = 636.0
+offset_bottom = 999.0
 size_flags_stretch_ratio = 0.0
 theme = ExtResource("1_rnxuq")
 
@@ -70,14 +65,14 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Title" type="Label" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
-custom_minimum_size = Vector2(500, 0)
+[node name="Title" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
+custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme = ExtResource("1_rnxuq")
 theme_type_variation = &"HeaderLarge"
-theme_override_constants/line_spacing = 0
-text = "Title"
-horizontal_alignment = 1
+theme_override_font_sizes/normal_font_size = 40
+bbcode_enabled = true
+text = "[center]Title[/center]"
 
 [node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
 layout_mode = 2
@@ -86,19 +81,20 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Text" type="Label" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText"]
+[node name="Text" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText"]
 custom_minimum_size = Vector2(500, 700)
 layout_mode = 2
 theme = ExtResource("1_rnxuq")
+theme_override_font_sizes/normal_font_size = 40
 text = "Definition of the move searched for goes here."
 autowrap_mode = 2
-justification_flags = 161
 
 [node name="Search" type="PanelContainer" parent="CanvasLayer"]
-offset_left = 680.0
-offset_top = 810.0
-offset_right = 1820.0
-offset_bottom = 985.0
+offset_left = 679.0
+offset_top = 803.0
+offset_right = 1819.0
+offset_bottom = 999.0
+scale = Vector2(0.994802, 0.997172)
 size_flags_stretch_ratio = 0.0
 theme = ExtResource("1_rnxuq")
 
@@ -106,29 +102,35 @@ theme = ExtResource("1_rnxuq")
 layout_mode = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
+theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Search/MarginContainerText"]
 layout_mode = 2
 
-[node name="Text" type="Label" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
-custom_minimum_size = Vector2(500, 80)
+[node name="Text" type="RichTextLabel" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme = ExtResource("1_rnxuq")
 theme_type_variation = &"HeaderLarge"
+theme_override_font_sizes/normal_font_size = 40
 text = "Search:"
-vertical_alignment = 1
 autowrap_mode = 2
-justification_flags = 161
 
-[node name="SelectedMove" type="Label" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+[node name="SelectedMove" type="RichTextLabel" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+theme_override_font_sizes/normal_font_size = 40
 
 [node name="LineEdit" type="LineEdit" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+theme_override_font_sizes/font_size = 30
 
 [node name="ItemList" type="ItemList" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
 
 [connection signal="text_changed" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]

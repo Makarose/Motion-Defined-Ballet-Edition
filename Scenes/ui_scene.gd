@@ -2,7 +2,7 @@ extends Control
 
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
-@onready var selected_label = $CanvasLayer/Search/MarginContainerText/VBoxContainer/SelectedMove
+@onready var selected_label: RichTextLabel = $CanvasLayer/Search/MarginContainerText/VBoxContainer/SelectedMove
 
 var database: BalletMoveDatabase
 
@@ -28,7 +28,7 @@ func _process(delta: float) -> void:
 # Called whenever the search bqr text changes
 func _on_search_text_changed(new_text: String) -> void:
 	item_list.clear()
-	selected_label.text = "" #clear by default
+	selected_label.set_text("") #clear by default
 	
 	if new_text == "":
 		item_list.visible = false
@@ -39,8 +39,8 @@ func _on_search_text_changed(new_text: String) -> void:
 		if move_name.to_lower().begins_with(new_text.to_lower()):
 			item_list.add_item(move_name)
 			# show first match as text above search bar
-			if selected_label.text == "":
-				selected_label.text = move_name
+			if selected_label.get_text() == "":
+				selected_label.set_text(move_name)
 			
 	# Show list only if we have a match
 	item_list.visible = item_list.get_item_count() > 0
@@ -49,7 +49,7 @@ func _on_search_text_changed(new_text: String) -> void:
 func _on_item_selected(index: int) -> void:
 	var selected_move = item_list.get_item_text(index)
 	search_bar.text = selected_move
-	selected_label.text = selected_move # update label
+	selected_label.set_text(selected_move) # update label
 	item_list.visible = false	
 	
 	# Optional: do something with the selected move
