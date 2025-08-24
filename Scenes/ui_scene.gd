@@ -2,7 +2,6 @@ extends Control
 
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
-@onready var selected_label: RichTextLabel = $CanvasLayer/Search/MarginContainerText/VBoxContainer/SelectedMove
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
 
@@ -60,7 +59,6 @@ func normalize(text: String) -> String:
 # Called whenever the search bar text changes
 func _on_search_text_changed(new_text: String) -> void:
 	item_list.clear()
-	selected_label.set_text("") #clear by default
 	current_index = -1
 	
 	if new_text == "":
@@ -72,9 +70,6 @@ func _on_search_text_changed(new_text: String) -> void:
 		var move_name = balletmove.name
 		if normalize(move_name).begins_with(normalized_input):
 			item_list.add_item(move_name)
-			# show first match as text above search bar
-			if selected_label.get_text() == "":
-				selected_label.set_text(move_name)
 			
 	# Show list only if we have a match
 	item_list.visible = item_list.get_item_count() > 0
@@ -131,7 +126,6 @@ func _select_item(index: int) -> void:
 	
 	# Show selection briefly before clearing
 	search_bar.text = selected_move
-	selected_label.set_text(selected_move)
 	
 	# Hide dropdown
 	item_list.visible = false

@@ -118,12 +118,6 @@ text = "Search:"
 scroll_active = false
 autowrap_mode = 2
 
-[node name="SelectedMove" type="RichTextLabel" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_font_sizes/normal_font_size = 40
-scroll_active = false
-
 [node name="LineEdit" type="LineEdit" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
