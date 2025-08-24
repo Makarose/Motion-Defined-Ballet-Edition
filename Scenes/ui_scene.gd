@@ -7,6 +7,7 @@ extends Control
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
 
 var database: BalletMoveDatabase
+var current_index := -1 # Tracks which suggestion is highlighted.
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -18,6 +19,9 @@ func _ready() -> void:
 	# Connect signals
 	search_bar.text_changed.connect(_on_search_text_changed)
 	item_list.item_selected.connect(_on_item_selected)
+	search_bar.gui_input.connect(_on_search_bar_gui_input)
+	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
+	
 	
 	# Initially hide ItemList until typing starts
 	item_list.visible = false
@@ -50,13 +54,13 @@ func normalize(text: String) -> String:
 func _on_search_text_changed(new_text: String) -> void:
 	item_list.clear()
 	selected_label.set_text("") #clear by default
+	current_index = -1
 	
 	if new_text == "":
 		item_list.visible = false
 		return
 		
 	var normalized_input = normalize(new_text)
-	
 	for balletmove in database.moves:
 		var move_name = balletmove.name
 		if normalize(move_name).begins_with(normalized_input):
@@ -68,14 +72,61 @@ func _on_search_text_changed(new_text: String) -> void:
 	# Show list only if we have a match
 	item_list.visible = item_list.get_item_count() > 0
 	
-# Called when the user selects an item from the list
+# Called when the user clicks a suggestion.
 func _on_item_selected(index: int) -> void:
+	current_index = index
+	_select_item(index)
+	
+# Handles keyboard navigation
+func _on_search_bar_gui_input(event: InputEvent) -> void:
+	if not item_list.visible:
+		return
+			
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_DOWN:
+				# Move focus to ItemList if nothing is slected
+				if current_index < item_list.get_item_count() - 1:
+					current_index += 1
+					item_list.select(current_index)
+					item_list.ensure_current_is_visible()
+			KEY_UP:
+				if current_index > 0:
+					current_index -= 1
+					item_list.select(current_index)
+					item_list.ensure_current_is_visible()
+			KEY_ENTER, KEY_KP_ENTER:
+				if current_index >= 0 and current_index < item_list.get_item_count():
+					_select_item(current_index)
+					print("Enter pressed, selected:", item_list.get_item_text(current_index))
+					return
+					
+# Called when user presses Enter in the search bar
+func _on_search_bar_entered(new_text: String) -> void:
+	if current_index >= 0 and current_index < item_list.get_item_count():
+		_select_item(current_index)
+		print("Enter pressed, dropdown or highlighted item selected:", item_list.get_item_text(current_index))
+		return
+	
+	# Only pick exact match if nothing is highlighted
+	var normalized_input = normalize(new_text)
+	for i in range(item_list.get_item_count()):
+		if normalize(item_list.get_item_text(i)) == normalized_input:
+			_select_item(i)
+			print("Enter pressed, exact match selected:", item_list.get_item_text(i))
+			return
+			
+	print("Enter pressed, nothing selected")
+			
+	# Select suggestion and update lables.
+func _select_item(index: int) -> void:
 	var selected_move = item_list.get_item_text(index)
 	search_bar.text = selected_move
-	selected_label.set_text(selected_move) # update label
-	item_list.visible = false	
+	selected_label.set_text(selected_move)
+	item_list.visible = false
+	search_bar.grab_focus()
 	
-	# Find definition with normalized comparison. 
+# Find definition with normalized comparison. 
 	var norm_selected = normalize(selected_move)
 	
 	# find it's definition from the database
