@@ -39,6 +39,7 @@ layout_mode = 2
 theme_override_font_sizes/normal_font_size = 60
 bbcode_enabled = true
 text = "[center]Motion Defined: Ballet Edition[/center]"
+scroll_active = false
 
 [node name="Definitions" type="PanelContainer" parent="CanvasLayer"]
 offset_left = 100.0
