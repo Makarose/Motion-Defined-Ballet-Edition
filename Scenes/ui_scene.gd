@@ -8,6 +8,7 @@ extends Control
 
 var database: BalletMoveDatabase
 var current_index := -1 # Tracks which suggestion is highlighted.
+var clear_timer: Timer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -22,9 +23,15 @@ func _ready() -> void:
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
 	
-	
 	# Initially hide ItemList until typing starts
 	item_list.visible = false
+	
+# Create and configure the timer
+	clear_timer = Timer.new()
+	clear_timer.one_shot = true
+	clear_timer.wait_time = 0.8  # show selection for 0.8 seconds
+	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
+	add_child(clear_timer)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -121,10 +128,17 @@ func _on_search_bar_entered(new_text: String) -> void:
 	# Select suggestion and update lables.
 func _select_item(index: int) -> void:
 	var selected_move = item_list.get_item_text(index)
+	
+	# Show selection briefly before clearing
 	search_bar.text = selected_move
 	selected_label.set_text(selected_move)
+	
+	# Hide dropdown
 	item_list.visible = false
 	search_bar.grab_focus()
+	
+	# Start timer to clear search bar shortly after selection
+	clear_timer.start()
 	
 # Find definition with normalized comparison. 
 	var norm_selected = normalize(selected_move)
@@ -138,3 +152,11 @@ func _select_item(index: int) -> void:
 	
 	# Optional: do something with the selected move
 	print("Selected move:", selected_move)
+	
+# Timer callback to clear the search bar.
+func _clear_search_now() -> void:
+	search_bar.text = ""
+	current_index = -1
+	item_list.clear()
+	item_list.visible = false
+	
