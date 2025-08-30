@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=4 format=3 uid="uid://crbl3op3bapp6"]
 
-[ext_resource type="Script" path="res://Scenes/ui_scene.gd" id="1_q043w"]
+[ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
+bg_color = Color(0.642257, 0.730302, 0.777878, 1)
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -14,6 +17,14 @@ script = ExtResource("1_q043w")
 metadata/_edit_vertical_guides_ = [1817.0, 538.0]
 metadata/_edit_horizontal_guides_ = [996.0]
 
+[node name="BackgroundColourPanel" type="Panel" parent="."]
+z_index = -100
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_o433g")
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="MainTitle" type="PanelContainer" parent="CanvasLayer"]
@@ -25,6 +36,7 @@ offset_top = 48.0
 offset_right = -100.0
 offset_bottom = 128.0
 grow_horizontal = 0
+scale = Vector2(0.998309, 1.00343)
 theme = ExtResource("1_rnxuq")
 
 [node name="MarginContainerTitle" type="MarginContainer" parent="CanvasLayer/MainTitle"]
@@ -36,7 +48,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="Title" type="RichTextLabel" parent="CanvasLayer/MainTitle/MarginContainerTitle"]
 layout_mode = 2
-theme_override_font_sizes/normal_font_size = 60
+theme_override_font_sizes/normal_font_size = 55
 bbcode_enabled = true
 text = "[center]Motion Defined: Ballet Edition[/center]"
 scroll_active = false
@@ -92,10 +104,10 @@ autowrap_mode = 2
 
 [node name="Search" type="PanelContainer" parent="CanvasLayer"]
 offset_left = 679.0
-offset_top = 803.0
+offset_top = 804.0
 offset_right = 1819.0
-offset_bottom = 999.0
-scale = Vector2(0.994802, 0.997172)
+offset_bottom = 1000.0
+scale = Vector2(0.998329, 0.995842)
 size_flags_stretch_ratio = 0.0
 theme = ExtResource("1_rnxuq")
 

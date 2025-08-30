@@ -1,16 +1,16 @@
 [gd_scene load_steps=6 format=3 uid="uid://dyr2srv21e1ql"]
 
-[ext_resource type="Script" path="res://Scenes/main_scene.gd" id="1_e5dl6"]
+[ext_resource type="Script" path="res://Scripts/main_scene.gd" id="1_e5dl6"]
 [ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/ui_scene.tscn" id="1_fnjpc"]
-[ext_resource type="PackedScene" uid="uid://cln35bqs21un4" path="res://Scenes/dancer_scene.tscn" id="2_2ww8a"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_j3esb"]
+[ext_resource type="PackedScene" uid="uid://clkq4ntdm6gvw" path="res://Scenes/dancer_animations_female.tscn" id="4_jvtmd"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_23plj"]
 viewport_path = NodePath("DancerViewport")
 
 [node name="MainScene" type="Node2D"]
 script = ExtResource("1_e5dl6")
-metadata/_edit_vertical_guides_ = [683.0, 1817.0]
+metadata/_edit_vertical_guides_ = [683.0, 1816.0]
 metadata/_edit_horizontal_guides_ = [181.0]
 
 [node name="UI" parent="." instance=ExtResource("1_fnjpc")]
@@ -21,11 +21,11 @@ layout_mode = 0
 offset_left = 680.0
 offset_top = 178.0
 offset_right = 1816.0
-offset_bottom = 809.0
+offset_bottom = 753.0
 theme = ExtResource("2_j3esb")
 
 [node name="TextureRect" type="TextureRect" parent="UI/PanelContainer"]
-custom_minimum_size = Vector2(1130, 625)
+custom_minimum_size = Vector2(1130, 575)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -35,7 +35,7 @@ stretch_mode = 5
 
 [node name="DancerViewport" type="SubViewport" parent="."]
 transparent_bg = true
-size = Vector2i(1130, 625)
+size = Vector2i(1130, 575)
 render_target_update_mode = 4
 
-[node name="DancerScene" parent="DancerViewport" instance=ExtResource("2_2ww8a")]
+[node name="dancer_animations_female" parent="DancerViewport" instance=ExtResource("4_jvtmd")]

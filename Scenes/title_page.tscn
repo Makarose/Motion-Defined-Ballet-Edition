@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccwvu0vry3nfd"]
+
+[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_k3hol"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0d775"]
+bg_color = Color(0.643137, 0.729412, 0.776471, 1)
+
+[node name="TitlePage" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="Panel" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme = ExtResource("1_k3hol")
+theme_override_styles/panel = SubResource("StyleBoxFlat_0d775")
