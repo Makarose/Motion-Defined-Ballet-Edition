@@ -6,3 +6,4 @@
 script = ExtResource("1_ka5t2")
 name = "Pirouette"
 definition = "A full rotation of the body."
+animation_name = "Female Armature|pirouette"

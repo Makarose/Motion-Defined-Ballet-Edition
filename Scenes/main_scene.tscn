@@ -8,8 +8,9 @@
 [sub_resource type="ViewportTexture" id="ViewportTexture_23plj"]
 viewport_path = NodePath("DancerViewport")
 
-[node name="MainScene" type="Node2D"]
+[node name="MainScene" type="Node2D" node_paths=PackedStringArray("character_instance")]
 script = ExtResource("1_e5dl6")
+character_instance = NodePath("DancerViewport/dancer_animations_female")
 metadata/_edit_vertical_guides_ = [683.0, 1816.0]
 metadata/_edit_horizontal_guides_ = [181.0]
 

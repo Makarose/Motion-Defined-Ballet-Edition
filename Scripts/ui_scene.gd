@@ -4,15 +4,19 @@ extends Control
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
+@onready var dancer_viewport: SubViewport = $"../DancerViewport"
 
-var database: BalletMoveDatabase
+@export var database: BalletMoveDatabase
+
+
 var current_index := -1 # Tracks which suggestion is highlighted.
 var clear_timer: Timer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Load the database
-	database = load("res://Definition Resources/ballet_moves_database.tres")
+	if not database:
+		database = load("res://Definition Resources/ballet_moves_database.tres")
 	print("Database loaded:", database)
 	print("Moves:", database.moves)
 	
@@ -32,7 +36,9 @@ func _ready() -> void:
 	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
 
-
+func _on_animation_started(anim_name: String) -> void:
+	print("Animation started:", anim_name)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
@@ -120,12 +126,13 @@ func _on_search_bar_entered(new_text: String) -> void:
 			
 	print("Enter pressed, nothing selected")
 			
-	# Select suggestion and update lables.
+	# Select item and update UI
 func _select_item(index: int) -> void:
-	var selected_move = item_list.get_item_text(index)
+	
+	var selected_move_name = item_list.get_item_text(index)
 	
 	# Show selection briefly before clearing
-	search_bar.text = selected_move
+	search_bar.text = selected_move_name
 	
 	# Hide dropdown
 	item_list.visible = false
@@ -134,18 +141,37 @@ func _select_item(index: int) -> void:
 	# Start timer to clear search bar shortly after selection
 	clear_timer.start()
 	
-# Find definition with normalized comparison. 
-	var norm_selected = normalize(selected_move)
+#Normalize the selected name for comparision
+	var norm_selected = normalize(selected_move_name)
 	
-	# find it's definition from the database
+# Find resource with normalized comparison. 
+	var move_resource: BalletMove = null
+	
+	# find it's resource from the database
 	for balletmove in database.moves:
 		if normalize(balletmove.name) == norm_selected:
-			definition_label.set_text(balletmove.definition)
-			title_label.set_text(balletmove.name) #keep accents for display text.
+			move_resource = balletmove
 			break
+			
+	if move_resource == null:
+		print("Resources not found for move:", selected_move_name)
+		return
+		
+	# Update UI with the resources definition and name (keeps accents)
+	definition_label.set_text(move_resource.definition)
+	title_label.set_text(move_resource.name)
 	
-	# Optional: do something with the selected move
-	print("Selected move:", selected_move)
+	# Play animation in SubViewport
+	if dancer_viewport.get_child_count() > 0:
+		var dancer_node = dancer_viewport.get_child(0)
+		if dancer_node.has_method("play_move"):
+			dancer_node.play_move(move_resource.name)
+			print("Requested animation:", move_resource.animation_name)
+		else:
+			print("SubViewport child does not have 'play_move' method!")
+	else:
+		print("Subviewport is empty; cannot play animation")
+	
 	
 # Timer callback to clear the search bar.
 func _clear_search_now() -> void:
@@ -154,3 +180,9 @@ func _clear_search_now() -> void:
 	item_list.clear()
 	item_list.visible = false
 	
+func _on_back_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+
+
+func _on_glossary_menu_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/index.tscn")

@@ -1,0 +1,106 @@
+[gd_scene load_steps=8 format=3 uid="uid://cllriydv8ru44"]
+
+[ext_resource type="Script" path="res://Scripts/index.gd" id="1_37t3u"]
+[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_vndco"]
+[ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="2_l3b18"]
+[ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_eq036"]
+[ext_resource type="Texture2D" uid="uid://c70g6jkijl6yl" path="res://UI Buttons/18.png" id="4_j1bci"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_35u1d"]
+bg_color = Color(0.643137, 0.729412, 0.776471, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3jq6v"]
+font = ExtResource("3_eq036")
+font_size = 40
+font_color = Color(0, 0, 0, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Index" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_37t3u")
+
+[node name="PanelContainer" type="Panel" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme = ExtResource("1_vndco")
+theme_override_styles/panel = SubResource("StyleBoxFlat_35u1d")
+
+[node name="MainTitle" type="PanelContainer" parent="PanelContainer"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1820.0
+offset_top = 48.0
+offset_right = -100.0
+offset_bottom = 128.0
+grow_horizontal = 0
+scale = Vector2(0.998309, 2.28343)
+theme = ExtResource("1_vndco")
+
+[node name="Title" type="RichTextLabel" parent="PanelContainer/MainTitle"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 70
+bbcode_enabled = true
+text = "[center]Index[/center]"
+scroll_active = false
+
+[node name="Container" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(75, 75)
+offset_top = 898.0
+offset_right = 198.0
+offset_bottom = 1088.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/margin_left = 35
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 35
+theme_override_constants/margin_bottom = 0
+
+[node name="BackButton" type="Button" parent="Container"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+icon = ExtResource("2_l3b18")
+flat = true
+
+[node name="Label" type="Label" parent="Container"]
+layout_mode = 2
+text = "BACK"
+label_settings = SubResource("LabelSettings_3jq6v")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Container2" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+offset_left = 1435.0
+offset_top = 759.0
+offset_right = 1633.0
+offset_bottom = 949.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/margin_left = 35
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 35
+theme_override_constants/margin_bottom = 0
+
+[node name="HomeButton" type="Button" parent="Container2"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+icon = ExtResource("4_j1bci")
+flat = true
+
+[node name="Label" type="Label" parent="Container2"]
+layout_mode = 2
+text = "HOME"
+label_settings = SubResource("LabelSettings_3jq6v")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[connection signal="pressed" from="Container/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Container2/HomeButton" to="." method="_on_home_button_pressed"]
