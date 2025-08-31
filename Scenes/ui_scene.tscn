@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=8 format=3 uid="uid://crbl3op3bapp6"]
 
 [ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
@@ -10,13 +10,6 @@
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_djaeu"]
-font = ExtResource("4_i7ljw")
-font_size = 40
-font_color = Color(0, 0, 0, 1)
-outline_size = 3
-outline_color = Color(0, 0, 0, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_11gy0"]
 font = ExtResource("4_i7ljw")
 font_size = 40
 font_color = Color(0, 0, 0, 1)
@@ -171,7 +164,11 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 35
 theme_override_constants/margin_bottom = 0
 
-[node name="BackButton" type="Button" parent="Container"]
+[node name="MarginContainer" type="MarginContainer" parent="Container"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 50
+
+[node name="BackButton" type="Button" parent="Container/MarginContainer"]
 layout_mode = 2
 icon = ExtResource("3_sgoow")
 flat = true
@@ -188,14 +185,21 @@ vertical_alignment = 2
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 0
 offset_left = 1819.0
-offset_top = 914.0
+offset_top = 901.0
 offset_right = 2017.0
-offset_bottom = 1044.0
+offset_bottom = 1091.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/margin_left = 35
+theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 35
+theme_override_constants/margin_bottom = 0
 
-[node name="GlossaryMenu" type="Button" parent="Container2"]
+[node name="Container" type="MarginContainer" parent="Container2"]
+layout_mode = 2
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 50
+
+[node name="IndexButton" type="Button" parent="Container2/Container"]
 layout_mode = 2
 icon = ExtResource("5_0cy04")
 flat = true
@@ -203,12 +207,13 @@ flat = true
 [node name="Label" type="Label" parent="Container2"]
 layout_mode = 2
 size_flags_vertical = 8
-text = "INDEX"
-label_settings = SubResource("LabelSettings_11gy0")
+text = "INDEX
+"
+label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 2
 
 [connection signal="text_changed" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
-[connection signal="pressed" from="Container/BackButton" to="." method="_on_back_button_pressed"]
-[connection signal="pressed" from="Container2/GlossaryMenu" to="." method="_on_glossary_menu_pressed"]
+[connection signal="pressed" from="Container/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Container2/Container/IndexButton" to="." method="_on_index_button_pressed"]

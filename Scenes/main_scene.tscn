@@ -9,6 +9,7 @@
 viewport_path = NodePath("DancerViewport")
 
 [node name="MainScene" type="Node2D" node_paths=PackedStringArray("character_instance")]
+position = Vector2(-2, 0)
 script = ExtResource("1_e5dl6")
 character_instance = NodePath("DancerViewport/dancer_animations_female")
 metadata/_edit_vertical_guides_ = [683.0, 1816.0]

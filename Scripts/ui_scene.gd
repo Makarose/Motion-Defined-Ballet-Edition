@@ -183,6 +183,5 @@ func _clear_search_now() -> void:
 func _on_back_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
 
-
-func _on_glossary_menu_pressed() -> void:
+func _on_index_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/index.tscn")
