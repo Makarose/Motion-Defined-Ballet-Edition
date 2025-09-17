@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://sr6vduhr1ncj"
-path="res://.godot/imported/dancer_animations_female.fbx-a3abdcf576a2fa84e89d8921f3e00fb8.scn"
+uid="uid://du1htf5ao34cs"
+path="res://.godot/imported/male.glb-d1f47ab5ca1b9d2931c77a809ad940f3.scn"
 
 [deps]
 
-source_file="res://Models/Female/dancer_animations_female.fbx"
-dest_files=["res://.godot/imported/dancer_animations_female.fbx-a3abdcf576a2fa84e89d8921f3e00fb8.scn"]
+source_file="res://Characters/male.glb"
+dest_files=["res://.godot/imported/male.glb-d1f47ab5ca1b9d2931c77a809ad940f3.scn"]
 
 [params]
 
@@ -27,11 +27,10 @@ meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
-animation/trimming=true
+animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
 _subresources={}
-fbx/importer=0
-fbx/allow_geometry_helper_nodes=false
-fbx/embedded_image_handling=1
+gltf/naming_version=1
+gltf/embedded_image_handling=1

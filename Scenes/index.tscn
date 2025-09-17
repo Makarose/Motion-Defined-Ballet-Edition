@@ -27,6 +27,7 @@ script = ExtResource("1_37t3u")
 
 [node name="PanelContainer" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 theme = ExtResource("1_vndco")
@@ -54,6 +55,7 @@ scroll_active = false
 
 [node name="Container" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(75, 75)
+layout_mode = 0
 offset_top = 898.0
 offset_right = 198.0
 offset_bottom = 1088.0

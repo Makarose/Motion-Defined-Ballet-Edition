@@ -6,4 +6,4 @@
 script = ExtResource("1_w24xy")
 name = "Plié"
 definition = "Bending of the knees."
-animation_name = "Female Armature|Plie"
+animation_name = "Plie"

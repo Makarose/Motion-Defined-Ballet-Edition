@@ -1,17 +1,14 @@
-[gd_scene load_steps=6 format=3 uid="uid://dyr2srv21e1ql"]
+[gd_scene load_steps=5 format=3 uid="uid://dyr2srv21e1ql"]
 
-[ext_resource type="Script" path="res://Scripts/main_scene.gd" id="1_e5dl6"]
 [ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/ui_scene.tscn" id="1_fnjpc"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_j3esb"]
-[ext_resource type="PackedScene" uid="uid://clkq4ntdm6gvw" path="res://Scenes/dancer_animations_female.tscn" id="4_jvtmd"]
+[ext_resource type="PackedScene" uid="uid://cyulgq3llf680" path="res://Scenes/skeleton.tscn" id="5_2n77f"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_23plj"]
 viewport_path = NodePath("DancerViewport")
 
-[node name="MainScene" type="Node2D" node_paths=PackedStringArray("character_instance")]
+[node name="MainScene" type="Node2D"]
 position = Vector2(-2, 0)
-script = ExtResource("1_e5dl6")
-character_instance = NodePath("DancerViewport/dancer_animations_female")
 metadata/_edit_vertical_guides_ = [683.0, 1816.0]
 metadata/_edit_horizontal_guides_ = [181.0]
 
@@ -40,4 +37,4 @@ transparent_bg = true
 size = Vector2i(1130, 575)
 render_target_update_mode = 4
 
-[node name="dancer_animations_female" parent="DancerViewport" instance=ExtResource("4_jvtmd")]
+[node name="skeleton" parent="DancerViewport" instance=ExtResource("5_2n77f")]

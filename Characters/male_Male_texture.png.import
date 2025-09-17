@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cahmlp8ldgomo"
-path.s3tc="res://.godot/imported/dancer_animations_female_0.png-b06d9d0e549a3ba6ef215f733c7931bd.s3tc.ctex"
+uid="uid://ciyyb42ddrj26"
+path.s3tc="res://.godot/imported/male_Male_texture.png-387a45cb5cde023ae0a25cee7bddf0f4.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "6b9eb8c9aad398251b1e589066ee8c59"
+"md5": "ceb06d0d5114b0e67032380e0a694169"
 }
 
 [deps]
 
-source_file="res://Models/Female/dancer_animations_female_0.png"
-dest_files=["res://.godot/imported/dancer_animations_female_0.png-b06d9d0e549a3ba6ef215f733c7931bd.s3tc.ctex"]
+source_file="res://Characters/male_Male_texture.png"
+dest_files=["res://.godot/imported/male_Male_texture.png-387a45cb5cde023ae0a25cee7bddf0f4.s3tc.ctex"]
 
 [params]
 

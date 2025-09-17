@@ -1,6 +1,4 @@
-[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bwkglkrll8mi0"]
-
-[ext_resource type="FontFile" uid="uid://dad288bvgy4nc" path="res://Fonts/XTypewriter-Regular.ttf" id="1_k8ogx"]
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://bwkglkrll8mi0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2sd4j"]
 bg_color = Color(0.4544, 0.62054, 0.71, 0.85098)
@@ -18,5 +16,5 @@ corner_radius_bottom_left = 5
 HeaderLarge/font_sizes/font_size = 40
 Label/colors/font_color = Color(0, 0, 0, 1)
 Label/font_sizes/font_size = 30
-Label/fonts/font = ExtResource("1_k8ogx")
+Label/fonts/font = null
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_2sd4j")
