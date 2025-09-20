@@ -6,4 +6,4 @@
 script = ExtResource("1_ifvdx")
 name = "Saute"
 definition = "A jump taking off from two feet and landing on two feet."
-animation_name = "Saute"
+animation_name = "saute"

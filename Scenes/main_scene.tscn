@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/ui_scene.tscn" id="1_fnjpc"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_j3esb"]
-[ext_resource type="PackedScene" uid="uid://cyulgq3llf680" path="res://Scenes/skeleton.tscn" id="5_2n77f"]
+[ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_h6s4l"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_23plj"]
 viewport_path = NodePath("DancerViewport")
@@ -37,4 +37,6 @@ transparent_bg = true
 size = Vector2i(1130, 575)
 render_target_update_mode = 4
 
-[node name="skeleton" parent="DancerViewport" instance=ExtResource("5_2n77f")]
+[node name="Background" parent="DancerViewport" instance=ExtResource("3_h6s4l")]
+
+[node name="CharacterSlot" type="Node3D" parent="DancerViewport"]

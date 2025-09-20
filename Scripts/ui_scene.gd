@@ -61,57 +61,21 @@ func _on_character_button_pressed(character_scene_path: String) -> void:
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Instance skeleton scene (master skeleton with animations)
-	var skeleton_scene_instance: PackedScene = load("res://Scenes/skeleton.tscn")
-	current_dancer = skeleton_scene_instance.instantiate()
+	# Load and instance the new character scene
+	var char_scene: PackedScene = load(character_scene_path)
+	if not char_scene:
+		push_error("Character scene not found!: "+ character_scene_path)
+		return
+	
+	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
-	print("Current dancer created:", current_dancer)
-
-	# Find Skeleton3D node in the master scene
-	var skeleton_node: Skeleton3D = current_dancer.get_node_or_null("Skeleton3D")
-	if not skeleton_node:
-		push_warning("Skeleton3D not found in skeleton scene!")
-		return
-
-	# Instance character mesh scene (male, female, clothes, etc.)
-	var mesh_scene: PackedScene = load(character_scene_path)
-	var mesh_root = mesh_scene.instantiate()
-	dancer_viewport.add_child(mesh_root)
-
-	# Find the MeshInstance3D recursively
-	var mesh_instance: MeshInstance3D = _find_mesh_instance(mesh_root)
-	if not mesh_instance:
-		push_warning("MeshInstance3D not found in mesh scene!")
-		mesh_root.queue_free()
-		return
-
-	# Reset mesh transform
-	mesh_instance.transform = Transform3D()
-
-	# Bind the Skin resource to the master skeleton
-	if mesh_instance.skin:
-		mesh_instance.skin.skeleton = skeleton_node
-		print("Mesh skin bound to skeleton:", mesh_instance)
-	else:
-		push_warning("Mesh has no Skin assigned: " + str(mesh_instance))
-
-	# Debug: print AnimationPlayer animations
-	var anim_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
-	if anim_player:
-		print("Animations available:", anim_player.get_animation_list())
-	else:
-		push_warning("AnimationPlayer not found in skeleton scene!")
-
-
-# Helper function to recursively find the first MeshInstance3D under a node
-func _find_mesh_instance(node: Node) -> MeshInstance3D:
-	if node is MeshInstance3D:
-		return node
-	for child in node.get_children():
-		var result = _find_mesh_instance(child)
-		if result:
-			return result
-	return null
+	
+	print ("Current dancer loaded:", current_dancer.name)
+	
+	#Debug animation list if the character has an AnimationPlayer
+	var animation_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
+	if animation_player:
+		print("Animations available:", animation_player.get_animation_list())
 
 
 # -----------------------------
@@ -131,26 +95,11 @@ func _select_item(index: int) -> void:
 	var selected_move_name = item_list.get_item_text(index)
 	print("Selecting move:", selected_move_name)
 	
-	if current_dancer:
-		print("Current dancer exists:", current_dancer)
-		print("Has method 'play_move':", current_dancer.has_method("play_move"))
-	else:
-		print("No dancer loaded")
-	# Show selection briefly before clearing
-	search_bar.text = selected_move_name
-	
-	# Hide dropdown
-	item_list.visible = false
-	search_bar.grab_focus()
-	
-	# Start timer to clear search bar shortly after selection
-	clear_timer.start()
+	#Find corresponding resource in database
+	var move_resource: BalletMove = null
 	
 # Normalize the selected name for comparision
 	var norm_selected = normalize(selected_move_name)
-	
-# Find resource with normalized comparison. 
-	var move_resource: BalletMove = null
 	
 	# find it's resource from the database
 	for balletmove in database.moves:
@@ -166,10 +115,24 @@ func _select_item(index: int) -> void:
 	definition_label.set_text(move_resource.definition)
 	title_label.set_text(move_resource.name)
 	
+	
+	# Show selection briefly before clearing
+	search_bar.text = selected_move_name
+	
+	# Hide dropdown
+	item_list.visible = false
+	search_bar.grab_focus()
+	
+	# Start timer to clear search bar shortly after selection
+	clear_timer.start()
+	
 	# Play animation on current dancer
 	if current_dancer and current_dancer.has_method("play_move"):
-		current_dancer.play_move(move_resource.name)
-		print("Requested animation:", move_resource.animation_name)
+		if move_resource.animation_name != "":
+			current_dancer.play_move(move_resource.animation_name)
+			print("Requested animation:", move_resource.animation_name)
+		else:
+			print("Warning: move_resource has no animation_name set")
 	else:
 		print("No dancer loaded or 'play_move' missing")
 
