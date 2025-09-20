@@ -24,17 +24,7 @@ func _ready() -> void:
 	# Load the database
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
-	print("Database loaded:", database)
-	print("Moves:", database.moves)
-
-	# Load chosen character automatically
-	if GameManager.chosen_character != "":
-		print("Spawning dancer:", GameManager.chosen_character)
-		_on_character_button_pressed(GameManager.chosen_character)
-		GameManager.chosen_character = ""  # reset so it doesn’t double-spawn
-	else:
-		print("No character chosen yet")
-
+	
 	# Connect signals
 	search_bar.text_changed.connect(_on_search_text_changed)
 	item_list.item_selected.connect(_on_item_selected)
@@ -50,12 +40,27 @@ func _ready() -> void:
 	clear_timer.wait_time = 0.8  # show selection for 0.8 seconds
 	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
+	
+	# Spawn previous character if one selected
+	if GameManager.chosen_character != "":
+		_on_character_button_pressed(GameManager.chosen_character)
+	else:
+		print("No character chosen yet")
+		
+	# If a term was selected from index, pre-seleect it
+	if GameManager.selected_term != "":
+		print("Previously selected term:", GameManager.selected_term)
+		_select_term(GameManager.selected_term)
+		GameManager.selected_term = "" # reset so it doesn't repeat next time
 
 
 #----------------------------------------
 # Character Selection (from buttons)
 # ---------------------------------------
 func _on_character_button_pressed(character_scene_path: String) -> void:
+	# Save for later so character can be reloaded
+	GameManager.chosen_character = character_scene_path
+	
 	# Remove previous dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
@@ -89,8 +94,32 @@ func _on_female_button_pressed() -> void:
 
 
 # _____________________________________
-# Animation Selection
+# Term Selection
 # _____________________________________
+func _select_term(term_name: String) -> void:
+	# Find the move in the database
+	var move_resource: BalletMove = null
+	for i in range(database.moves.size()):
+		if database.moves[i].name == term_name:
+			move_resource = database.moves[i]
+			break
+			
+	if move_resource == null:
+		print("Term not found in database:", term_name)
+		return
+		
+	# Update UI
+	definition_label.set_text(move_resource.definition)
+	title_label.set_text(move_resource.name)
+	search_bar.text = move_resource.name
+	item_list.visible = false
+
+	# Play animation if available
+	if current_dancer and current_dancer.has_method("play_move"):
+		if move_resource.animation_name != "":
+			current_dancer.play_move(move_resource.animation_name)
+			print("Requested animation:", move_resource.animation_name)
+
 func _select_item(index: int) -> void:
 	var selected_move_name = item_list.get_item_text(index)
 	print("Selecting move:", selected_move_name)
@@ -129,6 +158,7 @@ func _select_item(index: int) -> void:
 	# Play animation on current dancer
 	if current_dancer and current_dancer.has_method("play_move"):
 		if move_resource.animation_name != "":
+			print("About to play animation:", move_resource.animation_name)
 			current_dancer.play_move(move_resource.animation_name)
 			print("Requested animation:", move_resource.animation_name)
 		else:

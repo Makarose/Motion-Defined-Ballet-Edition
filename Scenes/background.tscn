@@ -1,4 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0opmlqorul1c"]
+[gd_scene load_steps=10 format=3 uid="uid://c0opmlqorul1c"]
+
+[ext_resource type="PackedScene" uid="uid://du1htf5ao34cs" path="res://Characters/male.glb" id="2_iuybu"]
+[ext_resource type="PackedScene" uid="uid://cd4snkot1sjo4" path="res://Scenes/female.tscn" id="2_q05r1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mfq5q"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -20,7 +23,7 @@ albedo_color = Color(0.16, 0.16, 0.16, 1)
 material = SubResource("StandardMaterial3D_80m8t")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jk6gj"]
-albedo_color = Color(0, 0, 0, 1)
+albedo_color = Color(0.352, 0.388667, 0.44, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_q4hd6"]
 material = SubResource("StandardMaterial3D_jk6gj")
@@ -45,3 +48,9 @@ skeleton = NodePath("../..")
 transform = Transform3D(8.69305, 0, 0, 0, -4.37114e-08, -2.5, 0, 1, -1.09278e-07, 0, 2, -2.28073)
 mesh = SubResource("PlaneMesh_q4hd6")
 skeleton = NodePath("../..")
+
+[node name="male" parent="." instance=ExtResource("2_iuybu")]
+visible = false
+
+[node name="female" parent="." instance=ExtResource("2_q05r1")]
+visible = false

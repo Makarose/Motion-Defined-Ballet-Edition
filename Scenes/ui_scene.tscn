@@ -61,7 +61,7 @@ script = ExtResource("1_q043w")
 database = ExtResource("2_k7bws")
 skeleton_scene = SubResource("PackedScene_ja6at")
 metadata/_edit_vertical_guides_ = [1817.0, 538.0]
-metadata/_edit_horizontal_guides_ = [996.0]
+metadata/_edit_horizontal_guides_ = [995.0]
 
 [node name="BackgroundColourPanel" type="Panel" parent="."]
 z_index = -100
@@ -191,9 +191,9 @@ theme_override_font_sizes/font_size = 20
 [node name="Container" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 0
-offset_top = 898.0
+offset_top = 900.0
 offset_right = 198.0
-offset_bottom = 1088.0
+offset_bottom = 1090.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/margin_left = 35
 theme_override_constants/margin_top = 0
@@ -221,9 +221,9 @@ vertical_alignment = 2
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 0
 offset_left = 1819.0
-offset_top = 901.0
+offset_top = 900.0
 offset_right = 2017.0
-offset_bottom = 1091.0
+offset_bottom = 1090.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/margin_left = 35
 theme_override_constants/margin_top = 0
