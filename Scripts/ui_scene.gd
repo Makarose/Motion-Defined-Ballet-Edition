@@ -15,6 +15,7 @@ extends Control
 var current_index := -1 # Tracks which suggestion is highlighted.
 var clear_timer: Timer
 var current_dancer: Node = null
+var pending_animation: String = ""
 
 
 #----------------------------------
@@ -47,11 +48,12 @@ func _ready() -> void:
 	else:
 		print("No character chosen yet")
 		
-	# If a term was selected from index, pre-seleect it
+	# Queue term from index if exists
 	if GameManager.selected_term != "":
-		print("Previously selected term:", GameManager.selected_term)
+		print("Queued term from index:", GameManager.selected_term)
 		_select_term(GameManager.selected_term)
-		GameManager.selected_term = "" # reset so it doesn't repeat next time
+		GameManager.selected_term = ""
+
 
 
 #----------------------------------------
@@ -74,14 +76,19 @@ func _on_character_button_pressed(character_scene_path: String) -> void:
 	
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
-	
 	print ("Current dancer loaded:", current_dancer.name)
 	
-	#Debug animation list if the character has an AnimationPlayer
+	# Debug animation list if the character has an AnimationPlayer
 	var animation_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
 	if animation_player:
 		print("Animations available:", animation_player.get_animation_list())
 
+	 # Play any pending animation queued from index or previous selection
+	if pending_animation != "":
+		print("▶ Queued animation detected:", pending_animation)
+		# Ensure it runs after the node is fully added to the scene tree
+		current_dancer.call_deferred("play_move", pending_animation)
+		pending_animation = ""
 
 # -----------------------------
 # Connect buttons
@@ -97,28 +104,36 @@ func _on_female_button_pressed() -> void:
 # Term Selection
 # _____________________________________
 func _select_term(term_name: String) -> void:
-	# Find the move in the database
+	# Normalize the incoming term
+	var norm_term_name = normalize(term_name)
+	
+	# Find the move in the database using normalized comparison
 	var move_resource: BalletMove = null
-	for i in range(database.moves.size()):
-		if database.moves[i].name == term_name:
-			move_resource = database.moves[i]
+	for move in database.moves:
+		if normalize(move.name) == norm_term_name:
+			move_resource = move
 			break
 			
 	if move_resource == null:
 		print("Term not found in database:", term_name)
 		return
-		
+
 	# Update UI
 	definition_label.set_text(move_resource.definition)
 	title_label.set_text(move_resource.name)
 	search_bar.text = move_resource.name
 	item_list.visible = false
 
-	# Play animation if available
+	# Determine animation to play
+	var animation_name = move_resource.animation_name.strip_edges()
+	print("Requested animation:", animation_name)
+	
 	if current_dancer and current_dancer.has_method("play_move"):
-		if move_resource.animation_name != "":
-			current_dancer.play_move(move_resource.animation_name)
-			print("Requested animation:", move_resource.animation_name)
+		current_dancer.call_deferred("play_move", move_resource.animation_name.strip_edges())
+	else:
+		print("!!! No dancer yet, queuing animation:", animation_name)
+		pending_animation = animation_name
+
 
 func _select_item(index: int) -> void:
 	var selected_move_name = item_list.get_item_text(index)

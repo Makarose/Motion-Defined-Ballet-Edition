@@ -4,6 +4,7 @@ extends Node
 
 var chosen_character : String = "" # Last selected character
 var selected_term: String = "" # Last selecetd term
+var pending_animation: String = "" # Animation to play when back in main scene
 
 func get_terms() -> Array:
 	var term_list: Array = []
