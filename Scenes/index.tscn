@@ -119,16 +119,22 @@ custom_minimum_size = Vector2(1720, 600)
 layout_mode = 0
 offset_left = 105.0
 offset_top = 268.0
-offset_right = 169.0
-offset_bottom = 308.0
+offset_right = 1825.0
+offset_bottom = 922.0
+theme = ExtResource("1_vndco")
+theme_override_constants/separation = 0
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
+theme = ExtResource("1_vndco")
+theme_override_font_sizes/font_size = 20
 
 [node name="ItemList" type="ItemList" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 600)
+custom_minimum_size = Vector2(0, 550)
 layout_mode = 2
+theme = ExtResource("1_vndco")
+theme_override_font_sizes/font_size = 40
 
 [connection signal="pressed" from="Back/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="Home/MarginContainer/HomeButton" to="." method="_on_home_button_pressed"]

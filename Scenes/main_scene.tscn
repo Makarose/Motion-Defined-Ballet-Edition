@@ -1,11 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dyr2srv21e1ql"]
+[gd_scene load_steps=3 format=3 uid="uid://dyr2srv21e1ql"]
 
 [ext_resource type="PackedScene" uid="uid://crbl3op3bapp6" path="res://Scenes/ui_scene.tscn" id="1_fnjpc"]
-[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_j3esb"]
 [ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_h6s4l"]
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_23plj"]
-viewport_path = NodePath("DancerViewport")
 
 [node name="MainScene" type="Node2D"]
 position = Vector2(-2, 0)
@@ -14,29 +10,24 @@ metadata/_edit_horizontal_guides_ = [181.0]
 
 [node name="UI" parent="." instance=ExtResource("1_fnjpc")]
 
-[node name="PanelContainer" type="PanelContainer" parent="UI"]
-show_behind_parent = true
-layout_mode = 0
-offset_left = 680.0
-offset_top = 178.0
-offset_right = 1816.0
-offset_bottom = 753.0
-theme = ExtResource("2_j3esb")
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+custom_minimum_size = Vector2(512, 512)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 690.0
+offset_top = 177.0
+offset_right = 1815.0
+offset_bottom = 689.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="UI/PanelContainer"]
-custom_minimum_size = Vector2(1130, 575)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme = ExtResource("2_j3esb")
-texture = SubResource("ViewportTexture_23plj")
-stretch_mode = 5
-
-[node name="DancerViewport" type="SubViewport" parent="."]
+[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
 transparent_bg = true
-size = Vector2i(1130, 575)
+handle_input_locally = false
+size = Vector2i(1125, 512)
 render_target_update_mode = 4
 
-[node name="Background" parent="DancerViewport" instance=ExtResource("3_h6s4l")]
+[node name="Background" parent="SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
 
-[node name="CharacterSlot" type="Node3D" parent="DancerViewport"]
+[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport"]

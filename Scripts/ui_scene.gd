@@ -4,8 +4,8 @@ extends Control
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-@onready var dancer_viewport: SubViewport = $"../DancerViewport"
-
+@onready var dancer_viewport: SubViewport = $"../SubViewportContainer/DancerViewport"
+@onready var sub_viewport_container: SubViewportContainer = $"../SubViewportContainer"
 
 #----------------------------------
 # Resources
@@ -16,7 +16,9 @@ var current_index := -1 # Tracks which suggestion is highlighted.
 var clear_timer: Timer
 var current_dancer: Node = null
 var pending_animation: String = ""
-
+var normal_size: Vector2
+var normal_pos: Vector2
+var is_fullscreen := false
 
 #----------------------------------
 # Setup
@@ -35,7 +37,7 @@ func _ready() -> void:
 	# Initially hide ItemList until typing starts
 	item_list.visible = false
 
-# Create and configure the timer
+	# Create and configure the timer
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8  # show selection for 0.8 seconds
@@ -54,6 +56,23 @@ func _ready() -> void:
 		_select_term(GameManager.selected_term)
 		GameManager.selected_term = ""
 
+	# Store initial size and position of viewport
+	normal_size = sub_viewport_container.size
+	normal_pos = sub_viewport_container.position
+	
+	 # Save initial panel size/position
+	normal_size = sub_viewport_container.size
+	normal_pos = sub_viewport_container.position
+
+	# Ensure viewport matches container initially
+	_update_viewport_size()
+
+	# Auto-update viewport when container is resized
+	sub_viewport_container.resized.connect(Callable(self, "_update_viewport_size"))
+	
+func _update_viewport_size() -> void:
+	dancer_viewport.size = sub_viewport_container.size
+	dancer_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
 
 #----------------------------------------
@@ -278,6 +297,43 @@ func strip_accents(text: String) -> String:
 # Helps to normalize user inputted text.
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
+
+
+# -----------------------------------------
+# Fullscreen / Viewport Resizing
+# -----------------------------------------
+func go_fullscreen():
+	normal_size = sub_viewport_container.size
+	normal_pos = sub_viewport_container.position
+	sub_viewport_container.position = Vector2.ZERO
+	sub_viewport_container.size = get_viewport().get_visible_rect().size
+	is_fullscreen = true
+
+func exit_fullscreen():
+	sub_viewport_container.position = normal_pos
+	sub_viewport_container.size = normal_size
+	is_fullscreen = false
+
+func toggle_fullscreen() -> void:
+	if is_fullscreen:
+		# Restore panel size/position
+		sub_viewport_container.size = normal_size
+		sub_viewport_container.position = normal_pos
+	else:
+		# Save current size/position
+		normal_size = sub_viewport_container.size
+		normal_pos = sub_viewport_container.position
+		# Expand to fullscreen
+		sub_viewport_container.size = get_viewport().get_visible_rect().size
+		sub_viewport_container.position = Vector2.ZERO
+
+	# Keep viewport in sync
+	_update_viewport_size()
+	is_fullscreen = !is_fullscreen
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_F:
+		toggle_fullscreen()
 
 
 # ------------------------------------------
