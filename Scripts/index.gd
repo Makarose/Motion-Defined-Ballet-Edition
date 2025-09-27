@@ -5,6 +5,8 @@ extends Control
 
 var terms = [] # Will load from ResourceManager
 var selected_term: String = "" # store the currently selected term
+var current_index := -1 # tracks highlighted item 
+
 
 # ____________________________________
 # Text Normalization
@@ -29,7 +31,9 @@ func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
 
 
-
+# ____________________________________
+# Setup
+# ____________________________________
 func _ready():
 	# Load all terms from ResourceManager
 	terms = GameManager.get_terms() 
@@ -42,13 +46,23 @@ func _ready():
 	
 	# Connect Signals
 	search_bar.text_changed.connect(_on_search_changed)
+	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	term_list.item_activated.connect(_on_term_selected) # Double click or enter
-	
+
+
+# ____________________________________
+# Populate List
+# ____________________________________	
 func _populate_list(term_array: Array):
 	term_list.clear()
+	current_index = -1
 	for t in term_array:
 		term_list.add_item(t)
 
+
+# ____________________________________
+# Search
+# ____________________________________
 func _on_search_changed(new_text: String):
 	var filtered = []
 	var search_normalized = normalize(new_text)
@@ -58,6 +72,10 @@ func _on_search_changed(new_text: String):
 			filtered.append(t)
 	_populate_list(filtered)
 
+
+# ____________________________________
+# Term Selection
+# ____________________________________
 func _on_term_selected(index: int):
 	var selected_term = term_list.get_item_text(index)
 	
@@ -70,6 +88,38 @@ func _on_term_selected(index: int):
 	# Return to main scene, where the animation will automatically play
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
+
+# ____________________________________
+# Keyboard Navigation
+# ____________________________________
+func _on_search_bar_gui_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_DOWN:
+				if current_index < term_list.get_item_count() - 1:
+					current_index += 1
+					term_list.select(current_index)
+					term_list.ensure_current_is_visible()
+			KEY_UP:
+				if current_index > 0:
+					current_index -= 1
+					term_list.select(current_index)
+					term_list.ensure_current_is_visible()
+			KEY_ENTER, KEY_KP_ENTER:
+				if current_index >= 0 and current_index < term_list.get_item_count():
+					_on_term_selected(current_index)
+				else:
+					# fallback: exact match with typed text
+					var normalized_input = normalize(search_bar.text)
+					for i in range(term_list.get_item_count()):
+						if normalize(term_list.get_item_text(i)) == normalized_input:
+							_on_term_selected(i)
+							return
+
+
+# ____________________________________
+# Scene Navigation
+# ____________________________________
 func _on_back_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
