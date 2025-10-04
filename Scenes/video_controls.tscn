@@ -1,0 +1,203 @@
+[gd_scene load_steps=15 format=3 uid="uid://bgixxv1jqc70l"]
+
+[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
+[ext_resource type="Texture2D" uid="uid://bpfk4yr4sgv3k" path="res://UI Buttons/0.png" id="2_vbtma"]
+[ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_qru45"]
+[ext_resource type="Texture2D" uid="uid://cognf4qc1jsq1" path="res://UI Buttons/3.png" id="4_3xnm3"]
+[ext_resource type="Texture2D" uid="uid://ccjq5ftju6b7w" path="res://UI Buttons/11.png" id="5_ha4y4"]
+[ext_resource type="Texture2D" uid="uid://d1utahd06e8al" path="res://UI Buttons/2.png" id="6_lwnut"]
+[ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_nvcej"]
+[ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_n4g7o"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_cy6n2"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_jsis0"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_col5w"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_q714i"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_wx6hk"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[node name="VideoControls" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VideoControls" type="MarginContainer" parent="."]
+z_index = 100
+layout_mode = 0
+offset_left = 895.0
+offset_top = 685.0
+offset_right = 1845.0
+offset_bottom = 885.0
+scale = Vector2(0.759999, 0.439996)
+theme = ExtResource("1_6w5i7")
+
+[node name="HContainerButtons" type="HBoxContainer" parent="VideoControls"]
+layout_mode = 2
+
+[node name="PlayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 0
+
+[node name="Play" type="VBoxContainer" parent="VideoControls/HContainerButtons/PlayContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="VideoControls/HContainerButtons/PlayContainer/Play"]
+layout_mode = 2
+icon = ExtResource("2_vbtma")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/PlayContainer/Play"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "PLAY"
+label_settings = SubResource("LabelSettings_n4g7o")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="PauseContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Pause" type="VBoxContainer" parent="VideoControls/HContainerButtons/PauseContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="PauseButton" type="Button" parent="VideoControls/HContainerButtons/PauseContainer/Pause"]
+layout_mode = 2
+icon = ExtResource("4_3xnm3")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/PauseContainer/Pause"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "PAUSE"
+label_settings = SubResource("LabelSettings_cy6n2")
+vertical_alignment = 2
+
+[node name="StopContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Stop" type="VBoxContainer" parent="VideoControls/HContainerButtons/StopContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="StopButton" type="Button" parent="VideoControls/HContainerButtons/StopContainer/Stop"]
+layout_mode = 2
+icon = ExtResource("5_ha4y4")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/StopContainer/Stop"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "STOP"
+label_settings = SubResource("LabelSettings_jsis0")
+vertical_alignment = 2
+
+[node name="ReplayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Replay" type="VBoxContainer" parent="VideoControls/HContainerButtons/ReplayContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="ReplayButton" type="Button" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+layout_mode = 2
+size_flags_horizontal = 4
+icon = ExtResource("6_lwnut")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "REPLAY"
+label_settings = SubResource("LabelSettings_col5w")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Music" type="VBoxContainer" parent="VideoControls/HContainerButtons/MusicContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="MusicButton" type="Button" parent="VideoControls/HContainerButtons/MusicContainer/Music"]
+layout_mode = 2
+icon = ExtResource("7_nvcej")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/MusicContainer/Music"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "MUSIC"
+label_settings = SubResource("LabelSettings_q714i")
+vertical_alignment = 2
+
+[node name="ExitContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 0
+
+[node name="Exit" type="VBoxContainer" parent="VideoControls/HContainerButtons/ExitContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="ExitButton" type="Button" parent="VideoControls/HContainerButtons/ExitContainer/Exit"]
+layout_mode = 2
+icon = ExtResource("8_6b72h")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ExitContainer/Exit"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "EXIT"
+label_settings = SubResource("LabelSettings_wx6hk")
+horizontal_alignment = 1
+vertical_alignment = 2

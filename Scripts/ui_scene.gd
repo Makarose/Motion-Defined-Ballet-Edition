@@ -16,9 +16,14 @@ var current_index := -1 # Tracks which suggestion is highlighted.
 var clear_timer: Timer
 var current_dancer: Node = null
 var pending_animation: String = ""
-var normal_size: Vector2
-var normal_pos: Vector2
+
+# Fullscreen Resources
 var is_fullscreen := false
+var prev_anchor : Rect2
+var prev_position : Vector2
+var prev_size : Vector2
+var saved := false  # ensures we save original state only once
+
 
 #----------------------------------
 # Setup
@@ -56,25 +61,11 @@ func _ready() -> void:
 		_select_term(GameManager.selected_term)
 		GameManager.selected_term = ""
 
-	# Store initial size and position of viewport
-	normal_size = sub_viewport_container.size
-	normal_pos = sub_viewport_container.position
+
+	# Store the initial window size and position so we can restore later
+	prev_size = DisplayServer.window_get_size()
+	prev_position = DisplayServer.window_get_position()
 	
-	 # Save initial panel size/position
-	normal_size = sub_viewport_container.size
-	normal_pos = sub_viewport_container.position
-
-	# Ensure viewport matches container initially
-	_update_viewport_size()
-
-	# Auto-update viewport when container is resized
-	sub_viewport_container.resized.connect(Callable(self, "_update_viewport_size"))
-	
-func _update_viewport_size() -> void:
-	dancer_viewport.size = sub_viewport_container.size
-	dancer_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-
-
 #----------------------------------------
 # Character Selection (from buttons)
 # ---------------------------------------
@@ -302,40 +293,66 @@ func normalize(text: String) -> String:
 # -----------------------------------------
 # Fullscreen / Viewport Resizing
 # -----------------------------------------
-func go_fullscreen():
-	normal_size = sub_viewport_container.size
-	normal_pos = sub_viewport_container.position
-	sub_viewport_container.position = Vector2.ZERO
-	sub_viewport_container.size = get_viewport().get_visible_rect().size
-	is_fullscreen = true
+func toggle_viewport_fullscreen() -> void:
+	if not is_fullscreen:
+		# Hide the UI
+		for child in get_children():
+			if child is CanvasLayer:
+				child.visible = false
+		
+		# Save current state only once
+		if not saved:
+			prev_anchor = Rect2(
+				sub_viewport_container.anchor_left,
+				sub_viewport_container.anchor_top,
+				sub_viewport_container.anchor_right,
+				sub_viewport_container.anchor_bottom
+			)
+			prev_position = sub_viewport_container.position
+			prev_size = sub_viewport_container.size
+			saved = true
 
-func exit_fullscreen():
-	sub_viewport_container.position = normal_pos
-	sub_viewport_container.size = normal_size
-	is_fullscreen = false
-
-func toggle_fullscreen() -> void:
-	if is_fullscreen:
-		# Restore panel size/position
-		sub_viewport_container.size = normal_size
-		sub_viewport_container.position = normal_pos
-	else:
-		# Save current size/position
-		normal_size = sub_viewport_container.size
-		normal_pos = sub_viewport_container.position
-		# Expand to fullscreen
-		sub_viewport_container.size = get_viewport().get_visible_rect().size
+		# Fullscreen: fill the screen
+		sub_viewport_container.anchor_left = 0
+		sub_viewport_container.anchor_top = 0
+		sub_viewport_container.anchor_right = 1
+		sub_viewport_container.anchor_bottom = 1
 		sub_viewport_container.position = Vector2.ZERO
 
-	# Keep viewport in sync
-	_update_viewport_size()
-	is_fullscreen = !is_fullscreen
+		var parent_size := Vector2.ZERO
+		if sub_viewport_container.get_parent() and sub_viewport_container.get_parent() is Control:
+			parent_size = sub_viewport_container.get_parent().size
+		else:
+			parent_size = DisplayServer.window_get_size()
+		sub_viewport_container.size = parent_size
+		dancer_viewport.size = parent_size
+
+		is_fullscreen = true
+	else:
+		# Show the UI again
+		for child in get_children():
+			if child is CanvasLayer:
+				child.visible = true
+
+		# Restore original state
+		sub_viewport_container.anchor_left = prev_anchor.position.x
+		sub_viewport_container.anchor_top = prev_anchor.position.y
+		sub_viewport_container.anchor_right = prev_anchor.size.x
+		sub_viewport_container.anchor_bottom = prev_anchor.size.y
+
+		sub_viewport_container.position = prev_position
+		sub_viewport_container.size = prev_size
+		dancer_viewport.size = prev_size
+
+		is_fullscreen = false
+
+
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_F:
-		toggle_fullscreen()
-
-
+	if event.is_action_pressed("ui_fullscreen_toggle"):
+		toggle_viewport_fullscreen()
+		
+		
 # ------------------------------------------
 # Scene Navigation
 # -----------------------------------------
