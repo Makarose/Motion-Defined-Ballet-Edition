@@ -6,6 +6,7 @@ extends Control
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
 @onready var dancer_viewport: SubViewport = $"../SubViewportContainer/DancerViewport"
 @onready var sub_viewport_container: SubViewportContainer = $"../SubViewportContainer"
+@onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
 
 #----------------------------------
 # Resources
@@ -18,6 +19,7 @@ var current_dancer: Node = null
 var pending_animation: String = ""
 
 # Fullscreen Resources
+var video_controls_instance: Node = null
 var is_fullscreen := false
 var prev_anchor : Rect2
 var prev_position : Vector2
@@ -326,6 +328,11 @@ func toggle_viewport_fullscreen() -> void:
 			parent_size = DisplayServer.window_get_size()
 		sub_viewport_container.size = parent_size
 		dancer_viewport.size = parent_size
+		
+		# Load and show video controls overlay
+		video_controls_instance = video_controls_scene.instantiate()
+		get_tree().root.add_child(video_controls_instance)
+		video_controls_instance.owner = get_tree().current_scene  # helps with freeing
 
 		is_fullscreen = true
 	else:
@@ -343,6 +350,11 @@ func toggle_viewport_fullscreen() -> void:
 		sub_viewport_container.position = prev_position
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
+		
+		# Remove the video controls overlay
+		if video_controls_instance and video_controls_instance.is_inside_tree():
+			video_controls_instance.queue_free()
+			video_controls_instance = null
 
 		is_fullscreen = false
 
