@@ -1,6 +1,7 @@
-[gd_scene load_steps=21 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=22 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
+[ext_resource type="Script" path="res://Scenes/video_controls.gd" id="1_bxpsy"]
 [ext_resource type="Texture2D" uid="uid://bpfk4yr4sgv3k" path="res://UI Buttons/0.png" id="2_vbtma"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_qru45"]
 [ext_resource type="Texture2D" uid="uid://cognf4qc1jsq1" path="res://UI Buttons/3.png" id="4_3xnm3"]
@@ -10,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
 [ext_resource type="Texture2D" uid="uid://5802jiqw7cbn" path="res://UI Buttons/27.png" id="9_kdeps"]
 [ext_resource type="Texture2D" uid="uid://d4nxi00wwdqdk" path="res://UI Buttons/24.png" id="10_6p203"]
+[ext_resource type="Texture2D" uid="uid://bn34g8732sc0" path="res://UI Buttons/10a.png" id="10_adio7"]
 [ext_resource type="Texture2D" uid="uid://qp8jgasrfck8" path="res://UI Buttons/up.png" id="11_p4hlb"]
 [ext_resource type="Texture2D" uid="uid://1ugdqypc4s6n" path="res://UI Buttons/14.png" id="12_rgmqn"]
 [ext_resource type="Texture2D" uid="uid://c1td7jtsff5f5" path="res://UI Buttons/13.png" id="14_8y0ap"]
@@ -38,9 +40,6 @@ font_size = 40
 font = ExtResource("3_qru45")
 font_size = 40
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_5beos"]
-load_path = "res://.godot/imported/left.png-10e40922942fb108b85379e887384aad.ctex"
-
 [node name="VideoControls" type="Control"]
 z_index = 100
 layout_mode = 3
@@ -49,6 +48,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_bxpsy")
 metadata/_edit_vertical_guides_ = [961.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
@@ -73,6 +73,7 @@ layout_mode = 2
 
 [node name="PlayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
@@ -99,6 +100,7 @@ vertical_alignment = 2
 
 [node name="PauseContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -122,6 +124,7 @@ vertical_alignment = 2
 
 [node name="StopContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -145,6 +148,7 @@ vertical_alignment = 2
 
 [node name="ReplayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -170,6 +174,7 @@ vertical_alignment = 1
 
 [node name="MusicContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -195,6 +200,7 @@ vertical_alignment = 2
 
 [node name="ExitContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
+size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
@@ -223,7 +229,7 @@ vertical_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_constants/margin_left = 50
+theme_override_constants/margin_left = 850
 theme_override_constants/margin_right = 50
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VideoControls/HContainerButtons/CameraDirections"]
@@ -248,7 +254,7 @@ theme_override_constants/separation = 25
 
 [node name="LeftButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-icon = SubResource("CompressedTexture2D_5beos")
+icon = ExtResource("10_adio7")
 flat = true
 
 [node name="RightButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer/HBoxContainer"]

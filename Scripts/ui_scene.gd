@@ -19,12 +19,13 @@ var current_dancer: Node = null
 var pending_animation: String = ""
 
 # Fullscreen Resources
-var video_controls_instance: Node = null
-var is_fullscreen := false
-var prev_anchor : Rect2
-var prev_position : Vector2
-var prev_size : Vector2
-var saved := false  # ensures we save original state only once
+var video_controls_instance: Control = null
+var is_fullscreen: bool = false
+var saved: bool = false
+
+var prev_anchor: Rect2 = Rect2()
+var prev_position: Vector2 = Vector2.ZERO
+var prev_size: Vector2 = Vector2.ZERO
 
 
 #----------------------------------
@@ -297,12 +298,12 @@ func normalize(text: String) -> String:
 # -----------------------------------------
 func toggle_viewport_fullscreen() -> void:
 	if not is_fullscreen:
-		# Hide the UI
+		# Hide normal UI layers (optional)
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = false
-		
-		# Save current state only once
+
+		# Save original state only once
 		if not saved:
 			prev_anchor = Rect2(
 				sub_viewport_container.anchor_left,
@@ -328,20 +329,33 @@ func toggle_viewport_fullscreen() -> void:
 			parent_size = DisplayServer.window_get_size()
 		sub_viewport_container.size = parent_size
 		dancer_viewport.size = parent_size
-		
-		# Load and show video controls overlay
+
+		# Instantiate video_controls overlay
 		video_controls_instance = video_controls_scene.instantiate()
-		get_tree().root.add_child(video_controls_instance)
-		video_controls_instance.owner = get_tree().current_scene  # helps with freeing
+		get_tree().current_scene.add_child(video_controls_instance)
+		video_controls_instance.owner = get_tree().current_scene  # ensures proper freeing
+
+		# Make sure the overlay stretches correctly
+		if video_controls_instance is Control:
+			video_controls_instance.anchor_left = 0
+			video_controls_instance.anchor_top = 0
+			video_controls_instance.anchor_right = 1
+			video_controls_instance.anchor_bottom = 1
+			video_controls_instance.position = Vector2.ZERO
+			video_controls_instance.size = parent_size
+
+		# Link the camera
+		var camera = $SubViewportContainer/DancerViewport/Background/Camera3D
+		video_controls_instance.camera = camera
 
 		is_fullscreen = true
 	else:
-		# Show the UI again
+		# Restore UI layers
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = true
 
-		# Restore original state
+		# Restore original viewport state
 		sub_viewport_container.anchor_left = prev_anchor.position.x
 		sub_viewport_container.anchor_top = prev_anchor.position.y
 		sub_viewport_container.anchor_right = prev_anchor.size.x
@@ -350,15 +364,13 @@ func toggle_viewport_fullscreen() -> void:
 		sub_viewport_container.position = prev_position
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
-		
-		# Remove the video controls overlay
+
+		# Remove video_controls overlay
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.queue_free()
 			video_controls_instance = null
 
 		is_fullscreen = false
-
-
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_fullscreen_toggle"):
