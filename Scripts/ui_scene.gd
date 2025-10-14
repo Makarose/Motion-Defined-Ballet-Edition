@@ -349,13 +349,19 @@ func toggle_viewport_fullscreen() -> void:
 		video_controls_instance.camera = camera
 
 		is_fullscreen = true
+		
+		
 	else:
+	# -----------------------------
+	# Exit Fullscreen
+	# -----------------------------
+
 		# Restore UI layers
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = true
 
-		# Restore original viewport state
+		# Restore viewport to original size/position
 		sub_viewport_container.anchor_left = prev_anchor.position.x
 		sub_viewport_container.anchor_top = prev_anchor.position.y
 		sub_viewport_container.anchor_right = prev_anchor.size.x
@@ -365,10 +371,13 @@ func toggle_viewport_fullscreen() -> void:
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
 
-		# Remove video_controls overlay
+		# Remove video_controls overlay immediately
 		if video_controls_instance and video_controls_instance.is_inside_tree():
-			video_controls_instance.queue_free()
+			video_controls_instance.free()
 			video_controls_instance = null
+
+		# Release GUI focus so buttons are clickable immediately
+		get_viewport().gui_release_focus()
 
 		is_fullscreen = false
 
@@ -384,4 +393,5 @@ func _on_back_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
 
 func _on_index_button_pressed() -> void:
+	print("Index button pressed!")
 	get_tree().change_scene_to_file("res://Scenes/index.tscn")

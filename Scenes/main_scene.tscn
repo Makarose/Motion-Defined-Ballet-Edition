@@ -5,8 +5,8 @@
 
 [node name="MainScene" type="Node2D"]
 position = Vector2(-2, 0)
-metadata/_edit_vertical_guides_ = [683.0, 1816.0]
-metadata/_edit_horizontal_guides_ = [181.0]
+metadata/_edit_vertical_guides_ = [692.0, 1816.0]
+metadata/_edit_horizontal_guides_ = [163.0, 1000.0]
 
 [node name="UI" parent="." instance=ExtResource("1_fnjpc")]
 
@@ -14,10 +14,10 @@ metadata/_edit_horizontal_guides_ = [181.0]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 689.0
-offset_top = 177.0
-offset_right = 1814.0
-offset_bottom = 677.0
+offset_left = 695.0
+offset_top = 163.0
+offset_right = 1820.0
+offset_bottom = 663.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3

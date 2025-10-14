@@ -24,7 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_37t3u")
-metadata/_edit_horizontal_guides_ = [995.0]
+metadata/_edit_horizontal_guides_ = [1000.0]
 
 [node name="PanelContainer" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
@@ -58,15 +58,18 @@ scroll_active = false
 
 [node name="Back" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(75, 75)
-layout_mode = 0
-offset_left = 1.0
-offset_top = 900.0
-offset_right = 199.0
-offset_bottom = 1090.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -170.0
+offset_right = 328.0
+offset_bottom = 10.0
+grow_vertical = 0
 scale = Vector2(0.5, 0.5)
-theme_override_constants/margin_left = 35
+theme_override_constants/margin_left = 200
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 35
+theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="Back"]
@@ -75,6 +78,7 @@ theme_override_constants/margin_bottom = 50
 
 [node name="BackButton" type="Button" parent="Back/MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("2_l3b18")
 flat = true
 
@@ -88,15 +92,22 @@ vertical_alignment = 2
 
 [node name="Home" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(75, 75)
-layout_mode = 0
-offset_left = 1820.0
-offset_top = 900.0
-offset_right = 2018.0
-offset_bottom = 1090.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -165.0
+offset_top = -172.0
+offset_right = 164.0
+offset_bottom = 8.0
+grow_horizontal = 0
+grow_vertical = 0
 scale = Vector2(0.5, 0.5)
-theme_override_constants/margin_left = 35
+theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 35
+theme_override_constants/margin_right = 200
 theme_override_constants/margin_bottom = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="Home"]
@@ -105,6 +116,7 @@ theme_override_constants/margin_bottom = 50
 
 [node name="HomeButton" type="Button" parent="Home/MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("4_j1bci")
 flat = true
 
@@ -122,7 +134,7 @@ layout_mode = 0
 offset_left = 105.0
 offset_top = 268.0
 offset_right = 1825.0
-offset_bottom = 922.0
+offset_bottom = 868.0
 theme = ExtResource("1_vndco")
 theme_override_constants/separation = 0
 
