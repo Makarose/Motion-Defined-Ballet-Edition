@@ -1,7 +1,7 @@
 extends Control  # or Node, depending on your root
 
-# Reference to the camera that the UI will control
-var camera: Camera3D
+@export var camera: Camera3D
+
 
 var move_speed := 0.5
 var zoom_speed := 0.5
