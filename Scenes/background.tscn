@@ -40,12 +40,12 @@ environment = SubResource("Environment_blqaw")
 transform = Transform3D(1, 0, 0, 0, 0.999343, 0.0362425, 0, -0.0362425, 0.999343, 0, 0.91391, 2.19744)
 
 [node name="Floor" type="MeshInstance3D" parent="."]
-transform = Transform3D(8.69921, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0)
+transform = Transform3D(13.9187, 0, 0, 0, 1, 0, 0, 0, 7.2, 0, 0, 4)
 mesh = SubResource("PlaneMesh_w5al8")
 skeleton = NodePath("../..")
 
 [node name="BackWall" type="MeshInstance3D" parent="."]
-transform = Transform3D(8.69305, 0, 0, 0, -4.37114e-08, -2.5, 0, 1, -1.09278e-07, 0, 2, -2.28073)
+transform = Transform3D(13.6144, 0, 0, 0, -4.37114e-08, -6.23698, 0, 1, -2.72626e-07, 0, 2, -2.28073)
 mesh = SubResource("PlaneMesh_q4hd6")
 skeleton = NodePath("../..")
 

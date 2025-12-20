@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=16 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scenes/video_controls.gd" id="1_bxpsy"]
@@ -9,12 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://d1utahd06e8al" path="res://UI Buttons/2.png" id="6_lwnut"]
 [ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_nvcej"]
 [ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
-[ext_resource type="Texture2D" uid="uid://5802jiqw7cbn" path="res://UI Buttons/27.png" id="9_kdeps"]
-[ext_resource type="Texture2D" uid="uid://d4nxi00wwdqdk" path="res://UI Buttons/24.png" id="10_6p203"]
-[ext_resource type="Texture2D" uid="uid://bn34g8732sc0" path="res://UI Buttons/10a.png" id="10_adio7"]
-[ext_resource type="Texture2D" uid="uid://qp8jgasrfck8" path="res://UI Buttons/up.png" id="11_p4hlb"]
-[ext_resource type="Texture2D" uid="uid://1ugdqypc4s6n" path="res://UI Buttons/14.png" id="12_rgmqn"]
-[ext_resource type="Texture2D" uid="uid://c1td7jtsff5f5" path="res://UI Buttons/13.png" id="14_8y0ap"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_n4g7o"]
 font = ExtResource("3_qru45")
@@ -49,6 +43,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bxpsy")
+zoom_min = 1.0
+zoom_max = 5.0
+zoom_step = 3.0
 metadata/_edit_vertical_guides_ = [961.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
@@ -71,7 +68,7 @@ theme = ExtResource("1_6w5i7")
 [node name="HContainerButtons" type="HBoxContainer" parent="VideoControls"]
 layout_mode = 2
 
-[node name="PlayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="ReplayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
@@ -79,21 +76,23 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 0
 
-[node name="Play" type="VBoxContainer" parent="VideoControls/HContainerButtons/PlayContainer"]
+[node name="Replay" type="VBoxContainer" parent="VideoControls/HContainerButtons/ReplayContainer"]
 layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="PlayButton" type="Button" parent="VideoControls/HContainerButtons/PlayContainer/Play"]
+[node name="ReplayButton" type="Button" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
 icon = ExtResource("2_vbtma")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/PlayContainer/Play"]
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "PLAY"
+text = "REPLAY"
 label_settings = SubResource("LabelSettings_n4g7o")
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -111,6 +110,7 @@ alignment = 1
 
 [node name="PauseButton" type="Button" parent="VideoControls/HContainerButtons/PauseContainer/Pause"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("4_3xnm3")
 flat = true
 
@@ -135,6 +135,7 @@ alignment = 1
 
 [node name="StopButton" type="Button" parent="VideoControls/HContainerButtons/StopContainer/Stop"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("5_ha4y4")
 flat = true
 
@@ -146,28 +147,28 @@ text = "STOP"
 label_settings = SubResource("LabelSettings_jsis0")
 vertical_alignment = 2
 
-[node name="ReplayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="LoopContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
-[node name="Replay" type="VBoxContainer" parent="VideoControls/HContainerButtons/ReplayContainer"]
+[node name="Loop" type="VBoxContainer" parent="VideoControls/HContainerButtons/LoopContainer"]
 layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="ReplayButton" type="Button" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+[node name="LoopButton" type="Button" parent="VideoControls/HContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
 icon = ExtResource("6_lwnut")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+[node name="Label" type="Label" parent="VideoControls/HContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "REPLAY"
+text = "LOOP"
 label_settings = SubResource("LabelSettings_col5w")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -187,6 +188,7 @@ alignment = 1
 
 [node name="MusicButton" type="Button" parent="VideoControls/HContainerButtons/MusicContainer/Music"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("7_nvcej")
 flat = true
 
@@ -213,6 +215,7 @@ alignment = 1
 
 [node name="ExitButton" type="Button" parent="VideoControls/HContainerButtons/ExitContainer/Exit"]
 layout_mode = 2
+size_flags_horizontal = 4
 icon = ExtResource("8_6b72h")
 flat = true
 
@@ -232,60 +235,15 @@ size_flags_vertical = 4
 theme_override_constants/margin_left = 850
 theme_override_constants/margin_right = 50
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VideoControls/HContainerButtons/CameraDirections"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 25
+[node name="ZoomSlider" type="VSlider" parent="."]
+layout_mode = 0
+offset_left = 1795.0
+offset_top = 148.0
+offset_right = 1845.0
+offset_bottom = 898.0
+max_value = 10.0
+value = 5.0
 
-[node name="UpButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer"]
-layout_mode = 2
-icon = ExtResource("11_p4hlb")
-flat = true
-icon_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 25
-
-[node name="LeftButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-icon = ExtResource("10_adio7")
-flat = true
-
-[node name="RightButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-icon = ExtResource("14_8y0ap")
-flat = true
-
-[node name="DownButton" type="Button" parent="VideoControls/HContainerButtons/CameraDirections/VBoxContainer"]
-layout_mode = 2
-icon = ExtResource("12_rgmqn")
-flat = true
-icon_alignment = 1
-
-[node name="ZoomButtons" type="MarginContainer" parent="VideoControls/HContainerButtons"]
-layout_mode = 2
-
-[node name="ZoomButtons" type="VBoxContainer" parent="VideoControls/HContainerButtons/ZoomButtons"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 100
-
-[node name="ZoomInButton" type="Button" parent="VideoControls/HContainerButtons/ZoomButtons/ZoomButtons"]
-layout_mode = 2
-size_flags_horizontal = 4
-icon = ExtResource("9_kdeps")
-flat = true
-
-[node name="ZoomOutButton" type="Button" parent="VideoControls/HContainerButtons/ZoomButtons/ZoomButtons"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-icon = ExtResource("10_6p203")
-flat = true
+[connection signal="pressed" from="VideoControls/HContainerButtons/ReplayContainer/Replay/ReplayButton" to="." method="_on_replay_button_pressed"]
+[connection signal="pressed" from="VideoControls/HContainerButtons/PauseContainer/Pause/PauseButton" to="." method="_on_pause_button_pressed"]
+[connection signal="value_changed" from="ZoomSlider" to="." method="_on_zoom_slider_value_changed"]

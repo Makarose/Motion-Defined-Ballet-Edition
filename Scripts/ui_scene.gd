@@ -32,76 +32,71 @@ var prev_size: Vector2 = Vector2.ZERO
 # Setup
 #----------------------------------
 func _ready() -> void:
-	# Load the database
+	# Load database
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
-	
+
 	# Connect signals
 	search_bar.text_changed.connect(_on_search_text_changed)
 	item_list.item_selected.connect(_on_item_selected)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
 
-	# Initially hide ItemList until typing starts
 	item_list.visible = false
 
-	# Create and configure the timer
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
-	clear_timer.wait_time = 0.8  # show selection for 0.8 seconds
+	clear_timer.wait_time = 0.8
 	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
-	
+
 	# Spawn previous character if one selected
 	if GameManager.chosen_character != "":
 		_on_character_button_pressed(GameManager.chosen_character)
-	else:
-		print("No character chosen yet")
-		
-	# Queue term from index if exists
+
 	if GameManager.selected_term != "":
-		print("Queued term from index:", GameManager.selected_term)
 		_select_term(GameManager.selected_term)
 		GameManager.selected_term = ""
 
-
-	# Store the initial window size and position so we can restore later
 	prev_size = DisplayServer.window_get_size()
 	prev_position = DisplayServer.window_get_position()
+
+
 	
 #----------------------------------------
 # Character Selection (from buttons)
 # ---------------------------------------
 func _on_character_button_pressed(character_scene_path: String) -> void:
-	# Save for later so character can be reloaded
 	GameManager.chosen_character = character_scene_path
-	
+
 	# Remove previous dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Load and instance the new character scene
+	# Load new dancer
 	var char_scene: PackedScene = load(character_scene_path)
 	if not char_scene:
-		push_error("Character scene not found!: "+ character_scene_path)
+		push_error("Character scene not found!: " + character_scene_path)
 		return
-	
+
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
-	print ("Current dancer loaded:", current_dancer.name)
-	
-	# Debug animation list if the character has an AnimationPlayer
+	print("Current dancer loaded:", current_dancer.name)
+
+	# Debug animations
 	var animation_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
 	if animation_player:
 		print("Animations available:", animation_player.get_animation_list())
 
-	 # Play any pending animation queued from index or previous selection
+	# Play queued animation if any
 	if pending_animation != "":
-		print("▶ Queued animation detected:", pending_animation)
-		# Ensure it runs after the node is fully added to the scene tree
 		current_dancer.call_deferred("play_move", pending_animation)
 		pending_animation = ""
+
+	# DO NOT initialize video_controls here
+	# Initialization will occur in _assign_video_controls_nodes when entering fullscreen
+
 
 # -----------------------------
 # Connect buttons
@@ -110,7 +105,7 @@ func _on_male_button_pressed() -> void:
 	_on_character_button_pressed("res://Scenes/male.tscn")
 
 func _on_female_button_pressed() -> void:
-	_on_character_button_pressed("res://Scenes/female.tscn")	
+	_on_character_button_pressed("res://Scenes/female.tscn")
 
 
 # _____________________________________
@@ -297,13 +292,18 @@ func normalize(text: String) -> String:
 # Fullscreen / Viewport Resizing
 # -----------------------------------------
 func toggle_viewport_fullscreen() -> void:
+	print("Toggling fullscreen. Current state:", is_fullscreen)
+
 	if not is_fullscreen:
-		# Hide normal UI layers (optional)
+		print("Entering fullscreen...")
+
+		# --- Hide all UI CanvasLayers ---
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = false
+				print("Hiding CanvasLayer:", child.name)
 
-		# Save original state only once
+		# --- Save original viewport state ---
 		if not saved:
 			prev_anchor = Rect2(
 				sub_viewport_container.anchor_left,
@@ -314,76 +314,144 @@ func toggle_viewport_fullscreen() -> void:
 			prev_position = sub_viewport_container.position
 			prev_size = sub_viewport_container.size
 			saved = true
+			print("Saved previous viewport state.")
 
-		# Fullscreen: fill the screen
+		# --- Stretch viewport container to fullscreen ---
 		sub_viewport_container.anchor_left = 0
 		sub_viewport_container.anchor_top = 0
 		sub_viewport_container.anchor_right = 1
 		sub_viewport_container.anchor_bottom = 1
 		sub_viewport_container.position = Vector2.ZERO
+		sub_viewport_container.size = DisplayServer.window_get_size()
+		dancer_viewport.size = sub_viewport_container.size
+		print("Viewport stretched to fullscreen:", sub_viewport_container.size)
 
-		var parent_size := Vector2.ZERO
-		if sub_viewport_container.get_parent() and sub_viewport_container.get_parent() is Control:
-			parent_size = sub_viewport_container.get_parent().size
-		else:
-			parent_size = DisplayServer.window_get_size()
-		sub_viewport_container.size = parent_size
-		dancer_viewport.size = parent_size
-
-		# Instantiate video_controls overlay
+		# --- Instantiate video_controls overlay ---
+		if video_controls_instance and video_controls_instance.is_inside_tree():
+			video_controls_instance.free()
+			print("Removed old video_controls_instance.")
 		video_controls_instance = video_controls_scene.instantiate()
 		get_tree().current_scene.add_child(video_controls_instance)
-		video_controls_instance.owner = get_tree().current_scene  # ensures proper freeing
+		video_controls_instance.owner = get_tree().current_scene
+		print("Instantiated new video_controls_instance.")
 
-		# Make sure the overlay stretches correctly
-		if video_controls_instance is Control:
-			video_controls_instance.anchor_left = 0
-			video_controls_instance.anchor_top = 0
-			video_controls_instance.anchor_right = 1
-			video_controls_instance.anchor_bottom = 1
-			video_controls_instance.position = Vector2.ZERO
-			video_controls_instance.size = parent_size
+		# --- Stretch overlay to match viewport ---
+		video_controls_instance.anchor_left = 0
+		video_controls_instance.anchor_top = 0
+		video_controls_instance.anchor_right = 1
+		video_controls_instance.anchor_bottom = 1
+		video_controls_instance.position = Vector2.ZERO
+		video_controls_instance.size = sub_viewport_container.size
+		print("Overlay sized to viewport:", video_controls_instance.size)
 
-		# Link the camera
-		var camera = $SubViewportContainer/DancerViewport/Background/Camera3D
-		video_controls_instance.camera = camera
+		# --- Assign camera and dancer after current frame ---
+		call_deferred("_assign_video_controls_nodes")
+		print("Deferred assignment of camera and dancer.")
 
 		is_fullscreen = true
-		
-		
+		print("Fullscreen enabled.")
 	else:
-	# -----------------------------
-	# Exit Fullscreen
-	# -----------------------------
+		print("Exiting fullscreen...")
 
-		# Restore UI layers
+		# --- Restore UI layers ---
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = true
+				print("Showing CanvasLayer:", child.name)
 
-		# Restore viewport to original size/position
+		# --- Restore viewport container to previous state ---
 		sub_viewport_container.anchor_left = prev_anchor.position.x
 		sub_viewport_container.anchor_top = prev_anchor.position.y
 		sub_viewport_container.anchor_right = prev_anchor.size.x
 		sub_viewport_container.anchor_bottom = prev_anchor.size.y
-
 		sub_viewport_container.position = prev_position
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
+		print("Viewport restored to previous state:", prev_size)
 
-		# Remove video_controls overlay immediately
+		# --- Remove fullscreen video controls ---
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.free()
 			video_controls_instance = null
+			print("Freed video_controls_instance.")
 
-		# Release GUI focus so buttons are clickable immediately
+		# --- Release focus to UI ---
 		get_viewport().gui_release_focus()
-
 		is_fullscreen = false
+		print("Fullscreen disabled.")
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_fullscreen_toggle"):
-		toggle_viewport_fullscreen()
+
+
+
+
+func _assign_video_controls_nodes() -> void:
+	if not video_controls_instance:
+		push_error("Video controls instance not found!")
+		return
+
+	var background_node = dancer_viewport.get_node_or_null("Background")
+	if not background_node:
+		push_error("Background node not found!")
+		return
+
+	var camera_node = background_node.get_node_or_null("Camera3D")
+	if not camera_node:
+		push_error("Camera node not found!")
+		return
+
+	# Assign camera and dancer
+	video_controls_instance.camera = camera_node
+	video_controls_instance.dancer = current_dancer
+
+	print("[UI] Camera assigned:", camera_node)
+	print("[UI] Dancer assigned:", current_dancer)
+
+	# Assign the skeleton and target bone
+	var skel: Skeleton3D = current_dancer.get_node_or_null("Female Armature/Skeleton3D")
+	if not skel:
+		print("[UI] Skeleton3D not found in dancer")
+		video_controls_instance.skel = null
+		video_controls_instance.target_bone_index = -1
+		return
+	video_controls_instance.skel = skel
+	video_controls_instance.target_bone_name = "Head"
+	video_controls_instance.target_bone_index = skel.find_bone(video_controls_instance.target_bone_name)
+
+	if video_controls_instance.target_bone_index != -1:
+		print("[UI] Target bone found:", video_controls_instance.target_bone_name)
+	else:
+		print("[UI] Target bone NOT found!")
+
+	# Apply initial zoom if possible
+	if video_controls_instance.zoom_slider:
+		var zoom_val = video_controls_instance.zoom_slider.value
+		print("[UI] Zoom slider value:", zoom_val)
+		if video_controls_instance.skel and video_controls_instance.target_bone_index != -1:
+			video_controls_instance.focus_and_zoom_on_bone(
+				video_controls_instance.target_bone_name,
+				zoom_val
+			)
+		else:
+			print("[UI] Cannot apply initial zoom — target bone not ready")
+	else:
+		print("[UI] Zoom slider NOT found!")
+
+
+func _deferred_focus_and_zoom() -> void:
+	if not video_controls_instance:
+		return
+
+	print("[UI] Deferred focus on target bone:", video_controls_instance.target_bone_name)
+
+	# Try to set target bone multiple times until found
+	video_controls_instance.set_target_bone(video_controls_instance.target_bone_name)
+	if video_controls_instance.target_bone:
+		print("[UI] Target bone found, applying initial zoom")
+		if video_controls_instance.zoom_slider:
+			video_controls_instance._on_zoom_slider_value_changed(video_controls_instance.zoom_slider.value)
+	else:
+		print("[UI] Target bone still not found, will retry next frame")
+		call_deferred("_deferred_focus_and_zoom")  # keep retrying until skeleton ready
 		
 		
 # ------------------------------------------
@@ -395,3 +463,9 @@ func _on_back_button_pressed() -> void:
 func _on_index_button_pressed() -> void:
 	print("Index button pressed!")
 	get_tree().change_scene_to_file("res://Scenes/index.tscn")
+	
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F1:
+			print("F1 pressed — toggling fullscreen")  # Debug check
+			toggle_viewport_fullscreen()
