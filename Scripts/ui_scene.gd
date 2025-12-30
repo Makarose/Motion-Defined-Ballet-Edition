@@ -69,6 +69,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_F1:
 			print("F1 pressed, toggling fullscreen")
 			toggle_viewport_fullscreen()
+	
 
 # ----------------------------
 # Character Selection
@@ -340,3 +341,14 @@ func _assign_video_controls_nodes() -> void:
 	video_controls_instance.set_camera(camera_node)
 	video_controls_instance.set_active_dancer(current_dancer)
 	print("Video controls assigned camera and dancer")
+	
+# ----------------------------
+# Button Connections
+# ----------------------------
+
+func _on_index_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/index.tscn")
+
+func _on_back_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+	

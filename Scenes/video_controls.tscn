@@ -43,6 +43,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bxpsy")
+zoom_speed = 1.0
+zoom_min = 0.5
+zoom_max = 8.0
 metadata/_edit_vertical_guides_ = [961.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
@@ -234,3 +237,4 @@ theme_override_constants/margin_right = 50
 
 [connection signal="pressed" from="VideoControls/HContainerButtons/ReplayContainer/Replay/ReplayButton" to="." method="_on_replay_button_pressed"]
 [connection signal="pressed" from="VideoControls/HContainerButtons/PauseContainer/Pause/PauseButton" to="." method="_on_pause_button_pressed"]
+[connection signal="pressed" from="VideoControls/HContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]

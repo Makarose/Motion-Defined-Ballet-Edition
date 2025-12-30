@@ -41,7 +41,8 @@ var home_vertical_offset: float
 # Ready
 # ----------------------------
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_PASS # ← FIX
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	focus_mode = Control.FOCUS_NONE # ← ensures Tab isn’t swallowed by UI
 
 # ----------------------------
 # Setup
@@ -79,7 +80,7 @@ func _save_home_state() -> void:
 # ----------------------------
 # MOUSE INPUT (Control-safe)
 # ----------------------------
-func _gui_input(event: InputEvent) -> void: # ← FIX
+func _gui_input(event: InputEvent) -> void:
 	if camera == null or dancer == null:
 		return
 
@@ -94,11 +95,17 @@ func _gui_input(event: InputEvent) -> void: # ← FIX
 			distance = clamp(distance + zoom_speed, zoom_min, zoom_max)
 
 	if event is InputEventMouseMotion:
-		if dragging:
-			# Horizontal orbit ONLY
+		if not dragging:
+			return
+
+		var dx: float = abs(event.relative.x)
+		var dy: float = abs(event.relative.y)
+
+		if dx >= dy:
+			# Horizontal ONLY
 			horizontal_angle -= event.relative.x * orbit_speed_mouse
 		else:
-			# Vertical movement ONLY
+			# Vertical ONLY
 			vertical_offset += -event.relative.y * vertical_speed_mouse
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 
@@ -108,6 +115,9 @@ func _gui_input(event: InputEvent) -> void: # ← FIX
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("camera_reset"):
 		reset_camera()
+
+	if event.is_action_pressed("exit_fullscreen"):
+		_on_exit_button_pressed() # ← Tab exits fullscreen
 
 # ----------------------------
 # Keyboard + Update
@@ -158,3 +168,9 @@ func _update_camera() -> void:
 
 	var look_target := Vector3(pivot.x, camera.global_position.y, pivot.z)
 	camera.look_at(look_target, Vector3.UP)
+
+# ----------------------------
+# Exit
+# ----------------------------
+func _on_exit_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")

@@ -12,3 +12,10 @@ func get_terms() -> Array:
 		for move in ballet_move_database.moves:
 			term_list.append(move.name)
 	return term_list
+
+# ----------------------------
+# Global input
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("quit_app"): # ← Esc
+		get_tree().quit()
