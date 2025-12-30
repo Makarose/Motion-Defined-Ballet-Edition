@@ -1,44 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=8 format=3 uid="uid://crbl3op3bapp6"]
 
 [ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
-[ext_resource type="Resource" uid="uid://dtp7d1oc0p6u" path="res://Definition Resources/ballet_moves_database.tres" id="2_k7bws"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_sgoow"]
-[ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="4_8lo18"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="4_i7ljw"]
 [ext_resource type="Texture2D" uid="uid://m7lpnticn8bw" path="res://UI Buttons/5.png" id="5_0cy04"]
-
-[sub_resource type="GDScript" id="GDScript_8j2pv"]
-script/source = "extends Node3D
-
-@onready var anim_player: AnimationPlayer = $AnimationPlayer
-@onready var skeleton: Skeleton3D = $Skeleton3D
-
-func play_move(anim_name: String) -> void:
-	if not anim_player:
-		push_warning(\"AnimationPlayer missing!\")
-		return
-
-	if not anim_player.has_animation(anim_name):
-		push_warning(\"Animation not found: \" + anim_name)
-		return
-
-	anim_player.play(anim_name)
-	print(\"Playing animation:\", anim_name)
-"
-
-[sub_resource type="PackedScene" id="PackedScene_ja6at"]
-_bundled = {
-"conn_count": 0,
-"conns": PackedInt32Array(),
-"editable_instances": [],
-"names": PackedStringArray("skeleton", "script", "Background", "Skeleton3D", "bones/1/position", "bones/2/rotation", "bones/6/rotation", "bones/8/rotation", "bones/9/rotation", "bones/10/rotation", "bones/11/rotation", "bones/32/rotation", "bones/33/rotation", "bones/34/rotation", "bones/35/rotation", "bones/56/rotation", "bones/57/rotation", "bones/58/rotation", "bones/59/rotation", "bones/61/rotation", "bones/62/rotation", "bones/63/rotation", "bones/64/rotation", "AnimationPlayer"),
-"node_count": 3,
-"node_paths": [],
-"nodes": PackedInt32Array(-1, -1, 2147483647, 0, -1, 1, 1, 0, 0, 0, 0, 2147483647, 262146, 1, 0, 0, 0, 0, 2147483647, 524291, -1, 19, 4, 2, 5, 3, 6, 4, 7, 5, 8, 6, 9, 7, 10, 8, 11, 9, 12, 10, 13, 11, 14, 12, 15, 13, 16, 14, 17, 15, 18, 16, 19, 17, 20, 18, 21, 19, 22, 20, 0),
-"variants": [SubResource("GDScript_8j2pv"), ExtResource("4_8lo18"), Vector3(0, 0.728412, -0.0116439), Quaternion(0.00284631, 0, 0, 0.999996), Quaternion(-1.3261e-08, 1.48597e-24, 3.48323e-24, 1), Quaternion(0.577482, 0.411828, 0.57365, -0.40968), Quaternion(-0.335963, -0.0508902, -0.0360422, 0.939808), Quaternion(-0.282358, -0.0229362, -0.0840424, 0.955345), Quaternion(-0.432487, -0.098577, -0.0384632, 0.895409), Quaternion(0.577482, -0.411828, -0.57365, -0.40968), Quaternion(-0.335963, 0.0508902, 0.0360422, 0.939808), Quaternion(-0.282358, 0.0229362, 0.0840424, 0.955345), Quaternion(-0.432487, 0.098577, 0.0384632, 0.895409), Quaternion(0.745371, 0.0121884, -0.666528, 0.00367186), Quaternion(0.0541633, -0.0085957, 0.00360445, 0.998489), Quaternion(-0.00699791, 0.835476, -0.549482, -0.000714469), Quaternion(0.234173, -0.000199095, 0.00177702, 0.972193), Quaternion(0.745368, -0.0129847, 0.666521, 0.00278128), Quaternion(0.0529705, 0.00859293, -0.00358902, 0.998553), Quaternion(0.00699785, 0.835476, -0.549482, 0.000714558), Quaternion(0.234173, 0.000202942, -0.00177614, 0.972193)],
-"version": 3
-}
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
@@ -58,8 +24,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_q043w")
-database = ExtResource("2_k7bws")
-skeleton_scene = SubResource("PackedScene_ja6at")
 metadata/_edit_vertical_guides_ = [1817.0, 692.0, -136.0]
 metadata/_edit_horizontal_guides_ = [1000.0, 868.0]
 

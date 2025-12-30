@@ -1,5 +1,8 @@
 extends Control
 
+# ----------------------------
+# UI Nodes
+# ----------------------------
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
@@ -8,40 +11,37 @@ extends Control
 @onready var sub_viewport_container: SubViewportContainer = $"../SubViewportContainer"
 @onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
 
-#----------------------------------
+# ----------------------------
 # Resources
-#----------------------------------
+# ----------------------------
 @export var database: BalletMoveDatabase
 @export var skeleton_scene: PackedScene
-var current_index := -1 # Tracks which suggestion is highlighted.
+var current_index := -1
 var clear_timer: Timer
 var current_dancer: Node = null
 var pending_animation: String = ""
 
-# Fullscreen Resources
+# Fullscreen management
 var video_controls_instance: Control = null
 var is_fullscreen: bool = false
 var saved: bool = false
-
 var prev_anchor: Rect2 = Rect2()
 var prev_position: Vector2 = Vector2.ZERO
 var prev_size: Vector2 = Vector2.ZERO
 
-
-#----------------------------------
-# Setup
-#----------------------------------
+# ----------------------------
+# Ready
+# ----------------------------
 func _ready() -> void:
-	# Load database
+	print("UI ready")
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
+		print("Database loaded")
 
-	# Connect signals
 	search_bar.text_changed.connect(_on_search_text_changed)
-	item_list.item_selected.connect(_on_item_selected)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
-
+	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
 
 	clear_timer = Timer.new()
@@ -50,31 +50,37 @@ func _ready() -> void:
 	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
 
-	# Spawn previous character if one selected
+	print("Connecting previous GameManager selections")
 	if GameManager.chosen_character != "":
 		_on_character_button_pressed(GameManager.chosen_character)
-
 	if GameManager.selected_term != "":
 		_select_term(GameManager.selected_term)
 		GameManager.selected_term = ""
 
 	prev_size = DisplayServer.window_get_size()
 	prev_position = DisplayServer.window_get_position()
+	print("Initial window size:", prev_size, "position:", prev_position)
 
+# ----------------------------
+# Global Input Handling
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F1:
+			print("F1 pressed, toggling fullscreen")
+			toggle_viewport_fullscreen()
 
-	
-#----------------------------------------
-# Character Selection (from buttons)
-# ---------------------------------------
+# ----------------------------
+# Character Selection
+# ----------------------------
 func _on_character_button_pressed(character_scene_path: String) -> void:
+	print("Character button pressed:", character_scene_path)
 	GameManager.chosen_character = character_scene_path
 
-	# Remove previous dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Load new dancer
 	var char_scene: PackedScene = load(character_scene_path)
 	if not char_scene:
 		push_error("Character scene not found!: " + character_scene_path)
@@ -84,191 +90,147 @@ func _on_character_button_pressed(character_scene_path: String) -> void:
 	dancer_viewport.add_child(current_dancer)
 	print("Current dancer loaded:", current_dancer.name)
 
-	# Debug animations
 	var animation_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
 	if animation_player:
 		print("Animations available:", animation_player.get_animation_list())
 
-	# Play queued animation if any
 	if pending_animation != "":
 		current_dancer.call_deferred("play_move", pending_animation)
+		print("Playing pending animation:", pending_animation)
 		pending_animation = ""
 
-	# DO NOT initialize video_controls here
-	# Initialization will occur in _assign_video_controls_nodes when entering fullscreen
-
-
-# -----------------------------
-# Connect buttons
-# -----------------------------
 func _on_male_button_pressed() -> void:
 	_on_character_button_pressed("res://Scenes/male.tscn")
 
 func _on_female_button_pressed() -> void:
 	_on_character_button_pressed("res://Scenes/female.tscn")
 
-
-# _____________________________________
+# ----------------------------
 # Term Selection
-# _____________________________________
+# ----------------------------
 func _select_term(term_name: String) -> void:
-	# Normalize the incoming term
+	print("Selecting term:", term_name)
 	var norm_term_name = normalize(term_name)
-	
-	# Find the move in the database using normalized comparison
 	var move_resource: BalletMove = null
+
 	for move in database.moves:
 		if normalize(move.name) == norm_term_name:
 			move_resource = move
 			break
-			
+
 	if move_resource == null:
 		print("Term not found in database:", term_name)
 		return
 
-	# Update UI
 	definition_label.set_text(move_resource.definition)
 	title_label.set_text(move_resource.name)
 	search_bar.text = move_resource.name
 	item_list.visible = false
 
-	# Determine animation to play
 	var animation_name = move_resource.animation_name.strip_edges()
 	print("Requested animation:", animation_name)
-	
-	if current_dancer and current_dancer.has_method("play_move"):
-		current_dancer.call_deferred("play_move", move_resource.animation_name.strip_edges())
-	else:
-		print("!!! No dancer yet, queuing animation:", animation_name)
-		pending_animation = animation_name
 
+	if current_dancer and current_dancer.has_method("play_move"):
+		current_dancer.call_deferred("play_move", animation_name)
+	else:
+		print("No dancer yet, queuing animation:", animation_name)
+		pending_animation = animation_name
 
 func _select_item(index: int) -> void:
 	var selected_move_name = item_list.get_item_text(index)
-	print("Selecting move:", selected_move_name)
-	
-	#Find corresponding resource in database
+	print("Selecting item from list:", selected_move_name)
 	var move_resource: BalletMove = null
-	
-# Normalize the selected name for comparision
 	var norm_selected = normalize(selected_move_name)
-	
-	# find it's resource from the database
+
 	for balletmove in database.moves:
 		if normalize(balletmove.name) == norm_selected:
 			move_resource = balletmove
 			break
-			
+
 	if move_resource == null:
 		print("Resources not found for move:", selected_move_name)
 		return
-		
-	# Update UI with the resources definition and name (keeps accents)
+
 	definition_label.set_text(move_resource.definition)
 	title_label.set_text(move_resource.name)
-	
-	
-	# Show selection briefly before clearing
 	search_bar.text = selected_move_name
-	
-	# Hide dropdown
 	item_list.visible = false
 	search_bar.grab_focus()
-	
-	# Start timer to clear search bar shortly after selection
 	clear_timer.start()
-	
-	# Play animation on current dancer
-	if current_dancer and current_dancer.has_method("play_move"):
-		if move_resource.animation_name != "":
-			print("About to play animation:", move_resource.animation_name)
-			current_dancer.play_move(move_resource.animation_name)
-			print("Requested animation:", move_resource.animation_name)
-		else:
-			print("Warning: move_resource has no animation_name set")
+
+	if current_dancer and current_dancer.has_method("play_move") and move_resource.animation_name != "":
+		current_dancer.play_move(move_resource.animation_name)
 	else:
-		print("No dancer loaded or 'play_move' missing")
+		print("No dancer loaded or 'play_move' missing or animation empty")
 
-
-#______________________________________
+# ----------------------------
 # Search Bar / List
-# _____________________________________
-# Called whenever the search bar text changes
+# ----------------------------
 func _on_search_text_changed(new_text: String) -> void:
+	print("Search text changed:", new_text)
 	item_list.clear()
 	current_index = -1
-	
+
 	if new_text == "":
 		item_list.visible = false
 		return
-		
+
 	var normalized_input = normalize(new_text)
 	for balletmove in database.moves:
-		var move_name = balletmove.name
-		if normalize(move_name).begins_with(normalized_input):
-			item_list.add_item(move_name)
-			
-	# Show list only if we have a match
+		if normalize(balletmove.name).begins_with(normalized_input):
+			item_list.add_item(balletmove.name)
+
 	item_list.visible = item_list.get_item_count() > 0
-	
-# Called when the user clicks a suggestion.
+
 func _on_item_selected(index: int) -> void:
 	current_index = index
+	print("Item selected:", index)
 	_select_item(index)
 
-# Handles keyboard navigation
 func _on_search_bar_gui_input(event: InputEvent) -> void:
 	if not item_list.visible:
 		return
-			
+
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_DOWN:
-				# Move focus to ItemList if nothing is slected
 				if current_index < item_list.get_item_count() - 1:
 					current_index += 1
 					item_list.select(current_index)
 					item_list.ensure_current_is_visible()
+					print("Arrow down, selected index:", current_index)
 			KEY_UP:
 				if current_index > 0:
 					current_index -= 1
 					item_list.select(current_index)
 					item_list.ensure_current_is_visible()
+					print("Arrow up, selected index:", current_index)
 			KEY_ENTER, KEY_KP_ENTER:
 				if current_index >= 0 and current_index < item_list.get_item_count():
 					_select_item(current_index)
 					print("Enter pressed, selected:", item_list.get_item_text(current_index))
 					return
-					
-# Called when user presses Enter in the search bar
+
 func _on_search_bar_entered(new_text: String) -> void:
+	print("Search bar entered:", new_text)
 	if current_index >= 0 and current_index < item_list.get_item_count():
 		_select_item(current_index)
-		print("Enter pressed, dropdown or highlighted item selected:", item_list.get_item_text(current_index))
 		return
-	
-	# Only pick exact match if nothing is highlighted
+
 	var normalized_input = normalize(new_text)
 	for i in range(item_list.get_item_count()):
 		if normalize(item_list.get_item_text(i)) == normalized_input:
 			_select_item(i)
-			print("Enter pressed, exact match selected:", item_list.get_item_text(i))
 			return
-			
 	print("Enter pressed, nothing selected")
-	
-	# Timer callback to clear the search bar.
+
 func _clear_search_now() -> void:
+	print("Clearing search bar")
 	search_bar.text = ""
 	current_index = -1
 	item_list.clear()
 	item_list.visible = false
-	
-	
-# ____________________________________
-# Text Normalization
-# ____________________________________
-# Strips user input of accented characters.
+
 func strip_accents(text: String) -> String:
 	var mapping = {
 		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a","Á":"A","À":"A","Â":"A","Ä":"A","Ã":"A","Å":"A",
@@ -280,108 +242,82 @@ func strip_accents(text: String) -> String:
 	}
 	var result := ""
 	for c in text:
-		result += mapping.get(c, c) # replace if in mapping, else keep original
+		result += mapping.get(c, c)
 	return result
-	
-# Helps to normalize user inputted text.
+
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
 
-
-# -----------------------------------------
-# Fullscreen / Viewport Resizing
-# -----------------------------------------
+# ----------------------------
+# Fullscreen / Video Controls
+# ----------------------------
 func toggle_viewport_fullscreen() -> void:
-	print("Toggling fullscreen. Current state:", is_fullscreen)
-
+	print("Toggling fullscreen, currently:", is_fullscreen)
 	if not is_fullscreen:
-		print("Entering fullscreen...")
-
-		# --- Hide all UI CanvasLayers ---
+		# Hide all UI layers except the viewport
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = false
 				print("Hiding CanvasLayer:", child.name)
 
-		# --- Save original viewport state ---
-		if not saved:
-			prev_anchor = Rect2(
-				sub_viewport_container.anchor_left,
-				sub_viewport_container.anchor_top,
-				sub_viewport_container.anchor_right,
-				sub_viewport_container.anchor_bottom
-			)
-			prev_position = sub_viewport_container.position
-			prev_size = sub_viewport_container.size
-			saved = true
-			print("Saved previous viewport state.")
+		# Save position & size
+		prev_position = sub_viewport_container.position
+		prev_size = sub_viewport_container.size
+		print("Saved viewport size:", prev_size, "position:", prev_position)
 
-		# --- Stretch viewport container to fullscreen ---
-		sub_viewport_container.anchor_left = 0
-		sub_viewport_container.anchor_top = 0
-		sub_viewport_container.anchor_right = 1
-		sub_viewport_container.anchor_bottom = 1
+		# Stretch viewport to fill window
 		sub_viewport_container.position = Vector2.ZERO
 		sub_viewport_container.size = DisplayServer.window_get_size()
 		dancer_viewport.size = sub_viewport_container.size
-		print("Viewport stretched to fullscreen:", sub_viewport_container.size)
+		print("Viewport resized to:", sub_viewport_container.size)
 
-		# --- Instantiate video_controls overlay ---
+		# Ensure CanvasLayer for video controls exists
+		var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
+		if canvas_layer == null:
+			canvas_layer = CanvasLayer.new()
+			canvas_layer.name = "CanvasLayerVideoControls"
+			get_tree().current_scene.add_child(canvas_layer)
+			print("Created new CanvasLayerVideoControls")
+
+		# Instantiate video controls if not already
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.free()
-			print("Removed old video_controls_instance.")
+			print("Removed old video controls instance")
+
 		video_controls_instance = video_controls_scene.instantiate()
-		get_tree().current_scene.add_child(video_controls_instance)
+		canvas_layer.add_child(video_controls_instance)
 		video_controls_instance.owner = get_tree().current_scene
-		print("Instantiated new video_controls_instance.")
+		print("Instantiated video controls:", video_controls_instance.name)
 
-		# --- Stretch overlay to match viewport ---
-		video_controls_instance.anchor_left = 0
-		video_controls_instance.anchor_top = 0
-		video_controls_instance.anchor_right = 1
-		video_controls_instance.anchor_bottom = 1
-		video_controls_instance.position = Vector2.ZERO
-		video_controls_instance.size = sub_viewport_container.size
-		print("Overlay sized to viewport:", video_controls_instance.size)
+		# Stretch controls using new method
+		if video_controls_instance.has_method("stretch_to_fullscreen"):
+			video_controls_instance.stretch_to_fullscreen()
+			print("Video controls stretched to fullscreen")
 
-		# --- Assign camera and dancer after current frame ---
 		call_deferred("_assign_video_controls_nodes")
-		print("Deferred assignment of camera and dancer.")
-
 		is_fullscreen = true
-		print("Fullscreen enabled.")
 	else:
-		print("Exiting fullscreen...")
-
-		# --- Restore UI layers ---
+		print("Exiting fullscreen")
+		# Restore UI layers
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = true
-				print("Showing CanvasLayer:", child.name)
+				print("Restoring CanvasLayer:", child.name)
 
-		# --- Restore viewport container to previous state ---
-		sub_viewport_container.anchor_left = prev_anchor.position.x
-		sub_viewport_container.anchor_top = prev_anchor.position.y
-		sub_viewport_container.anchor_right = prev_anchor.size.x
-		sub_viewport_container.anchor_bottom = prev_anchor.size.y
+		# Restore viewport size & position
 		sub_viewport_container.position = prev_position
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
-		print("Viewport restored to previous state:", prev_size)
+		print("Restored viewport size:", prev_size, "position:", prev_position)
 
-		# --- Remove fullscreen video controls ---
+		# Remove video controls
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.free()
+			print("Freed video controls instance")
 			video_controls_instance = null
-			print("Freed video_controls_instance.")
 
-		# --- Release focus to UI ---
-		get_viewport().gui_release_focus()
 		is_fullscreen = false
-		print("Fullscreen disabled.")
-
-
-
+		get_viewport().gui_release_focus()
 
 
 func _assign_video_controls_nodes() -> void:
@@ -389,6 +325,7 @@ func _assign_video_controls_nodes() -> void:
 		push_error("Video controls instance not found!")
 		return
 
+	print("Assigning video control nodes...")
 	var background_node = dancer_viewport.get_node_or_null("Background")
 	if not background_node:
 		push_error("Background node not found!")
@@ -400,72 +337,6 @@ func _assign_video_controls_nodes() -> void:
 		return
 
 	# Assign camera and dancer
-	video_controls_instance.camera = camera_node
-	video_controls_instance.dancer = current_dancer
-
-	print("[UI] Camera assigned:", camera_node)
-	print("[UI] Dancer assigned:", current_dancer)
-
-	# Assign the skeleton and target bone
-	var skel: Skeleton3D = current_dancer.get_node_or_null("Female Armature/Skeleton3D")
-	if not skel:
-		print("[UI] Skeleton3D not found in dancer")
-		video_controls_instance.skel = null
-		video_controls_instance.target_bone_index = -1
-		return
-	video_controls_instance.skel = skel
-	video_controls_instance.target_bone_name = "Head"
-	video_controls_instance.target_bone_index = skel.find_bone(video_controls_instance.target_bone_name)
-
-	if video_controls_instance.target_bone_index != -1:
-		print("[UI] Target bone found:", video_controls_instance.target_bone_name)
-	else:
-		print("[UI] Target bone NOT found!")
-
-	# Apply initial zoom if possible
-	if video_controls_instance.zoom_slider:
-		var zoom_val = video_controls_instance.zoom_slider.value
-		print("[UI] Zoom slider value:", zoom_val)
-		if video_controls_instance.skel and video_controls_instance.target_bone_index != -1:
-			video_controls_instance.focus_and_zoom_on_bone(
-				video_controls_instance.target_bone_name,
-				zoom_val
-			)
-		else:
-			print("[UI] Cannot apply initial zoom — target bone not ready")
-	else:
-		print("[UI] Zoom slider NOT found!")
-
-
-func _deferred_focus_and_zoom() -> void:
-	if not video_controls_instance:
-		return
-
-	print("[UI] Deferred focus on target bone:", video_controls_instance.target_bone_name)
-
-	# Try to set target bone multiple times until found
-	video_controls_instance.set_target_bone(video_controls_instance.target_bone_name)
-	if video_controls_instance.target_bone:
-		print("[UI] Target bone found, applying initial zoom")
-		if video_controls_instance.zoom_slider:
-			video_controls_instance._on_zoom_slider_value_changed(video_controls_instance.zoom_slider.value)
-	else:
-		print("[UI] Target bone still not found, will retry next frame")
-		call_deferred("_deferred_focus_and_zoom")  # keep retrying until skeleton ready
-		
-		
-# ------------------------------------------
-# Scene Navigation
-# -----------------------------------------
-func _on_back_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
-
-func _on_index_button_pressed() -> void:
-	print("Index button pressed!")
-	get_tree().change_scene_to_file("res://Scenes/index.tscn")
-	
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_F1:
-			print("F1 pressed — toggling fullscreen")  # Debug check
-			toggle_viewport_fullscreen()
+	video_controls_instance.set_camera(camera_node)
+	video_controls_instance.set_active_dancer(current_dancer)
+	print("Video controls assigned camera and dancer")

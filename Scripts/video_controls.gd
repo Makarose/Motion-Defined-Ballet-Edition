@@ -1,0 +1,160 @@
+extends Control
+
+# ----------------------------
+# Tunables
+# ----------------------------
+@export var zoom_speed: float = 3.0
+@export var zoom_min: float = 2.0
+@export var zoom_max: float = 10.0
+
+@export var orbit_speed_mouse: float = 0.01
+@export var orbit_speed_keyboard: float = 1.8
+
+@export var vertical_speed_mouse: float = 0.015
+@export var vertical_speed_keyboard: float = 2.0
+@export var vertical_min: float = -1.5
+@export var vertical_max: float = 2.5
+
+@export var default_distance: float = 5.0
+@export var head_bone_name: String = "Head"
+
+# ----------------------------
+# Runtime state
+# ----------------------------
+var camera: Camera3D
+var dancer: Node3D
+var skel: Skeleton3D
+
+var distance: float
+var horizontal_angle: float
+var vertical_offset: float
+var pivot: Vector3
+
+var dragging := false
+
+# Home state
+var home_distance: float
+var home_horizontal_angle: float
+var home_vertical_offset: float
+
+# ----------------------------
+# Ready
+# ----------------------------
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_PASS # ← FIX
+
+# ----------------------------
+# Setup
+# ----------------------------
+func set_camera(cam: Camera3D) -> void:
+	camera = cam
+
+func set_active_dancer(dancer_node: Node3D) -> void:
+	dancer = dancer_node
+	skel = dancer.get_node_or_null("Skeleton3D") as Skeleton3D
+
+	_update_pivot()
+
+	distance = default_distance
+	horizontal_angle = 0.0
+	vertical_offset = 0.0
+
+	_save_home_state()
+	_update_camera()
+
+# ----------------------------
+# Home / Reset
+# ----------------------------
+func reset_camera() -> void:
+	distance = home_distance
+	horizontal_angle = home_horizontal_angle
+	vertical_offset = home_vertical_offset
+	_update_camera()
+
+func _save_home_state() -> void:
+	home_distance = distance
+	home_horizontal_angle = horizontal_angle
+	home_vertical_offset = vertical_offset
+
+# ----------------------------
+# MOUSE INPUT (Control-safe)
+# ----------------------------
+func _gui_input(event: InputEvent) -> void: # ← FIX
+	if camera == null or dancer == null:
+		return
+
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			dragging = event.pressed
+
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			distance = clamp(distance - zoom_speed, zoom_min, zoom_max)
+
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			distance = clamp(distance + zoom_speed, zoom_min, zoom_max)
+
+	if event is InputEventMouseMotion:
+		if dragging:
+			# Horizontal orbit ONLY
+			horizontal_angle -= event.relative.x * orbit_speed_mouse
+		else:
+			# Vertical movement ONLY
+			vertical_offset += -event.relative.y * vertical_speed_mouse
+			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
+
+# ----------------------------
+# KEYBOARD INPUT
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("camera_reset"):
+		reset_camera()
+
+# ----------------------------
+# Keyboard + Update
+# ----------------------------
+func _process(delta: float) -> void:
+	if camera == null or dancer == null:
+		return
+
+	if Input.is_action_pressed("camera_left"):
+		horizontal_angle += orbit_speed_keyboard * delta
+	if Input.is_action_pressed("camera_right"):
+		horizontal_angle -= orbit_speed_keyboard * delta
+
+	if Input.is_action_pressed("camera_up"):
+		vertical_offset += vertical_speed_keyboard * delta
+	if Input.is_action_pressed("camera_down"):
+		vertical_offset -= vertical_speed_keyboard * delta
+
+	if Input.is_action_pressed("zoom_in"):
+		distance -= zoom_speed * delta
+	if Input.is_action_pressed("zoom_out"):
+		distance += zoom_speed * delta
+
+	distance = clamp(distance, zoom_min, zoom_max)
+	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
+
+	_update_camera()
+
+# ----------------------------
+# Camera math
+# ----------------------------
+func _update_pivot() -> void:
+	if skel != null and skel.has_bone(head_bone_name):
+		var idx := skel.find_bone(head_bone_name)
+		pivot = skel.get_bone_global_pose(idx).origin
+	else:
+		pivot = dancer.global_position + Vector3(0.0, 1.6, 0.0)
+
+func _update_camera() -> void:
+	_update_pivot()
+
+	var horizontal_offset := Vector3(0.0, 0.0, distance).rotated(
+		Vector3.UP,
+		horizontal_angle
+	)
+
+	camera.global_position = pivot + horizontal_offset + Vector3(0.0, vertical_offset, 0.0)
+
+	var look_target := Vector3(pivot.x, camera.global_position.y, pivot.z)
+	camera.look_at(look_target, Vector3.UP)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=16 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
-[ext_resource type="Script" path="res://Scenes/video_controls.gd" id="1_bxpsy"]
+[ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
 [ext_resource type="Texture2D" uid="uid://bpfk4yr4sgv3k" path="res://UI Buttons/0.png" id="2_vbtma"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_qru45"]
 [ext_resource type="Texture2D" uid="uid://cognf4qc1jsq1" path="res://UI Buttons/3.png" id="4_3xnm3"]
@@ -43,9 +43,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bxpsy")
-zoom_min = 1.0
-zoom_max = 5.0
-zoom_step = 3.0
 metadata/_edit_vertical_guides_ = [961.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
@@ -235,15 +232,5 @@ size_flags_vertical = 4
 theme_override_constants/margin_left = 850
 theme_override_constants/margin_right = 50
 
-[node name="ZoomSlider" type="VSlider" parent="."]
-layout_mode = 0
-offset_left = 1795.0
-offset_top = 148.0
-offset_right = 1845.0
-offset_bottom = 898.0
-max_value = 10.0
-value = 5.0
-
 [connection signal="pressed" from="VideoControls/HContainerButtons/ReplayContainer/Replay/ReplayButton" to="." method="_on_replay_button_pressed"]
 [connection signal="pressed" from="VideoControls/HContainerButtons/PauseContainer/Pause/PauseButton" to="." method="_on_pause_button_pressed"]
-[connection signal="value_changed" from="ZoomSlider" to="." method="_on_zoom_slider_value_changed"]

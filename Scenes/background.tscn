@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://c0opmlqorul1c"]
+[gd_scene load_steps=12 format=3 uid="uid://c0opmlqorul1c"]
 
 [ext_resource type="PackedScene" uid="uid://du1htf5ao34cs" path="res://Characters/male.glb" id="2_iuybu"]
+[ext_resource type="Script" path="res://Characters/male.gd" id="2_ohbij"]
 [ext_resource type="PackedScene" uid="uid://cd4snkot1sjo4" path="res://Scenes/female.tscn" id="2_q05r1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mfq5q"]
@@ -16,11 +17,13 @@ sky = SubResource("Sky_umun0")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_80m8t"]
-albedo_color = Color(0.16, 0.16, 0.16, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_gy04u"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_w5al8"]
-material = SubResource("StandardMaterial3D_80m8t")
+[sub_resource type="FogMaterial" id="FogMaterial_bpotl"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lba0p"]
+next_pass = SubResource("FogMaterial_bpotl")
+albedo_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jk6gj"]
 albedo_color = Color(0.352, 0.388667, 0.44, 1)
@@ -40,17 +43,19 @@ environment = SubResource("Environment_blqaw")
 transform = Transform3D(1, 0, 0, 0, 0.999343, 0.0362425, 0, -0.0362425, 0.999343, 0, 0.91391, 2.19744)
 
 [node name="Floor" type="MeshInstance3D" parent="."]
-transform = Transform3D(13.9187, 0, 0, 0, 1, 0, 0, 0, 7.2, 0, 0, 4)
-mesh = SubResource("PlaneMesh_w5al8")
+transform = Transform3D(32.013, 0, 0, 0, 2.1, 0, 0, 0, 7.2, 0.00807884, -1.05282, 2.96079)
+mesh = SubResource("BoxMesh_gy04u")
 skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_lba0p")
 
 [node name="BackWall" type="MeshInstance3D" parent="."]
-transform = Transform3D(13.6144, 0, 0, 0, -4.37114e-08, -6.23698, 0, 1, -2.72626e-07, 0, 2, -2.28073)
+transform = Transform3D(44.9275, 0, 0, 0, -4.37114e-08, -11.2266, 0, 1, -4.90727e-07, 0, 6, -2.28073)
 mesh = SubResource("PlaneMesh_q4hd6")
 skeleton = NodePath("../..")
 
 [node name="male" parent="." instance=ExtResource("2_iuybu")]
 visible = false
+script = ExtResource("2_ohbij")
 
 [node name="female" parent="." instance=ExtResource("2_q05r1")]
 visible = false
