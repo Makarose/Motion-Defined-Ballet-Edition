@@ -5,6 +5,8 @@ extends Node
 var chosen_character : String = "" # Last selected character
 var selected_term: String = "" # Last selecetd term
 var pending_animation: String = "" # Animation to play when back in main scene
+var last_played_animation: String = "" # Last animation played globally
+
 
 func get_terms() -> Array:
 	var term_list: Array = []

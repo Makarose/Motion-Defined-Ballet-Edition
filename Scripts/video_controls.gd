@@ -169,6 +169,16 @@ func _update_camera() -> void:
 	var look_target := Vector3(pivot.x, camera.global_position.y, pivot.z)
 	camera.look_at(look_target, Vector3.UP)
 
+
+# ----------------------------
+# Replay
+# ----------------------------
+func replay_animation() -> void:
+	if dancer and dancer.has_method("play_move") and GameManager.last_played_animation != "":
+		dancer.play_move(GameManager.last_played_animation)
+		print("Replaying animation:", GameManager.last_played_animation)
+
+
 # ----------------------------
 # Exit
 # ----------------------------

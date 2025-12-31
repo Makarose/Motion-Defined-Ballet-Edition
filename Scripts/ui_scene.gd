@@ -71,6 +71,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			if not is_fullscreen:
 				print("F1 pressed, toggling fullscreen")
 				toggle_viewport_fullscreen()
+				
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_R and is_fullscreen:
+			if current_dancer and current_dancer.has_method("play_move") and GameManager.last_played_animation != "":
+				print("R pressed — replaying last animation:", GameManager.last_played_animation)
+				current_dancer.call_deferred("play_move", GameManager.last_played_animation)
+
 
 	
 # ----------------------------
@@ -133,11 +140,14 @@ func _select_term(term_name: String) -> void:
 	var animation_name = move_resource.animation_name.strip_edges()
 	print("Requested animation:", animation_name)
 
-	if current_dancer and current_dancer.has_method("play_move"):
+	if current_dancer and current_dancer.has_method("play_move") and animation_name != "":
 		current_dancer.call_deferred("play_move", animation_name)
+		GameManager.last_played_animation = animation_name # <--- TRACK LAST ANIMATION
+		print("Animation played (deferred):", animation_name)
 	else:
 		print("No dancer yet, queuing animation:", animation_name)
 		pending_animation = animation_name
+
 
 func _select_item(index: int) -> void:
 	var selected_move_name = item_list.get_item_text(index)
@@ -161,10 +171,15 @@ func _select_item(index: int) -> void:
 	search_bar.grab_focus()
 	clear_timer.start()
 
-	if current_dancer and current_dancer.has_method("play_move") and move_resource.animation_name != "":
-		current_dancer.play_move(move_resource.animation_name)
+	var animation_name = move_resource.animation_name.strip_edges()
+	if current_dancer and current_dancer.has_method("play_move") and animation_name != "":
+		current_dancer.call_deferred("play_move", animation_name)
+		GameManager.last_played_animation = animation_name # <--- TRACK LAST ANIMATION
+		print("Animation played (deferred):", animation_name)
 	else:
 		print("No dancer loaded or 'play_move' missing or animation empty")
+		pending_animation = animation_name
+
 
 # ----------------------------
 # Search Bar / List
