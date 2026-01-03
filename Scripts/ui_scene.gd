@@ -77,14 +77,16 @@ func _unhandled_input(event: InputEvent) -> void:
 # ----------------------------
 # Character Selection
 # ----------------------------
-func _on_character_button_pressed(character_scene_path: String) -> void:
+func _on_character_button_pressed(character_scene_path: String, from_title_page: bool = false) -> void:
 	print("Character button pressed:", character_scene_path)
 	GameManager.chosen_character = character_scene_path
 
+	# Remove existing dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
+	# Load new dancer
 	var char_scene: PackedScene = load(character_scene_path)
 	if not char_scene:
 		push_error("Character scene not found!: " + character_scene_path)
@@ -94,20 +96,21 @@ func _on_character_button_pressed(character_scene_path: String) -> void:
 	dancer_viewport.add_child(current_dancer)
 	print("Current dancer loaded:", current_dancer.name)
 
-	var animation_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
-	if animation_player:
-		print("Animations available:", animation_player.get_animation_list())
+	# Optional debug
+	var anim_player: AnimationPlayer = current_dancer.get_node_or_null("AnimationPlayer")
+	if anim_player:
+		print("Animations available:", anim_player.get_animation_list())
 
-	# Immediately replay last animation if it exists
-	if GameManager.last_played_animation != "":
-		current_dancer.call_deferred("play_move", GameManager.last_played_animation)
+	# Decide whether to auto-play
+	if not from_title_page and GameManager.last_played_animation != "":
+		current_dancer.call_deferred(
+			"play_move",
+			GameManager.last_played_animation
+		)
 		print("Replaying last played animation:", GameManager.last_played_animation)
 
-func _on_male_button_pressed() -> void:
-	_on_character_button_pressed("res://Scenes/male.tscn")
 
-func _on_female_button_pressed() -> void:
-	_on_character_button_pressed("res://Scenes/female.tscn")
+
 
 # ----------------------------
 # Term Selection
@@ -315,4 +318,6 @@ func _on_index_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/index.tscn")
 
 func _on_back_button_pressed() -> void:
+	GameManager.selected_term = ""
+	GameManager.last_played_animation = ""
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")

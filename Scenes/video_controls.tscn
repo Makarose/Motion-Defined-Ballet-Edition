@@ -115,7 +115,7 @@ flat = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "PAUSE"
+text = "PAUSE [P]"
 label_settings = SubResource("LabelSettings_cy6n2")
 vertical_alignment = 2
 
@@ -220,7 +220,7 @@ flat = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "EXIT"
+text = "EXIT [TAB]"
 label_settings = SubResource("LabelSettings_wx6hk")
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -232,5 +232,4 @@ size_flags_vertical = 4
 theme_override_constants/margin_left = 850
 theme_override_constants/margin_right = 50
 
-[connection signal="pressed" from="VideoControls/HContainerButtons/ReplayContainer/Replay/ReplayButton" to="." method="replay_animation"]
 [connection signal="pressed" from="VideoControls/HContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]

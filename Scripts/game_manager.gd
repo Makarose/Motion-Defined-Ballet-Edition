@@ -5,6 +5,7 @@ extends Node
 var chosen_character: String = ""       # Last selected character
 var selected_term: String = ""          # Last selected term
 var last_played_animation: String = ""  # Last animation played globally
+var coming_from_title := false
 
 # ----------------------------
 # Ballet moves
@@ -29,3 +30,10 @@ func play_move_on_dancer(dancer: Node3D, term: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("quit_app"): # ← Esc
 		get_tree().quit()
+		
+func _on_back_button_pressed() -> void:
+	# Indicate that the next character selected should start fresh
+	GameManager.coming_from_title = true
+
+	# Go back to the title page
+	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")

@@ -11,3 +11,5 @@ var current_animation: String = ""
 var animation_time: float = 0.0
 var animation_length: float = 0.0
 var is_playing: bool = false
+var paused_position: float = 0.0
+var is_paused: bool = false
