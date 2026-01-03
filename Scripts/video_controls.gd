@@ -174,9 +174,17 @@ func _update_camera() -> void:
 # Replay
 # ----------------------------
 func replay_animation() -> void:
-	if dancer and dancer.has_method("play_move") and GameManager.last_played_animation != "":
-		dancer.play_move(GameManager.last_played_animation)
-		print("Replaying animation:", GameManager.last_played_animation)
+	if dancer == null or not dancer.has_method("play_move"):
+		push_warning("No active dancer or dancer cannot play moves.")
+		return
+	
+	if GameManager.last_played_animation == "":
+		push_warning("No animation recorded to replay.")
+		return
+	
+	# Safely replay animation
+	dancer.play_move(GameManager.last_played_animation)
+
 
 
 # ----------------------------
