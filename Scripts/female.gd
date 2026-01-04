@@ -1,81 +1,112 @@
 extends Node3D
 
-# Class-level variable, visible in all functions
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 var last_animation_name: String = ""
-var is_paused := false
-var paused_position := 0.0
+var is_paused: bool = false
+var paused_position: float = 0.0
 
 func _ready() -> void:
-	animation_player.playback_active = true # ensures playback is active
+	animation_player.playback_active = true
 
 func _process(_delta: float) -> void:
-	# Update DancerState playback time live
+	# Keep DancerState in sync
 	if animation_player.is_playing():
 		DancerState.animation_time = animation_player.current_animation_position
-		
 
+# ----------------------------
+# Animation Control
+# ----------------------------
 func play_move(anim_name: String) -> void:
-	print("DEBUG: play_move called with:", anim_name)
-	if animation_player and animation_player.has_animation(anim_name):
-		print("About to play animation:", anim_name)
-
-		animation_player.stop()
-		animation_player.play(anim_name)
-		last_animation_name = anim_name
-
-		# Reset pause state
-		is_paused = false
-		paused_position = 0.0
-
-		# Update DancerState
-		DancerState.current_animation = anim_name
-		DancerState.is_playing = true
-		DancerState.animation_time = 0.0
-		DancerState.animation_length = animation_player.current_animation_length
-
-		print("AnimationPlayer found animations:", animation_player.get_animation_list())
-	else:
+	if not animation_player or not animation_player.has_animation(anim_name):
 		push_warning("Animation not found: " + anim_name)
+		return
 
+	print("DEBUG: play_move called with:", anim_name)
+
+	animation_player.stop()
+	animation_player.play(anim_name)
+	last_animation_name = anim_name
+
+	is_paused = false
+	paused_position = 0.0
+
+	# Update DancerState
+	DancerState.current_animation = anim_name
+	DancerState.is_playing = true
+	DancerState.is_paused = false
+	DancerState.animation_time = 0.0
+	DancerState.animation_length = animation_player.current_animation_length
 
 func toggle_pause_or_resume() -> void:
-	if animation_player == null:
+	if not animation_player:
 		return
 
 	if is_paused:
 		animation_player.speed_scale = 1.0
 		is_paused = false
-		print("Animation resumed at:", animation_player.current_animation_position)
+		DancerState.is_paused = false
+		DancerState.is_playing = true
 	else:
 		animation_player.speed_scale = 0.0
 		is_paused = true
-		print("Animation paused at:", animation_player.current_animation_position)
-
-
-
+		DancerState.is_paused = true
+		DancerState.is_playing = false
 
 func replay_last_animation() -> void:
-	if last_animation_name == "":
-		return
-	if not animation_player.has_animation(last_animation_name):
+	if last_animation_name == "" or not animation_player.has_animation(last_animation_name):
 		return
 
-	# Reset pause state and speed
+	print("Replaying last animation:", last_animation_name)
+
 	is_paused = false
 	paused_position = 0.0
-	animation_player.speed_scale = 1.0  # <--- ensure it will play
+	animation_player.speed_scale = 1.0
 
-	# Restart animation cleanly
 	animation_player.stop()
 	animation_player.play(last_animation_name)
-	animation_player.seek(0.0, true) # start from beginning
+	animation_player.seek(0.0, true)
 
-	# Update DancerState fully
 	DancerState.current_animation = last_animation_name
 	DancerState.is_playing = true
+	DancerState.is_paused = false
 	DancerState.animation_time = 0.0
 	DancerState.animation_length = animation_player.current_animation_length
 
-	print("Replayed animation from start:", last_animation_name)
+# ----------------------------
+# Seamless switch support
+# ----------------------------
+func seek_to_time(time: float) -> void:
+	if not animation_player or last_animation_name == "":
+		return
+
+	animation_player.seek(time, true)
+	DancerState.animation_time = time
+
+func get_playback_state() -> Dictionary:
+	return {
+		"animation": last_animation_name,
+		"time": animation_player.current_animation_position,
+		"is_paused": is_paused
+	}
+
+func apply_playback_state(state: Dictionary) -> void:
+	if not state.has("animation") or state.animation == "":
+		return
+	if not animation_player.has_animation(state.animation):
+		return
+
+	animation_player.stop()
+	animation_player.play(state.animation)
+	animation_player.seek(state.get("time", 0.0), true)
+
+	last_animation_name = state.animation
+	is_paused = state.get("is_paused", false)
+
+	animation_player.speed_scale = 0.0 if is_paused else 1.0
+
+	# Update DancerState
+	DancerState.current_animation = state.animation
+	DancerState.animation_time = state.get("time", 0.0)
+	DancerState.is_paused = is_paused
+	DancerState.is_playing = not is_paused

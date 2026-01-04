@@ -1,5 +1,7 @@
 extends Control
 
+signal character_requested(character_scene_path: String)
+
 # ----------------------------
 # Tunables
 # ----------------------------
@@ -37,16 +39,21 @@ var home_distance: float
 var home_horizontal_angle: float
 var home_vertical_offset: float
 
+var dancer_viewport: Node
+
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
-	focus_mode = Control.FOCUS_ALL # ensures keyboard input always works
+	focus_mode = Control.FOCUS_ALL
 	set_process_input(true)
 
+	# Connect buttons safely
 	$VideoControls/VContainerButtons/PauseContainer/Pause/PauseButton.pressed.connect(_on_pause_button_pressed)
 	$VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
+	$VBoxContainer/MaleButton/MaleButton.pressed.connect(Callable(self, "_on_male_button_pressed"))
+	$VBoxContainer/FemaleButton/FemaleButton.pressed.connect(Callable(self, "_on_female_button_pressed"))
 
 # ----------------------------
 # Setup
@@ -55,17 +62,27 @@ func set_camera(cam: Camera3D) -> void:
 	camera = cam
 
 func set_active_dancer(dancer_node: Node3D) -> void:
+	if dancer != null and dancer.is_inside_tree():
+		dancer.queue_free()  # safely free previous dancer
+
 	dancer = dancer_node
 	skel = dancer.get_node_or_null("Skeleton3D") as Skeleton3D
 
 	_update_pivot()
-
 	distance = default_distance
 	horizontal_angle = 0.0
 	vertical_offset = 0.0
 
 	_save_home_state()
 	_update_camera()
+
+	# Restore playback from DancerState
+	if dancer.has_method("apply_playback_state"):
+		dancer.call_deferred("apply_playback_state", {
+			"animation": DancerState.current_animation,
+			"time": DancerState.animation_time,
+			"is_paused": not DancerState.is_playing
+		})
 
 # ----------------------------
 # Home / Reset
@@ -107,26 +124,26 @@ func _gui_input(event: InputEvent) -> void:
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 
 # ----------------------------
-# Keyboard input
+# Keyboard input (safe)
 # ----------------------------
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
-		# Exit fullscreen
+		var dancer_instance = dancer
+		if dancer_instance == null or not dancer_instance.is_inside_tree():
+			return
+
 		if Input.is_action_pressed("exit_fullscreen"):
 			_on_exit_button_pressed()
 
-		# Replay last animation
-		if Input.is_action_pressed("replay_animation") and dancer and dancer.has_method("replay_last_animation"):
-			dancer.replay_last_animation()
+		if Input.is_action_pressed("replay_animation") and dancer_instance.has_method("replay_last_animation"):
+			dancer_instance.replay_last_animation()
 
-		# Reset camera
 		if Input.is_action_pressed("camera_reset"):
 			reset_camera()
-			
-		# Pause animation with P key
-		if Input.is_action_pressed("pause_animation") and dancer and dancer.has_method("toggle_pause_or_resume"):
-			dancer.toggle_pause_or_resume()
-			grab_focus() # make sure keyboard input keeps working
+
+		if Input.is_action_pressed("pause_animation") and dancer_instance.has_method("toggle_pause_or_resume"):
+			dancer_instance.toggle_pause_or_resume()
+			grab_focus()
 
 # ----------------------------
 # Update loop
@@ -135,7 +152,6 @@ func _process(delta: float) -> void:
 	if camera == null or dancer == null:
 		return
 
-	# Keyboard movement (continuous)
 	if Input.is_action_pressed("camera_left"):
 		horizontal_angle += orbit_speed_keyboard * delta
 	if Input.is_action_pressed("camera_right"):
@@ -151,7 +167,6 @@ func _process(delta: float) -> void:
 
 	distance = clamp(distance, zoom_min, zoom_max)
 	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
-
 	_update_camera()
 
 # ----------------------------
@@ -171,23 +186,35 @@ func _update_camera() -> void:
 	camera.look_at(Vector3(pivot.x, camera.global_position.y, pivot.z), Vector3.UP)
 
 # ----------------------------
+# Fullscreen Character Select Buttons
+# ----------------------------
+func _on_male_button_pressed() -> void:
+	emit_signal("character_requested", "res://Scenes/male.tscn")
+
+func _on_female_button_pressed() -> void:
+	emit_signal("character_requested", "res://Scenes/female.tscn")
+
+# ----------------------------
 # Replay
 # ----------------------------
 func replay_animation() -> void:
-	if dancer == null or not dancer.has_method("replay_last_animation"):
+	var dancer_instance = dancer
+	if dancer_instance == null or not dancer_instance.is_inside_tree() or not dancer_instance.has_method("replay_last_animation"):
 		push_warning("No active dancer or dancer cannot replay animation.")
 		return
-
-	dancer.replay_last_animation()
-	grab_focus() # restore keyboard focus
+	dancer_instance.replay_last_animation()
+	grab_focus()
 
 # ----------------------------
 # Pause
 # ----------------------------
 func _on_pause_button_pressed() -> void:
-	if dancer and dancer.has_method("toggle_pause_or_resume"):
-		dancer.toggle_pause_or_resume()
-		grab_focus() # restore keyboard focus
+	var dancer_instance = dancer
+	if dancer_instance != null and dancer_instance.is_inside_tree() and dancer_instance.has_method("toggle_pause_or_resume"):
+		dancer_instance.toggle_pause_or_resume()
+		grab_focus()
+	else:
+		print("DEBUG: Pause button pressed but no valid dancer instance")
 
 # ----------------------------
 # Exit

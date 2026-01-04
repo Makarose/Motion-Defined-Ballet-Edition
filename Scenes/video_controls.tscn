@@ -295,3 +295,5 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [connection signal="pressed" from="VideoControls/VContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/MaleButton/MaleButton" to="." method="_on_male_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/FemaleButton/FemaleButton" to="." method="_on_female_button_pressed"]
