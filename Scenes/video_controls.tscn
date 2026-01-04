@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=18 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
@@ -9,20 +9,22 @@
 [ext_resource type="Texture2D" uid="uid://d1utahd06e8al" path="res://UI Buttons/2.png" id="6_lwnut"]
 [ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_nvcej"]
 [ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_n4g7o"]
-font = ExtResource("3_qru45")
-font_size = 40
+[ext_resource type="Texture2D" uid="uid://cctx36p3ddvom" path="res://Characters/male.png" id="10_je4oq"]
+[ext_resource type="Texture2D" uid="uid://bfgbxmoappbvn" path="res://Characters/female.png" id="11_oa5pk"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cy6n2"]
 font = ExtResource("3_qru45")
 font_size = 40
 
-[sub_resource type="LabelSettings" id="LabelSettings_jsis0"]
+[sub_resource type="LabelSettings" id="LabelSettings_n4g7o"]
 font = ExtResource("3_qru45")
 font_size = 40
 
 [sub_resource type="LabelSettings" id="LabelSettings_col5w"]
+font = ExtResource("3_qru45")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_jsis0"]
 font = ExtResource("3_qru45")
 font_size = 40
 
@@ -43,49 +45,76 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bxpsy")
+zoom_speed = 2.0
 metadata/_edit_vertical_guides_ = [961.0]
+metadata/_edit_horizontal_guides_ = [99.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
 z_index = 100
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
+anchors_preset = 9
 anchor_bottom = 1.0
-offset_left = -535.0
-offset_top = -196.0
-offset_right = 1041.0
-offset_bottom = 202.0
-grow_horizontal = 2
-grow_vertical = 0
-scale = Vector2(0.759999, 0.439996)
+offset_left = -122.0
+offset_top = 96.0
+offset_right = 778.0
+offset_bottom = 390.0
+grow_vertical = 2
+scale = Vector2(0.65, 0.65)
 theme = ExtResource("1_6w5i7")
 
-[node name="HContainerButtons" type="HBoxContainer" parent="VideoControls"]
+[node name="VContainerButtons" type="VBoxContainer" parent="VideoControls"]
 layout_mode = 2
+size_flags_stretch_ratio = 0.0
+theme_override_constants/separation = 25
 
-[node name="ReplayContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="PauseContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Pause" type="VBoxContainer" parent="VideoControls/VContainerButtons/PauseContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="PauseButton" type="Button" parent="VideoControls/VContainerButtons/PauseContainer/Pause"]
+layout_mode = 2
+size_flags_horizontal = 4
+icon = ExtResource("4_3xnm3")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/PauseContainer/Pause"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "PAUSE [P]"
+label_settings = SubResource("LabelSettings_cy6n2")
+vertical_alignment = 2
+
+[node name="ReplayContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
+layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 0
 
-[node name="Replay" type="VBoxContainer" parent="VideoControls/HContainerButtons/ReplayContainer"]
+[node name="Replay" type="VBoxContainer" parent="VideoControls/VContainerButtons/ReplayContainer"]
 layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="ReplayButton" type="Button" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+[node name="ReplayButton" type="Button" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
 icon = ExtResource("2_vbtma")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ReplayContainer/Replay"]
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
@@ -94,129 +123,108 @@ label_settings = SubResource("LabelSettings_n4g7o")
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="PauseContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="LoopContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
-[node name="Pause" type="VBoxContainer" parent="VideoControls/HContainerButtons/PauseContainer"]
+[node name="Loop" type="VBoxContainer" parent="VideoControls/VContainerButtons/LoopContainer"]
 layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="PauseButton" type="Button" parent="VideoControls/HContainerButtons/PauseContainer/Pause"]
-layout_mode = 2
-size_flags_horizontal = 4
-icon = ExtResource("4_3xnm3")
-flat = true
-
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/PauseContainer/Pause"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 40
-text = "PAUSE [P]"
-label_settings = SubResource("LabelSettings_cy6n2")
-vertical_alignment = 2
-
-[node name="StopContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
-layout_mode = 2
-size_flags_vertical = 8
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-
-[node name="Stop" type="VBoxContainer" parent="VideoControls/HContainerButtons/StopContainer"]
-layout_mode = 2
-theme = ExtResource("1_6w5i7")
-alignment = 1
-
-[node name="StopButton" type="Button" parent="VideoControls/HContainerButtons/StopContainer/Stop"]
-layout_mode = 2
-size_flags_horizontal = 4
-icon = ExtResource("5_ha4y4")
-flat = true
-
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/StopContainer/Stop"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 40
-text = "STOP"
-label_settings = SubResource("LabelSettings_jsis0")
-vertical_alignment = 2
-
-[node name="LoopContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
-layout_mode = 2
-size_flags_vertical = 8
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-
-[node name="Loop" type="VBoxContainer" parent="VideoControls/HContainerButtons/LoopContainer"]
-layout_mode = 2
-theme = ExtResource("1_6w5i7")
-alignment = 1
-
-[node name="LoopButton" type="Button" parent="VideoControls/HContainerButtons/LoopContainer/Loop"]
+[node name="LoopButton" type="Button" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
 icon = ExtResource("6_lwnut")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/LoopContainer/Loop"]
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "LOOP"
+text = "LOOP [L]"
 label_settings = SubResource("LabelSettings_col5w")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MusicContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="StopContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
-[node name="Music" type="VBoxContainer" parent="VideoControls/HContainerButtons/MusicContainer"]
+[node name="Stop" type="VBoxContainer" parent="VideoControls/VContainerButtons/StopContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="StopButton" type="Button" parent="VideoControls/VContainerButtons/StopContainer/Stop"]
+layout_mode = 2
+size_flags_horizontal = 4
+icon = ExtResource("5_ha4y4")
+flat = true
+
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/StopContainer/Stop"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "STOP [S]"
+label_settings = SubResource("LabelSettings_jsis0")
+vertical_alignment = 2
+
+[node name="MusicContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Music" type="VBoxContainer" parent="VideoControls/VContainerButtons/MusicContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="MusicButton" type="Button" parent="VideoControls/HContainerButtons/MusicContainer/Music"]
+[node name="MusicButton" type="Button" parent="VideoControls/VContainerButtons/MusicContainer/Music"]
 layout_mode = 2
 size_flags_horizontal = 4
 icon = ExtResource("7_nvcej")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/MusicContainer/Music"]
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/MusicContainer/Music"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "MUSIC"
+text = "MUSIC ON/OFF [M]"
 label_settings = SubResource("LabelSettings_q714i")
 vertical_alignment = 2
 
-[node name="ExitContainer" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="ExitContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 8
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 0
 
-[node name="Exit" type="VBoxContainer" parent="VideoControls/HContainerButtons/ExitContainer"]
+[node name="Exit" type="VBoxContainer" parent="VideoControls/VContainerButtons/ExitContainer"]
 layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="ExitButton" type="Button" parent="VideoControls/HContainerButtons/ExitContainer/Exit"]
+[node name="ExitButton" type="Button" parent="VideoControls/VContainerButtons/ExitContainer/Exit"]
 layout_mode = 2
 size_flags_horizontal = 4
 icon = ExtResource("8_6b72h")
 flat = true
 
-[node name="Label" type="Label" parent="VideoControls/HContainerButtons/ExitContainer/Exit"]
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/ExitContainer/Exit"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
@@ -225,11 +233,65 @@ label_settings = SubResource("LabelSettings_wx6hk")
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="CameraDirections" type="MarginContainer" parent="VideoControls/HContainerButtons"]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
-size_flags_horizontal = 3
+offset_left = 1737.0
+offset_top = 99.0
+offset_right = 2465.0
+offset_bottom = 2375.0
+scale = Vector2(0.15, 0.15)
+size_flags_horizontal = 4
 size_flags_vertical = 4
-theme_override_constants/margin_left = 850
-theme_override_constants/margin_right = 50
+size_flags_stretch_ratio = 0.0
+theme_override_constants/separation = 100
 
-[connection signal="pressed" from="VideoControls/HContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]
+[node name="MaleButton" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MaleButton" type="Button" parent="VBoxContainer/MaleButton"]
+layout_mode = 2
+icon = ExtResource("10_je4oq")
+
+[node name="Label" type="Label" parent="VBoxContainer/MaleButton"]
+layout_mode = 2
+size_flags_vertical = 8
+theme = ExtResource("1_6w5i7")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("3_qru45")
+theme_override_font_sizes/font_size = 250
+text = "[1]"
+
+[node name="FemaleButton" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="FemaleButton" type="Button" parent="VBoxContainer/FemaleButton"]
+layout_mode = 2
+icon = ExtResource("11_oa5pk")
+
+[node name="Label" type="Label" parent="VBoxContainer/FemaleButton"]
+layout_mode = 2
+size_flags_vertical = 8
+theme = ExtResource("1_6w5i7")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("3_qru45")
+theme_override_font_sizes/font_size = 250
+text = "[2]"
+
+[node name="VideoScrubSlider" type="HSlider" parent="."]
+custom_minimum_size = Vector2(1000, 25)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -119.0
+offset_right = 500.0
+offset_bottom = -94.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[connection signal="pressed" from="VideoControls/VContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]

@@ -45,8 +45,8 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_ALL # ensures keyboard input always works
 	set_process_input(true)
 
-	$VideoControls/HContainerButtons/PauseContainer/Pause/PauseButton.pressed.connect(_on_pause_button_pressed)
-	$VideoControls/HContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
+	$VideoControls/VContainerButtons/PauseContainer/Pause/PauseButton.pressed.connect(_on_pause_button_pressed)
+	$VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
 
 # ----------------------------
 # Setup
