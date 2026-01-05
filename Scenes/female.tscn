@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/female.gd" id="2_sem4o"]
 
 [node name="female" instance=ExtResource("1_lwakl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0152286, 0)
 script = ExtResource("2_sem4o")
 
 [node name="Skeleton3D" parent="Female Armature" index="0"]

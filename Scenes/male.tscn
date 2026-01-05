@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/male.gd" id="2_u4368"]
 
 [node name="male" instance=ExtResource("1_h6u74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0152286, 0)
 script = ExtResource("2_u4368")
 
 [node name="Skeleton3D" parent="Male Armature" index="0"]

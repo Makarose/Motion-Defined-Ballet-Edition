@@ -1,23 +1,17 @@
-[gd_scene load_steps=12 format=3 uid="uid://c0opmlqorul1c"]
+[gd_scene load_steps=10 format=3 uid="uid://c0opmlqorul1c"]
 
 [ext_resource type="PackedScene" uid="uid://du1htf5ao34cs" path="res://Characters/male.glb" id="2_iuybu"]
 [ext_resource type="Script" path="res://Characters/male.gd" id="2_ohbij"]
 [ext_resource type="PackedScene" uid="uid://cd4snkot1sjo4" path="res://Scenes/female.tscn" id="2_q05r1"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mfq5q"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-
-[sub_resource type="Sky" id="Sky_umun0"]
-sky_material = SubResource("ProceduralSkyMaterial_mfq5q")
-
 [sub_resource type="Environment" id="Environment_blqaw"]
-background_mode = 2
-sky = SubResource("Sky_umun0")
+background_mode = 1
+background_color = Color(0.608592, 0.683907, 0.807551, 1)
+ambient_light_energy = 0.0
+reflected_light_source = 2
 tonemap_mode = 2
-glow_enabled = true
 
-[sub_resource type="BoxMesh" id="BoxMesh_gy04u"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_yd80d"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_bpotl"]
 
@@ -25,16 +19,20 @@ glow_enabled = true
 next_pass = SubResource("FogMaterial_bpotl")
 albedo_color = Color(0, 0, 0, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jk6gj"]
-albedo_color = Color(0.352, 0.388667, 0.44, 1)
+[sub_resource type="TorusMesh" id="TorusMesh_7dmuk"]
+outer_radius = 0.593
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_q4hd6"]
-material = SubResource("StandardMaterial3D_jk6gj")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8xpt4"]
+albedo_color = Color(1, 0.58096, 0.616879, 1)
+disable_receive_shadows = true
 
 [node name="Background" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0.499798, -0.764019, 0.408017, 0.0143273, 0.478302, 0.878079, 0, 2.36931, 4.66546)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+light_energy = 0.25
+light_volumetric_fog_energy = 0.0
+shadow_bias = 0.79
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_blqaw")
@@ -43,19 +41,68 @@ environment = SubResource("Environment_blqaw")
 transform = Transform3D(1, 0, 0, 0, 0.999343, 0.0362425, 0, -0.0362425, 0.999343, 0, 0.91391, 2.19744)
 
 [node name="Floor" type="MeshInstance3D" parent="."]
-transform = Transform3D(32.013, 0, 0, 0, 2.1, 0, 0, 0, 7.2, 0.00807884, -1.05282, 2.96079)
-mesh = SubResource("BoxMesh_gy04u")
+transform = Transform3D(42.1459, 0, 0, 0, 4.25147, 0, 0, 0, 42.1459, 0, -4.25, 0)
+mesh = SubResource("CylinderMesh_yd80d")
 skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_lba0p")
 
-[node name="BackWall" type="MeshInstance3D" parent="."]
-transform = Transform3D(44.9275, 0, 0, 0, -4.37114e-08, -11.2266, 0, 1, -4.90727e-07, 0, 6, -2.28073)
-mesh = SubResource("PlaneMesh_q4hd6")
-skeleton = NodePath("../..")
+[node name="Wall" type="MeshInstance3D" parent="."]
+transform = Transform3D(150, 0, 0, 0, 956.585, 0, 0, 0, 150, 0, 32.523, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("TorusMesh_7dmuk")
+surface_material_override/0 = SubResource("StandardMaterial3D_8xpt4")
 
 [node name="male" parent="." instance=ExtResource("2_iuybu")]
 visible = false
 script = ExtResource("2_ohbij")
 
 [node name="female" parent="." instance=ExtResource("2_q05r1")]
-visible = false
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="."]
+transform = Transform3D(0.707107, 3.09086e-08, -0.707107, 0.707107, -3.09086e-08, 0.707107, 0, -1, -4.37114e-08, -21, 11, 0)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.707107, 3.09086e-08, 0.707107, 0.707107, 3.09086e-08, 0.707107, -3.82137e-15, 1, -4.37114e-08, 21, 11, 0)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D4" type="SpotLight3D" parent="."]
+transform = Transform3D(4.37114e-08, 1, -8.74228e-08, 0.707107, 3.09086e-08, 0.707107, 0.707107, -9.27259e-08, -0.707107, -0.210463, 11, -21)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D5" type="SpotLight3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 5.32907e-15, 0.707107, -3.09086e-08, 0.707107, -0.707107, 3.09086e-08, 0.707107, -0.210463, 11, 21)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D6" type="SpotLight3D" parent="."]
+transform = Transform3D(0.5, -0.707107, -0.5, 0.707107, -9.83519e-09, 0.707107, -0.5, -0.707107, 0.5, -14.8801, 11, 14.7748)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D7" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.5, 0.707107, 0.5, 0.707107, 9.83519e-09, 0.707107, 0.5, 0.707107, -0.5, 14.8184, 11, -14.9237)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D8" type="SpotLight3D" parent="."]
+transform = Transform3D(0.5, 0.707107, -0.5, 0.707107, 3.09086e-08, 0.707107, 0.5, -0.707107, -0.5, -15.0289, 11, -14.7748)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
+
+[node name="SpotLight3D9" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.5, -0.707107, 0.5, 0.707107, -5.1982e-08, 0.707107, -0.5, 0.707107, 0.5, 14.6696, 11, 14.9237)
+light_energy = 4.0
+spot_range = 25.0
+spot_attenuation = 0.0
