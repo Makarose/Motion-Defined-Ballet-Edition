@@ -10,6 +10,7 @@ extends Control
 @onready var dancer_viewport: SubViewport = $"../SubViewportContainer/DancerViewport"
 @onready var sub_viewport_container: SubViewportContainer = $"../SubViewportContainer"
 @onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
+@onready var fullscreen_controls_container: MarginContainer = $CanvasLayer/Fullscreen
 
 # ----------------------------
 # Resources
@@ -32,6 +33,7 @@ var prev_size: Vector2 = Vector2.ZERO
 # Runtime state
 var dancer: Node3D
 var skel: Skeleton3D
+var has_selected_term: bool = false
 
 
 # ----------------------------
@@ -40,12 +42,18 @@ var skel: Skeleton3D
 func _ready() -> void:
 	print("UI READY")
 	
-	# Make sure VideoControl exists before connecting
+	# ----------------------------
+	# Initial UI setup
+	# ----------------------------
+	has_selected_term = false
+	_show_fullscreen_controls(false)
+	
+	# ----------------------------
+	# VideoControl setup
+	# ----------------------------
 	var video_control = $VideoControl
 	if video_control:
 		print("DEBUG: VideoControl node found:", video_control)
-		
-		# Connect signal safely using a Callable
 		var target_callable = Callable(self, "_on_character_button_pressed")
 		if not video_control.is_connected("character_requested", target_callable):
 			video_control.character_requested.connect(target_callable)
@@ -55,39 +63,55 @@ func _ready() -> void:
 	else:
 		push_error("VideoControl node not found!")
 
-	# Load database if not already loaded
+	# ----------------------------
+	# Load database if not assigned
+	# ----------------------------
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
 		print("DEBUG: Database loaded")
 
+	# ----------------------------
 	# Connect search bar signals
+	# ----------------------------
 	search_bar.text_changed.connect(_on_search_text_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
 
+	# ----------------------------
 	# Setup clear timer
+	# ----------------------------
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8
 	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
 
-	# Restore previous selections if any
+	# ----------------------------
+	# Restore previous character
+	# ----------------------------
 	print("DEBUG: Checking previous GameManager selections")
 	if GameManager.chosen_character != "":
 		print("DEBUG: Restoring chosen character:", GameManager.chosen_character)
 		_on_character_button_pressed(GameManager.chosen_character)
+
+	# ----------------------------
+	# Restore previously selected term (from index or previous session)
+	# ----------------------------
 	if GameManager.selected_term != "":
-		print("DEBUG: Restoring selected term:", GameManager.selected_term)
-		_select_term(GameManager.selected_term)
+		print("DEBUG: Restoring selected term from GameManager:", GameManager.selected_term)
+		# Use call_deferred to ensure dancer is instantiated before selecting term
+		call_deferred("_select_term", GameManager.selected_term)
 		GameManager.selected_term = ""
 
-	# Debug window size
+	# ----------------------------
+	# Debug window info
+	# ----------------------------
 	var prev_size = DisplayServer.window_get_size()
 	var prev_position = DisplayServer.window_get_position()
 	print("DEBUG: Initial window size:", prev_size, "position:", prev_position)
+
 
 
 
@@ -97,15 +121,23 @@ func _ready() -> void:
 # ----------------------------
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
+		print("DEBUG: Key pressed:", event)
+
 		match event.keycode:
 			KEY_F1:
-				if not is_fullscreen:
-					print("F1 pressed, toggling fullscreen")
+				print("DEBUG: F1 pressed, has_selected_term =", has_selected_term)
+				if has_selected_term:
 					toggle_viewport_fullscreen()
+				else:
+					print("DEBUG: F1 ignored — no term selected yet")
+
 			KEY_R:
 				if is_fullscreen and current_dancer and current_dancer.has_method("play_move") and GameManager.last_played_animation != "":
 					current_dancer.call_deferred("play_move", GameManager.last_played_animation)
-					print("R pressed — replaying last animation:", GameManager.last_played_animation)
+					print("DEBUG: R pressed — replaying last animation:", GameManager.last_played_animation)
+
+
+
 
 # ----------------------------
 # Character Selection
@@ -161,7 +193,9 @@ func _select_term(term_name: String) -> void:
 	var norm_term_name = normalize(term_name)
 	var move_resource: BalletMove = null
 
-	# Find move in database
+	# ----------------------------
+	# Find the move in the database
+	# ----------------------------
 	for move in database.moves:
 		if normalize(move.name) == norm_term_name:
 			move_resource = move
@@ -171,42 +205,52 @@ func _select_term(term_name: String) -> void:
 		print("DEBUG: Term not found in database:", term_name)
 		return
 
+	# ----------------------------
 	# Update UI labels
-	definition_label.set_text(move_resource.definition)
+	# ----------------------------
 	title_label.set_text(move_resource.name)
+	definition_label.set_text(move_resource.definition)
 	search_bar.text = move_resource.name
 	item_list.visible = false
 
+	# ----------------------------
+	# Enable fullscreen button / F1
+	# ----------------------------
+	has_selected_term = true
+	_show_fullscreen_controls(true)
+
+	# ----------------------------
 	# Get animation name
+	# ----------------------------
 	var animation_name = move_resource.animation_name.strip_edges()
 	if animation_name == "":
 		print("DEBUG: No animation defined for this term:", term_name)
-		return
-
-	# Decide if we actually play the animation
-	if current_dancer == null:
-		print("DEBUG: No dancer instance available, only updating DancerState")
-		DancerState.current_animation = animation_name
-		DancerState.animation_time = 0.0
+		DancerState.current_animation = ""
 		DancerState.is_playing = false
 		GameManager.last_played_animation = ""
 		return
 
-	if is_fullscreen and current_dancer.has_method("play_move"):
-		# Only play animation in fullscreen
+	# ----------------------------
+	# Save animation in GameManager
+	# ----------------------------
+	DancerState.current_animation = animation_name
+	DancerState.animation_time = 0.0
+	GameManager.last_played_animation = animation_name
+
+	# ----------------------------
+	# Play animation if dancer exists
+	# ----------------------------
+	if current_dancer and current_dancer.has_method("play_move"):
 		current_dancer.call_deferred("play_move", animation_name)
-		DancerState.current_animation = animation_name
-		DancerState.animation_time = 0.0
 		DancerState.is_playing = true
-		GameManager.last_played_animation = animation_name
-		print("DEBUG: Animation played in fullscreen:", animation_name)
+		print("DEBUG: Animation played (deferred):", animation_name)
 	else:
-		# On title page: just update DancerState, do NOT play
-		DancerState.current_animation = animation_name
-		DancerState.animation_time = 0.0
+		# If dancer not ready yet, wait until instantiated
 		DancerState.is_playing = false
-		GameManager.last_played_animation = ""
-		print("DEBUG: Title page term selected, animation not played:", animation_name)
+		print("DEBUG: Animation not played — dancer not ready yet")
+
+
+
 
 
 
@@ -225,6 +269,7 @@ func _select_item(index: int) -> void:
 		print("Resources not found for move:", selected_move_name)
 		return
 
+	# Update UI labels
 	definition_label.set_text(move_resource.definition)
 	title_label.set_text(move_resource.name)
 	search_bar.text = selected_move_name
@@ -232,11 +277,16 @@ func _select_item(index: int) -> void:
 	search_bar.grab_focus()
 	clear_timer.start()
 
+	# TERM SELECTED: show fullscreen button and enable F1
+	has_selected_term = true
+	_show_fullscreen_controls(true)
+
 	var animation_name = move_resource.animation_name.strip_edges()
 	if current_dancer and current_dancer.has_method("play_move") and animation_name != "":
 		current_dancer.call_deferred("play_move", animation_name)
 		GameManager.last_played_animation = animation_name
 		print("Animation played (deferred):", animation_name)
+
 
 # ----------------------------
 # Search Bar / List
@@ -316,6 +366,14 @@ func normalize(text: String) -> String:
 # ----------------------------
 # Fullscreen / Video Controls
 # ----------------------------
+func _show_fullscreen_controls(visible: bool) -> void:
+	if fullscreen_controls_container and fullscreen_controls_container.is_inside_tree():
+		fullscreen_controls_container.visible = visible
+		print("DEBUG: Fullscreen container visibility set to:", visible)
+	else:
+		print("DEBUG: Fullscreen container not found or not in tree!")
+
+
 func toggle_viewport_fullscreen() -> void:
 	if not is_fullscreen:
 		# Hide all main CanvasLayers except fullscreen controls
@@ -417,3 +475,10 @@ func _on_back_button_pressed() -> void:
 	GameManager.selected_term = ""
 	GameManager.last_played_animation = ""
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+
+func _on_fullscreen_button_pressed() -> void:
+	print("DEBUG: Fullscreen button pressed, has_selected_term =", has_selected_term)
+	if has_selected_term:
+		toggle_viewport_fullscreen()
+	else:
+		print("DEBUG: Fullscreen ignored, no term selected yet")

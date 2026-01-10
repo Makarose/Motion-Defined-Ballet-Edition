@@ -44,8 +44,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_bxpsy")
 zoom_speed = 2.0
+default_distance = 10.0
 metadata/_edit_vertical_guides_ = [961.0]
 metadata/_edit_horizontal_guides_ = [99.0]
 
@@ -60,17 +62,20 @@ offset_right = 778.0
 offset_bottom = 390.0
 grow_vertical = 2
 scale = Vector2(0.65, 0.65)
+mouse_filter = 2
 theme = ExtResource("1_6w5i7")
 
 [node name="VContainerButtons" type="VBoxContainer" parent="VideoControls"]
 layout_mode = 2
 size_flags_stretch_ratio = 0.0
+mouse_filter = 2
 theme_override_constants/separation = 25
 
 [node name="PauseContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -97,6 +102,7 @@ vertical_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
@@ -127,17 +133,20 @@ vertical_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
 [node name="Loop" type="VBoxContainer" parent="VideoControls/VContainerButtons/LoopContainer"]
 layout_mode = 2
+mouse_filter = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
 [node name="LoopButton" type="Button" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
 icon = ExtResource("6_lwnut")
 flat = true
 
@@ -154,6 +163,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -180,6 +190,7 @@ vertical_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
@@ -208,6 +219,7 @@ vertical_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 10
@@ -243,13 +255,16 @@ scale = Vector2(0.15, 0.15)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 size_flags_stretch_ratio = 0.0
+mouse_filter = 2
 theme_override_constants/separation = 100
 
 [node name="MaleButton" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="MaleButton" type="Button" parent="VBoxContainer/MaleButton"]
 layout_mode = 2
+mouse_filter = 2
 icon = ExtResource("10_je4oq")
 
 [node name="Label" type="Label" parent="VBoxContainer/MaleButton"]
@@ -264,9 +279,11 @@ text = "[1]"
 
 [node name="FemaleButton" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="FemaleButton" type="Button" parent="VBoxContainer/FemaleButton"]
 layout_mode = 2
+mouse_filter = 2
 icon = ExtResource("11_oa5pk")
 
 [node name="Label" type="Label" parent="VBoxContainer/FemaleButton"]
@@ -293,6 +310,7 @@ offset_right = 500.0
 offset_bottom = -94.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 
 [connection signal="pressed" from="VideoControls/VContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/MaleButton/MaleButton" to="." method="_on_male_button_pressed"]

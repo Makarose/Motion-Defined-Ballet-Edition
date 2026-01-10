@@ -127,23 +127,29 @@ func _gui_input(event: InputEvent) -> void:
 # Keyboard input (safe)
 # ----------------------------
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		var dancer_instance = dancer
-		if dancer_instance == null or not dancer_instance.is_inside_tree():
-			return
+	var dancer_instance = dancer
+	if dancer_instance == null or not dancer_instance.is_inside_tree():
+		return
 
-		if Input.is_action_pressed("exit_fullscreen"):
-			_on_exit_button_pressed()
+	# Exit fullscreen (TAB)
+	if Input.is_action_just_pressed("exit_fullscreen"):
+		_on_exit_button_pressed()
 
-		if Input.is_action_pressed("replay_animation") and dancer_instance.has_method("replay_last_animation"):
-			dancer_instance.replay_last_animation()
+	# Replay animation (R)
+	if Input.is_action_just_pressed("replay_animation") \
+	and dancer_instance.has_method("replay_last_animation"):
+		dancer_instance.replay_last_animation()
 
-		if Input.is_action_pressed("camera_reset"):
-			reset_camera()
+	# Reset camera (Home OR Right Mouse)
+	if Input.is_action_just_pressed("camera_reset"):
+		reset_camera()
 
-		if Input.is_action_pressed("pause_animation") and dancer_instance.has_method("toggle_pause_or_resume"):
-			dancer_instance.toggle_pause_or_resume()
-			grab_focus()
+	# Pause (P)
+	if Input.is_action_just_pressed("pause_animation") \
+	and dancer_instance.has_method("toggle_pause_or_resume"):
+		dancer_instance.toggle_pause_or_resume()
+		grab_focus()
+
 
 # ----------------------------
 # Update loop

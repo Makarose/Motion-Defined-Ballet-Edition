@@ -249,35 +249,31 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
+[node name="FullscreenButton" type="Button" parent="CanvasLayer/Fullscreen"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+flat = true
+
 [node name="Panel" type="Panel" parent="CanvasLayer/Fullscreen"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_cyxhj")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Fullscreen/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -243.0
-offset_top = -65.0
-offset_right = 243.0
-offset_bottom = 65.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 25
-
-[node name="FullscreenButton" type="Button" parent="CanvasLayer/Fullscreen/Panel/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Fullscreen"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-icon = ExtResource("6_leo0t")
-flat = true
+mouse_filter = 2
+theme_override_constants/separation = 50
 
-[node name="Label" type="Label" parent="CanvasLayer/Fullscreen/Panel/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Fullscreen/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
+texture = ExtResource("6_leo0t")
+stretch_mode = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/Fullscreen/HBoxContainer"]
+layout_mode = 2
 text = "FULLSCREEN [F1]
 "
 label_settings = SubResource("LabelSettings_djaeu")
@@ -288,4 +284,4 @@ vertical_alignment = 2
 [connection signal="text_submitted" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="CanvasLayer/Container/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Container2/Container/IndexButton" to="." method="_on_index_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/Fullscreen/Panel/HBoxContainer/FullscreenButton" to="." method="_on_index_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Fullscreen/FullscreenButton" to="." method="_on_fullscreen_button_pressed"]
