@@ -1,20 +1,22 @@
-[gd_scene load_steps=8 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=10 format=3 uid="uid://crbl3op3bapp6"]
 
 [ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_sgoow"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="4_i7ljw"]
 [ext_resource type="Texture2D" uid="uid://m7lpnticn8bw" path="res://UI Buttons/5.png" id="5_0cy04"]
+[ext_resource type="Texture2D" uid="uid://dwwyxsih8n68u" path="res://UI Buttons/20.png" id="6_leo0t"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_djaeu"]
 font = ExtResource("4_i7ljw")
-font_size = 40
-font_color = Color(0, 0, 0, 1)
-outline_size = 3
+font_size = 50
 outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cyxhj"]
+bg_color = Color(0.482353, 0.635294, 0.721569, 1)
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -31,8 +33,10 @@ metadata/_edit_horizontal_guides_ = [1000.0, 868.0]
 z_index = -100
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 1930.0
+offset_bottom = 1085.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_o433g")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -226,7 +230,62 @@ label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 2
 
+[node name="Fullscreen" type="MarginContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(75, 75)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1211.0
+offset_top = -528.0
+offset_right = -541.0
+offset_bottom = -348.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.5, 0.493487)
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="Panel" type="Panel" parent="CanvasLayer/Fullscreen"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cyxhj")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Fullscreen/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -243.0
+offset_top = -65.0
+offset_right = 243.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+
+[node name="FullscreenButton" type="Button" parent="CanvasLayer/Fullscreen/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+icon = ExtResource("6_leo0t")
+flat = true
+
+[node name="Label" type="Label" parent="CanvasLayer/Fullscreen/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "FULLSCREEN [F1]
+"
+label_settings = SubResource("LabelSettings_djaeu")
+horizontal_alignment = 1
+vertical_alignment = 2
+
 [connection signal="text_changed" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="CanvasLayer/Container/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Container2/Container/IndexButton" to="." method="_on_index_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Fullscreen/Panel/HBoxContainer/FullscreenButton" to="." method="_on_index_button_pressed"]
