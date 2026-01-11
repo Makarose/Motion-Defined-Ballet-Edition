@@ -127,7 +127,7 @@ func _gui_input(event: InputEvent) -> void:
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 
 # ----------------------------
-# Keyboard input (safe)
+# Keyboard Input
 # ----------------------------
 func _input(event: InputEvent) -> void:
 	var dancer_instance = dancer
@@ -158,6 +158,12 @@ func _input(event: InputEvent) -> void:
 		_toggle_loop()
 		grab_focus()
 
+	# Fullscreen Character Select via Number Keys
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1 or event.keycode == KEY_KP_1:
+			_on_male_button_pressed()
+		elif event.keycode == KEY_2 or event.keycode == KEY_KP_2:
+			_on_female_button_pressed()
 
 
 # ----------------------------
