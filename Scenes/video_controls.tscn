@@ -1,16 +1,28 @@
-[gd_scene load_steps=18 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=34 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
 [ext_resource type="Texture2D" uid="uid://bpfk4yr4sgv3k" path="res://UI Buttons/0.png" id="2_vbtma"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_qru45"]
 [ext_resource type="Texture2D" uid="uid://cognf4qc1jsq1" path="res://UI Buttons/3.png" id="4_3xnm3"]
+[ext_resource type="Texture2D" uid="uid://crokha4u4iyur" path="res://UI Buttons/pause_selected_button.png" id="4_ta3ni"]
+[ext_resource type="Texture2D" uid="uid://ca206oewopfce" path="res://UI Buttons/pause_highlight_button.png" id="5_841mv"]
 [ext_resource type="Texture2D" uid="uid://ccjq5ftju6b7w" path="res://UI Buttons/11.png" id="5_ha4y4"]
+[ext_resource type="Texture2D" uid="uid://c7jk4poleltdy" path="res://UI Buttons/play_selected_button.png" id="6_cfs3h"]
 [ext_resource type="Texture2D" uid="uid://d1utahd06e8al" path="res://UI Buttons/2.png" id="6_lwnut"]
+[ext_resource type="Texture2D" uid="uid://dugpion57hci5" path="res://UI Buttons/play_highlight_button.png" id="7_7d60p"]
 [ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_nvcej"]
 [ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
 [ext_resource type="Texture2D" uid="uid://cctx36p3ddvom" path="res://Characters/male.png" id="10_je4oq"]
+[ext_resource type="Texture2D" uid="uid://bx7uv5iqnbiya" path="res://UI Buttons/loop_selected_button.png" id="11_nt7t8"]
 [ext_resource type="Texture2D" uid="uid://bfgbxmoappbvn" path="res://Characters/female.png" id="11_oa5pk"]
+[ext_resource type="Texture2D" uid="uid://dkmlfuypouph4" path="res://UI Buttons/loop_highlight_button.png" id="12_y61kq"]
+[ext_resource type="Texture2D" uid="uid://d0e5rfj0pdffr" path="res://UI Buttons/stop_selected_button.png" id="14_xm3w4"]
+[ext_resource type="Texture2D" uid="uid://q5kxojkgssxx" path="res://UI Buttons/stop_highlight_button.png" id="15_lxk1w"]
+[ext_resource type="Texture2D" uid="uid://cbj25vc3nr1uq" path="res://UI Buttons/music_select_button.png" id="17_pug1l"]
+[ext_resource type="Texture2D" uid="uid://ceiehxh5124ow" path="res://UI Buttons/music_highlight_button.png" id="18_uhs5j"]
+[ext_resource type="Texture2D" uid="uid://dj05fyuer3itm" path="res://UI Buttons/exit_select_button.png" id="20_l8vmc"]
+[ext_resource type="Texture2D" uid="uid://41h2mvauywyd" path="res://UI Buttons/exit_highlight_button.png" id="21_dvm2q"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cy6n2"]
 font = ExtResource("3_qru45")
@@ -36,6 +48,48 @@ font_size = 40
 font = ExtResource("3_qru45")
 font_size = 40
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty5wo"]
+bg_color = Color(0, 0, 0, 0)
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.180392, 0.968627, 0.0392157, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1y73t"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.180392, 0.968627, 0.0392157, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7o72n"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.180392, 0.968627, 0.0392157, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ea7w"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.180392, 0.968627, 0.0392157, 1)
+
 [node name="VideoControls" type="Control"]
 z_index = 100
 layout_mode = 3
@@ -50,7 +104,7 @@ vertical_speed = 1.75
 zoom_speed = 3.5
 zoom_min = 1.0
 default_distance = 10.0
-metadata/_edit_vertical_guides_ = [961.0]
+metadata/_edit_vertical_guides_ = [961.0, 1685.0]
 metadata/_edit_horizontal_guides_ = [99.0]
 
 [node name="VideoControls" type="MarginContainer" parent="."]
@@ -86,17 +140,19 @@ layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="PauseButton" type="Button" parent="VideoControls/VContainerButtons/PauseContainer/Pause"]
+[node name="PauseButton" type="TextureButton" parent="VideoControls/VContainerButtons/PauseContainer/Pause"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("4_3xnm3")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("4_3xnm3")
+texture_pressed = ExtResource("4_ta3ni")
+texture_hover = ExtResource("5_841mv")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/PauseContainer/Pause"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "PAUSE [P]"
+text = "PAUSE ON/OFF [P]"
 label_settings = SubResource("LabelSettings_cy6n2")
 vertical_alignment = 2
 
@@ -115,12 +171,13 @@ layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="ReplayButton" type="Button" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
+[node name="ReplayButton" type="TextureButton" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 8
-icon = ExtResource("2_vbtma")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("2_vbtma")
+texture_pressed = ExtResource("6_cfs3h")
+texture_hover = ExtResource("7_7d60p")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
@@ -145,11 +202,13 @@ mouse_filter = 0
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="LoopButton" type="Button" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
+[node name="LoopButton" type="TextureButton" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("6_lwnut")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("6_lwnut")
+texture_pressed = ExtResource("11_nt7t8")
+texture_hover = ExtResource("12_y61kq")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
 layout_mode = 2
@@ -174,11 +233,13 @@ layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="StopButton" type="Button" parent="VideoControls/VContainerButtons/StopContainer/Stop"]
+[node name="StopButton" type="TextureButton" parent="VideoControls/VContainerButtons/StopContainer/Stop"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("5_ha4y4")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("5_ha4y4")
+texture_pressed = ExtResource("14_xm3w4")
+texture_hover = ExtResource("15_lxk1w")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/StopContainer/Stop"]
 layout_mode = 2
@@ -203,11 +264,13 @@ size_flags_vertical = 4
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="MusicButton" type="Button" parent="VideoControls/VContainerButtons/MusicContainer/Music"]
+[node name="MusicButton" type="TextureButton" parent="VideoControls/VContainerButtons/MusicContainer/Music"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("7_nvcej")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("7_nvcej")
+texture_pressed = ExtResource("17_pug1l")
+texture_hover = ExtResource("18_uhs5j")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/MusicContainer/Music"]
 layout_mode = 2
@@ -232,11 +295,13 @@ layout_mode = 2
 theme = ExtResource("1_6w5i7")
 alignment = 1
 
-[node name="ExitButton" type="Button" parent="VideoControls/VContainerButtons/ExitContainer/Exit"]
+[node name="ExitButton" type="TextureButton" parent="VideoControls/VContainerButtons/ExitContainer/Exit"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("8_6b72h")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("8_6b72h")
+texture_pressed = ExtResource("20_l8vmc")
+texture_hover = ExtResource("21_dvm2q")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/ExitContainer/Exit"]
 layout_mode = 2
@@ -249,23 +314,30 @@ vertical_alignment = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
-offset_left = 1737.0
+offset_left = 1707.0
 offset_top = 99.0
-offset_right = 2465.0
-offset_bottom = 2375.0
+offset_right = 2731.0
+offset_bottom = 2475.0
+grow_horizontal = 2
+grow_vertical = 2
 scale = Vector2(0.15, 0.15)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 size_flags_stretch_ratio = 0.0
 mouse_filter = 0
-theme_override_constants/separation = 100
+theme_override_constants/separation = 200
 
 [node name="MaleButton" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 mouse_filter = 0
+theme_override_constants/separation = 50
 
 [node name="MaleButton" type="Button" parent="VBoxContainer/MaleButton"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxFlat_ty5wo")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1y73t")
 icon = ExtResource("10_je4oq")
 
 [node name="Label" type="Label" parent="VBoxContainer/MaleButton"]
@@ -282,9 +354,12 @@ text = "[1]"
 [node name="FemaleButton" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 mouse_filter = 0
+theme_override_constants/separation = 50
 
 [node name="FemaleButton" type="Button" parent="VBoxContainer/FemaleButton"]
 layout_mode = 2
+theme_override_styles/focus = SubResource("StyleBoxFlat_7o72n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3ea7w")
 icon = ExtResource("11_oa5pk")
 
 [node name="Label" type="Label" parent="VBoxContainer/FemaleButton"]

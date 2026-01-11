@@ -1,10 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://cllriydv8ru44"]
+[gd_scene load_steps=12 format=3 uid="uid://cllriydv8ru44"]
 
 [ext_resource type="Script" path="res://Scripts/index.gd" id="1_37t3u"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_vndco"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="2_l3b18"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_eq036"]
+[ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_blvt4"]
 [ext_resource type="Texture2D" uid="uid://c70g6jkijl6yl" path="res://UI Buttons/18.png" id="4_j1bci"]
+[ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="5_15t15"]
+[ext_resource type="Texture2D" uid="uid://dvd8voictywof" path="res://UI Buttons/home_selected_button.png" id="8_ka0yk"]
+[ext_resource type="Texture2D" uid="uid://cos3cyr6eott2" path="res://UI Buttons/home_highlight_button.png" id="9_55g2m"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_35u1d"]
 bg_color = Color(0.643137, 0.729412, 0.776471, 1)
@@ -76,11 +80,13 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 theme_override_constants/margin_bottom = 50
 
-[node name="BackButton" type="Button" parent="Back/MarginContainer"]
+[node name="BackButton" type="TextureButton" parent="Back/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("2_l3b18")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("2_l3b18")
+texture_pressed = ExtResource("4_blvt4")
+texture_hover = ExtResource("5_15t15")
 
 [node name="Label" type="Label" parent="Back"]
 layout_mode = 2
@@ -114,11 +120,13 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 theme_override_constants/margin_bottom = 50
 
-[node name="HomeButton" type="Button" parent="Home/MarginContainer"]
+[node name="HomeButton" type="TextureButton" parent="Home/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-icon = ExtResource("4_j1bci")
-flat = true
+size_flags_vertical = 4
+texture_normal = ExtResource("4_j1bci")
+texture_pressed = ExtResource("8_ka0yk")
+texture_hover = ExtResource("9_55g2m")
 
 [node name="Label" type="Label" parent="Home"]
 layout_mode = 2

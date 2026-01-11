@@ -1,0 +1,55 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1b8hcpwqw1c0"]
+
+[ext_resource type="Texture2D" uid="uid://dxdmlsv4nw4ce" path="res://UI Buttons/highlight_button.png" id="1_twxgt"]
+[ext_resource type="Texture2D" uid="uid://bhiv6g5s1uu6r" path="res://UI Buttons/selected_button.png" id="2_06kqw"]
+
+[sub_resource type="GDScript" id="GDScript_vtp6h"]
+script/source = "extends Button
+
+@onready var hover_overlay = $HoverOverlay
+@onready var selected_overlay = $SelectedOverlay
+
+var is_selected: bool = false
+
+func _ready():
+    # Connect hover signals
+    mouse_entered.connect(_on_hover_entered)
+    mouse_exited.connect(_on_hover_exited)
+    pressed.connect(_on_pressed)
+
+func _on_hover_entered():
+    if not is_selected:
+        hover_overlay.visible = true
+
+func _on_hover_exited():
+    if not is_selected:
+        hover_overlay.visible = false
+
+func _on_pressed():
+    is_selected = true
+    selected_overlay.visible = true
+    hover_overlay.visible = false
+"
+
+[node name="ButtonWithOverlay" type="Button"]
+offset_right = 8.0
+offset_bottom = 8.0
+script = SubResource("GDScript_vtp6h")
+
+[node name="HoverOverlay" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 7.0
+offset_top = 4.0
+offset_right = 127.0
+offset_bottom = 126.0
+texture = ExtResource("1_twxgt")
+
+[node name="SelectedOverlay" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 126.0
+offset_bottom = 126.0
+texture = ExtResource("2_06kqw")

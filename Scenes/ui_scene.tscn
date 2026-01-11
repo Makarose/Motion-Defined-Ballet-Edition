@@ -1,11 +1,17 @@
-[gd_scene load_steps=10 format=3 uid="uid://crbl3op3bapp6"]
+[gd_scene load_steps=16 format=3 uid="uid://crbl3op3bapp6"]
 
 [ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_sgoow"]
+[ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_66hya"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="4_i7ljw"]
 [ext_resource type="Texture2D" uid="uid://m7lpnticn8bw" path="res://UI Buttons/5.png" id="5_0cy04"]
+[ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="5_hpfhr"]
 [ext_resource type="Texture2D" uid="uid://dwwyxsih8n68u" path="res://UI Buttons/20.png" id="6_leo0t"]
+[ext_resource type="Texture2D" uid="uid://myav0h3tsxl0" path="res://UI Buttons/index_selected_button.png" id="8_0woyu"]
+[ext_resource type="Texture2D" uid="uid://dydr5wiqss10u" path="res://UI Buttons/index_highlight_button.png" id="9_js43b"]
+[ext_resource type="Texture2D" uid="uid://vnwwsbv0mckb" path="res://UI Buttons/fullscreen_select_button.png" id="11_2kgsv"]
+[ext_resource type="Texture2D" uid="uid://coqs1kq51lxuf" path="res://UI Buttons/fullscreen_highlight_button.png" id="12_6jwf7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
@@ -165,7 +171,7 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -175.0
-offset_right = 328.0
+offset_right = 339.0
 offset_bottom = 15.0
 grow_vertical = 0
 scale = Vector2(0.5, 0.5)
@@ -178,10 +184,13 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 theme_override_constants/margin_bottom = 50
 
-[node name="BackButton" type="Button" parent="CanvasLayer/Container/MarginContainer"]
+[node name="BackButton" type="TextureButton" parent="CanvasLayer/Container/MarginContainer"]
 layout_mode = 2
-icon = ExtResource("3_sgoow")
-flat = true
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("3_sgoow")
+texture_pressed = ExtResource("4_66hya")
+texture_hover = ExtResource("5_hpfhr")
 
 [node name="Label" type="Label" parent="CanvasLayer/Container"]
 layout_mode = 2
@@ -215,10 +224,13 @@ layout_mode = 2
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_bottom = 50
 
-[node name="IndexButton" type="Button" parent="CanvasLayer/Container2/Container"]
+[node name="IndexButton" type="TextureButton" parent="CanvasLayer/Container2/Container"]
 layout_mode = 2
-icon = ExtResource("5_0cy04")
-flat = true
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("5_0cy04")
+texture_pressed = ExtResource("8_0woyu")
+texture_hover = ExtResource("9_js43b")
 
 [node name="Label" type="Label" parent="CanvasLayer/Container2"]
 layout_mode = 2
@@ -248,11 +260,6 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="FullscreenButton" type="Button" parent="CanvasLayer/Fullscreen"]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-flat = true
-
 [node name="Panel" type="Panel" parent="CanvasLayer/Fullscreen"]
 layout_mode = 2
 mouse_filter = 2
@@ -265,11 +272,14 @@ size_flags_vertical = 4
 mouse_filter = 2
 theme_override_constants/separation = 50
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Fullscreen/HBoxContainer"]
+[node name="FullscreenButton" type="TextureButton" parent="CanvasLayer/Fullscreen/HBoxContainer"]
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
-size_flags_horizontal = 3
-texture = ExtResource("6_leo0t")
-stretch_mode = 3
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("6_leo0t")
+texture_pressed = ExtResource("11_2kgsv")
+texture_hover = ExtResource("12_6jwf7")
 
 [node name="Label" type="Label" parent="CanvasLayer/Fullscreen/HBoxContainer"]
 layout_mode = 2
@@ -283,4 +293,4 @@ vertical_alignment = 2
 [connection signal="text_submitted" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="CanvasLayer/Container/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Container2/Container/IndexButton" to="." method="_on_index_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/Fullscreen/FullscreenButton" to="." method="_on_fullscreen_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton" to="." method="_on_fullscreen_button_pressed"]
