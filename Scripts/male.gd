@@ -84,6 +84,23 @@ func loop_current_animation() -> void:
 	animation_player.get_animation(last_animation_name).loop = true
 	print("DEBUG: Looping enabled for", last_animation_name)
 
+func stop_animation() -> void:
+	if not animation_player:
+		return
+
+	# Stop playback immediately
+	animation_player.stop()
+	is_paused = false
+	paused_position = 0.0
+
+	# Keep last_animation_name so replay works
+	# Update DancerState to reflect stopped but replayable animation
+	DancerState.is_playing = false
+	DancerState.is_paused = false
+	DancerState.animation_time = 0.0
+
+
+
 # ----------------------------
 # Seamless switch support
 # ----------------------------

@@ -3,21 +3,32 @@ extends Control
 signal character_requested(character_scene_path: String)
 
 # ----------------------------
-# Tunables
+# Camera / Dancer Tunables
 # ----------------------------
-@export var zoom_speed: float = 3.0
+
+# Horizontal / orbit speeds
+@export var orbit_speed: float = 1.5
+@export var vertical_speed: float = 1.5
+
+@export var mouse_orbit_speed: float = 0.015
+@export var mouse_vertical_speed: float = 0.015
+
+# Zoom speeds
+@export var zoom_speed: float = 1.5
+@export var mouse_zoom_step: float = 0.6
+
+# Zoom limits
 @export var zoom_min: float = 2.0
 @export var zoom_max: float = 10.0
 
-@export var orbit_speed_mouse: float = 0.01
-@export var orbit_speed_keyboard: float = 1.8
-
-@export var vertical_speed_mouse: float = 0.015
-@export var vertical_speed_keyboard: float = 2.0
+# Vertical movement limits
 @export var vertical_min: float = -1.5
 @export var vertical_max: float = 2.5
 
+# Default camera distance
 @export var default_distance: float = 5.0
+
+# Skeleton head bone name
 @export var head_bone_name: String = "Head"
 
 # ----------------------------
@@ -35,7 +46,6 @@ var pivot: Vector3
 var dragging := false
 var is_looping := false
 
-
 # Home state
 var home_distance: float
 var home_horizontal_angle: float
@@ -51,12 +61,12 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_ALL
 	set_process_input(true)
 
-	# Connect buttons safely
 	$VideoControls/VContainerButtons/PauseContainer/Pause/PauseButton.pressed.connect(_on_pause_button_pressed)
 	$VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
 	$VBoxContainer/MaleButton/MaleButton.pressed.connect(Callable(self, "_on_male_button_pressed"))
 	$VBoxContainer/FemaleButton/FemaleButton.pressed.connect(Callable(self, "_on_female_button_pressed"))
 	$VideoControls/VContainerButtons/LoopContainer/Loop/LoopButton.pressed.connect(_on_loop_button_pressed)
+	$VideoControls/VContainerButtons/StopContainer/Stop/StopButton.pressed.connect(_on_stop_button_pressed)
 
 # ----------------------------
 # Setup
@@ -66,7 +76,7 @@ func set_camera(cam: Camera3D) -> void:
 
 func set_active_dancer(dancer_node: Node3D) -> void:
 	if dancer != null and dancer.is_inside_tree():
-		dancer.queue_free()  # safely free previous dancer
+		dancer.queue_free()
 
 	dancer = dancer_node
 	skel = dancer.get_node_or_null("Skeleton3D") as Skeleton3D
@@ -79,7 +89,6 @@ func set_active_dancer(dancer_node: Node3D) -> void:
 	_save_home_state()
 	_update_camera()
 
-	# Restore playback from DancerState
 	if dancer.has_method("apply_playback_state"):
 		dancer.call_deferred("apply_playback_state", {
 			"animation": DancerState.current_animation,
@@ -111,76 +120,71 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			dragging = event.pressed
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			distance = clamp(distance - zoom_speed, zoom_min, zoom_max)
-		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			distance = clamp(distance + zoom_speed, zoom_min, zoom_max)
+
+		if event.pressed:
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				distance = clamp(distance - mouse_zoom_step, zoom_min, zoom_max)
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				distance = clamp(distance + mouse_zoom_step, zoom_min, zoom_max)
 
 	if event is InputEventMouseMotion and dragging:
 		var dx: float = abs(event.relative.x)
 		var dy: float = abs(event.relative.y)
 
-		if dx >= dy:
-			horizontal_angle -= event.relative.x * orbit_speed_mouse
+		if dx > dy:
+			horizontal_angle -= event.relative.x * mouse_orbit_speed
 		else:
-			vertical_offset += -event.relative.y * vertical_speed_mouse
+			vertical_offset += -event.relative.y * mouse_vertical_speed
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 
 # ----------------------------
 # Keyboard Input
 # ----------------------------
 func _input(event: InputEvent) -> void:
-	var dancer_instance = dancer
-	if dancer_instance == null or not dancer_instance.is_inside_tree():
+	if dancer == null or not dancer.is_inside_tree():
 		return
 
-	# Exit fullscreen (TAB)
 	if Input.is_action_just_pressed("exit_fullscreen"):
 		_on_exit_button_pressed()
 
-	# Replay animation (R)
-	if Input.is_action_just_pressed("replay_animation") \
-	and dancer_instance.has_method("replay_last_animation"):
-		dancer_instance.replay_last_animation()
+	if Input.is_action_just_pressed("replay_animation") and dancer.has_method("replay_last_animation"):
+		dancer.replay_last_animation()
 
-	# Reset camera (Home OR Right Mouse)
 	if Input.is_action_just_pressed("camera_reset"):
 		reset_camera()
 
-	# Pause (P)
-	if Input.is_action_just_pressed("pause_animation") \
-	and dancer_instance.has_method("toggle_pause_or_resume"):
-		dancer_instance.toggle_pause_or_resume()
+	if Input.is_action_just_pressed("pause_animation") and dancer.has_method("toggle_pause_or_resume"):
+		dancer.toggle_pause_or_resume()
 		grab_focus()
-		
-	# Loop (L)
+
 	if Input.is_action_just_pressed("toggle_loop"):
 		_toggle_loop()
 		grab_focus()
 
-	# Fullscreen Character Select via Number Keys
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 or event.keycode == KEY_KP_1:
 			_on_male_button_pressed()
 		elif event.keycode == KEY_2 or event.keycode == KEY_KP_2:
 			_on_female_button_pressed()
-
+		elif event.keycode == KEY_S:
+			stop_animation()
+			grab_focus()
 
 # ----------------------------
-# Update loop
+# Update loop (keyboard continuous input)
 # ----------------------------
 func _process(delta: float) -> void:
 	if camera == null or dancer == null:
 		return
 
 	if Input.is_action_pressed("camera_left"):
-		horizontal_angle += orbit_speed_keyboard * delta
+		horizontal_angle += orbit_speed * delta
 	if Input.is_action_pressed("camera_right"):
-		horizontal_angle -= orbit_speed_keyboard * delta
+		horizontal_angle -= orbit_speed * delta
 	if Input.is_action_pressed("camera_up"):
-		vertical_offset += vertical_speed_keyboard * delta
+		vertical_offset += vertical_speed * delta
 	if Input.is_action_pressed("camera_down"):
-		vertical_offset -= vertical_speed_keyboard * delta
+		vertical_offset -= vertical_speed * delta
 	if Input.is_action_pressed("zoom_in"):
 		distance -= zoom_speed * delta
 	if Input.is_action_pressed("zoom_out"):
@@ -207,7 +211,7 @@ func _update_camera() -> void:
 	camera.look_at(Vector3(pivot.x, camera.global_position.y, pivot.z), Vector3.UP)
 
 # ----------------------------
-# Fullscreen Character Select Buttons
+# Character Buttons
 # ----------------------------
 func _on_male_button_pressed() -> void:
 	emit_signal("character_requested", "res://Scenes/male.tscn")
@@ -219,24 +223,18 @@ func _on_female_button_pressed() -> void:
 # Replay
 # ----------------------------
 func replay_animation() -> void:
-	var dancer_instance = dancer
-	if dancer_instance == null or not dancer_instance.is_inside_tree() or not dancer_instance.has_method("replay_last_animation"):
-		push_warning("No active dancer or dancer cannot replay animation.")
+	if dancer == null or not dancer.is_inside_tree() or not dancer.has_method("replay_last_animation"):
 		return
-	dancer_instance.replay_last_animation()
+	dancer.replay_last_animation()
 	grab_focus()
 
 # ----------------------------
 # Pause
 # ----------------------------
 func _on_pause_button_pressed() -> void:
-	var dancer_instance = dancer
-	if dancer_instance != null and dancer_instance.is_inside_tree() and dancer_instance.has_method("toggle_pause_or_resume"):
-		dancer_instance.toggle_pause_or_resume()
+	if dancer != null and dancer.has_method("toggle_pause_or_resume"):
+		dancer.toggle_pause_or_resume()
 		grab_focus()
-	else:
-		print("DEBUG: Pause button pressed but no valid dancer instance")
-
 
 # ----------------------------
 # Loop
@@ -244,14 +242,28 @@ func _on_pause_button_pressed() -> void:
 func _toggle_loop() -> void:
 	is_looping = !is_looping
 	DancerState.loop_enabled = is_looping
-	print("DEBUG: Loop toggled:", is_looping)
-
 
 func _on_loop_button_pressed() -> void:
 	if dancer != null and dancer.has_method("loop_current_animation"):
 		dancer.loop_current_animation()
 		grab_focus()
 
+# ----------------------------
+# Stop
+# ----------------------------
+func stop_animation() -> void:
+	if dancer == null or not dancer.is_inside_tree():
+		return
+
+	if dancer.has_method("get_playback_state") and dancer.has_method("apply_playback_state"):
+		var state: Dictionary = dancer.get_playback_state()
+		state.time = 0.0
+		state.is_paused = true
+		dancer.apply_playback_state(state)
+
+func _on_stop_button_pressed() -> void:
+	stop_animation()
+	grab_focus()
 
 # ----------------------------
 # Exit
