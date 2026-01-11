@@ -57,7 +57,8 @@ func _populate_list(term_array: Array):
 	term_list.clear()
 	current_index = -1
 	for t in term_array:
-		term_list.add_item(t)
+		var idx = term_list.add_item(t)
+		term_list.set_item_tooltip(idx, "")  # This disables the hover popup
 
 
 # ____________________________________
