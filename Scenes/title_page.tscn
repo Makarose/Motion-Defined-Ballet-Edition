@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://ccwvu0vry3nfd"]
+[gd_scene load_steps=14 format=3 uid="uid://ccwvu0vry3nfd"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_k3hol"]
 [ext_resource type="Script" path="res://Scripts/title_page.gd" id="1_ybhyw"]
@@ -30,6 +30,10 @@ border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.180392, 0.968627, 0.0392157, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_27k02"]
+font = ExtResource("5_ix5ab")
+font_size = 40
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1e1xe"]
 bg_color = Color(0, 0, 0, 0)
@@ -63,6 +67,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ybhyw")
 metadata/_edit_vertical_guides_ = [960.0]
+metadata/_edit_horizontal_guides_ = [900.0]
 
 [node name="PanelContainer" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
@@ -112,11 +117,43 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_6n5tx")
 theme_override_styles/hover = SubResource("StyleBoxFlat_5mu3h")
 icon = ExtResource("3_xmies")
 
+[node name="Label" type="Label" parent="HBoxContainer/Male"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0001
+offset_top = -92.0
+offset_right = 19.9999
+offset_bottom = -73.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "[1]"
+label_settings = SubResource("LabelSettings_27k02")
+
 [node name="Female" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxFlat_1e1xe")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ino3p")
 icon = ExtResource("4_hu7ph")
+
+[node name="Label" type="Label" parent="HBoxContainer/Female"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -92.0
+offset_right = 20.0
+offset_bottom = -73.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "[2]"
+label_settings = SubResource("LabelSettings_27k02")
 
 [node name="ChooseYourDancer" type="Label" parent="."]
 layout_mode = 0
