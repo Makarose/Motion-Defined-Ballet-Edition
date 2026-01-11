@@ -5,6 +5,8 @@ extends Node3D
 var last_animation_name: String = ""
 var is_paused: bool = false
 var paused_position: float = 0.0
+var is_looping: bool = false
+
 
 func _ready() -> void:
 	animation_player.playback_active = true
@@ -72,6 +74,15 @@ func replay_last_animation() -> void:
 	DancerState.is_paused = false
 	DancerState.animation_time = 0.0
 	DancerState.animation_length = animation_player.current_animation_length
+
+func loop_current_animation() -> void:
+	if last_animation_name == "" or not animation_player.has_animation(last_animation_name):
+		print("DEBUG: No animation to loop")
+		return
+
+	is_looping = true
+	animation_player.get_animation(last_animation_name).loop = true
+	print("DEBUG: Looping enabled for", last_animation_name)
 
 # ----------------------------
 # Seamless switch support

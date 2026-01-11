@@ -13,3 +13,4 @@ var animation_length: float = 0.0
 var is_playing: bool = false
 var paused_position: float = 0.0
 var is_paused: bool = false
+var loop_enabled := false

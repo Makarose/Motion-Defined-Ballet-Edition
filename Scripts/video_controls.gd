@@ -33,6 +33,8 @@ var vertical_offset: float
 var pivot: Vector3
 
 var dragging := false
+var is_looping := false
+
 
 # Home state
 var home_distance: float
@@ -54,6 +56,7 @@ func _ready() -> void:
 	$VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
 	$VBoxContainer/MaleButton/MaleButton.pressed.connect(Callable(self, "_on_male_button_pressed"))
 	$VBoxContainer/FemaleButton/FemaleButton.pressed.connect(Callable(self, "_on_female_button_pressed"))
+	$VideoControls/VContainerButtons/LoopContainer/Loop/LoopButton.pressed.connect(_on_loop_button_pressed)
 
 # ----------------------------
 # Setup
@@ -149,6 +152,12 @@ func _input(event: InputEvent) -> void:
 	and dancer_instance.has_method("toggle_pause_or_resume"):
 		dancer_instance.toggle_pause_or_resume()
 		grab_focus()
+		
+	# Loop (L)
+	if Input.is_action_just_pressed("toggle_loop"):
+		_toggle_loop()
+		grab_focus()
+
 
 
 # ----------------------------
@@ -221,6 +230,22 @@ func _on_pause_button_pressed() -> void:
 		grab_focus()
 	else:
 		print("DEBUG: Pause button pressed but no valid dancer instance")
+
+
+# ----------------------------
+# Loop
+# ----------------------------
+func _toggle_loop() -> void:
+	is_looping = !is_looping
+	DancerState.loop_enabled = is_looping
+	print("DEBUG: Loop toggled:", is_looping)
+
+
+func _on_loop_button_pressed() -> void:
+	if dancer != null and dancer.has_method("loop_current_animation"):
+		dancer.loop_current_animation()
+		grab_focus()
+
 
 # ----------------------------
 # Exit
