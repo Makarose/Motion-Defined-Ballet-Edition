@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=37 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
@@ -13,8 +13,11 @@
 [ext_resource type="Texture2D" uid="uid://dugpion57hci5" path="res://UI Buttons/play_highlight_button.png" id="7_7d60p"]
 [ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_nvcej"]
 [ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="8_6b72h"]
+[ext_resource type="Texture2D" uid="uid://b68jgbun7v6o8" path="res://UI Buttons/replay_selected_button.png" id="8_ocgq2"]
+[ext_resource type="Texture2D" uid="uid://dhxuxv0riqku2" path="res://UI Buttons/replay_highlight_button.png" id="9_w82bw"]
+[ext_resource type="Texture2D" uid="uid://dmode33vig28t" path="res://UI Buttons/25.png" id="10_2oxmc"]
 [ext_resource type="Texture2D" uid="uid://cctx36p3ddvom" path="res://Characters/male.png" id="10_je4oq"]
-[ext_resource type="Texture2D" uid="uid://bx7uv5iqnbiya" path="res://UI Buttons/loop_selected_button.png" id="11_nt7t8"]
+[ext_resource type="Texture2D" uid="uid://uqpymbwbcw3j" path="res://UI Buttons/loop_select_button.png" id="11_28s5p"]
 [ext_resource type="Texture2D" uid="uid://bfgbxmoappbvn" path="res://Characters/female.png" id="11_oa5pk"]
 [ext_resource type="Texture2D" uid="uid://dkmlfuypouph4" path="res://UI Buttons/loop_highlight_button.png" id="12_y61kq"]
 [ext_resource type="Texture2D" uid="uid://d0e5rfj0pdffr" path="res://UI Buttons/stop_selected_button.png" id="14_xm3w4"]
@@ -156,6 +159,35 @@ text = "PAUSE ON/OFF [P]"
 label_settings = SubResource("LabelSettings_cy6n2")
 vertical_alignment = 2
 
+[node name="PlayContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+mouse_filter = 0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Play" type="VBoxContainer" parent="VideoControls/VContainerButtons/PlayContainer"]
+layout_mode = 2
+theme = ExtResource("1_6w5i7")
+alignment = 1
+
+[node name="PlayButton" type="TextureButton" parent="VideoControls/VContainerButtons/PlayContainer/Play"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("2_vbtma")
+texture_pressed = ExtResource("6_cfs3h")
+texture_hover = ExtResource("7_7d60p")
+
+[node name="Label" type="Label" parent="VideoControls/VContainerButtons/PlayContainer/Play"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 40
+text = "PLAY [SPACE]"
+label_settings = SubResource("LabelSettings_cy6n2")
+vertical_alignment = 2
+
 [node name="ReplayContainer" type="MarginContainer" parent="VideoControls/VContainerButtons"]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -175,9 +207,9 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture_normal = ExtResource("2_vbtma")
-texture_pressed = ExtResource("6_cfs3h")
-texture_hover = ExtResource("7_7d60p")
+texture_normal = ExtResource("6_lwnut")
+texture_pressed = ExtResource("8_ocgq2")
+texture_hover = ExtResource("9_w82bw")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/ReplayContainer/Replay"]
 layout_mode = 2
@@ -206,8 +238,8 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture_normal = ExtResource("6_lwnut")
-texture_pressed = ExtResource("11_nt7t8")
+texture_normal = ExtResource("10_2oxmc")
+texture_pressed = ExtResource("11_28s5p")
 texture_hover = ExtResource("12_y61kq")
 
 [node name="Label" type="Label" parent="VideoControls/VContainerButtons/LoopContainer/Loop"]
@@ -373,7 +405,7 @@ theme_override_fonts/font = ExtResource("3_qru45")
 theme_override_font_sizes/font_size = 250
 text = "[2]"
 
-[node name="VideoScrubSlider" type="HSlider" parent="."]
+[node name="ScrubSlider" type="HSlider" parent="."]
 custom_minimum_size = Vector2(1000, 25)
 layout_mode = 1
 anchors_preset = 7
@@ -382,12 +414,16 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -500.0
-offset_top = -119.0
+offset_top = -151.0
 offset_right = 500.0
-offset_bottom = -94.0
+offset_bottom = -101.0
 grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(1, 2)
+max_value = 1.0
+step = 0.001
 
+[connection signal="pressed" from="VideoControls/VContainerButtons/PlayContainer/Play/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="VideoControls/VContainerButtons/ExitContainer/Exit/ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/MaleButton/MaleButton" to="." method="_on_male_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/FemaleButton/FemaleButton" to="." method="_on_female_button_pressed"]
