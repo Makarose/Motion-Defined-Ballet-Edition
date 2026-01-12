@@ -7,30 +7,17 @@ signal character_requested(character_scene_path: String)
 # ----------------------------
 # Camera / Dancer Tunables
 # ----------------------------
-
-# Horizontal / orbit speeds
 @export var orbit_speed: float = 1.5
 @export var vertical_speed: float = 1.5
-
 @export var mouse_orbit_speed: float = 0.015
 @export var mouse_vertical_speed: float = 0.015
-
-# Zoom speeds
 @export var zoom_speed: float = 1.5
 @export var mouse_zoom_step: float = 0.6
-
-# Zoom limits
 @export var zoom_min: float = 2.0
 @export var zoom_max: float = 10.0
-
-# Vertical movement limits
 @export var vertical_min: float = -1.5
 @export var vertical_max: float = 2.5
-
-# Default camera distance
 @export var default_distance: float = 5.0
-
-# Skeleton head bone name
 @export var head_bone_name: String = "Head"
 
 # ----------------------------
@@ -39,23 +26,19 @@ signal character_requested(character_scene_path: String)
 var camera: Camera3D
 var dancer: Node3D
 var skel: Skeleton3D
-
 var distance: float
 var horizontal_angle: float
 var vertical_offset: float
 var pivot: Vector3
-
 var dragging := false
-var is_looping := false
+var scrub_active: bool = false
+var was_playing_before_scrub: bool = false
+
 
 # Home state
 var home_distance: float
 var home_horizontal_angle: float
 var home_vertical_offset: float
-
-var dancer_viewport: Node
-
-var scrub_active := false
 
 # ----------------------------
 # Ready
@@ -66,22 +49,50 @@ func _ready() -> void:
 	set_process_input(true)
 
 	# ----------------------------
-	# Button connections
+	# Button connections (safe, Godot 4 syntax)
 	# ----------------------------
-	$VideoControls/VContainerButtons/PauseContainer/Pause/PauseButton.pressed.connect(_on_pause_button_pressed)
-	$VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton.pressed.connect(replay_animation)
-	$VBoxContainer/MaleButton/MaleButton.pressed.connect(Callable(self, "_on_male_button_pressed"))
-	$VBoxContainer/FemaleButton/FemaleButton.pressed.connect(Callable(self, "_on_female_button_pressed"))
-	$VideoControls/VContainerButtons/LoopContainer/Loop/LoopButton.pressed.connect(_on_loop_button_pressed)
-	$VideoControls/VContainerButtons/StopContainer/Stop/StopButton.pressed.connect(_on_stop_button_pressed)
+	var pause_btn = $VideoControls/VContainerButtons/PauseContainer/Pause/PauseButton
+	if pause_btn != null:
+		var pause_callable := Callable(self, "_on_pause_button_pressed")
+		if not pause_btn.is_connected("pressed", pause_callable):
+			pause_btn.pressed.connect(pause_callable)
+
+	var replay_btn = $VideoControls/VContainerButtons/ReplayContainer/Replay/ReplayButton
+	if replay_btn != null:
+		print("Replay button found, connecting...")
+		var replay_callable := Callable(self, "_on_replay_button_pressed")
+		if not replay_btn.is_connected("pressed", replay_callable):
+			replay_btn.pressed.connect(replay_callable)
+
+
+	var male_btn = $VBoxContainer/MaleButton/MaleButton
+	if male_btn != null:
+		var male_callable := Callable(self, "_on_male_button_pressed")
+		if not male_btn.is_connected("pressed", male_callable):
+			male_btn.pressed.connect(male_callable)
+
+	var female_btn = $VBoxContainer/FemaleButton/FemaleButton
+	if female_btn != null:
+		var female_callable := Callable(self, "_on_female_button_pressed")
+		if not female_btn.is_connected("pressed", female_callable):
+			female_btn.pressed.connect(female_callable)
+
+	var stop_btn = $VideoControls/VContainerButtons/StopContainer/Stop/StopButton
+	if stop_btn != null:
+		var stop_callable := Callable(self, "_on_stop_button_pressed")
+		if not stop_btn.is_connected("pressed", stop_callable):
+			stop_btn.pressed.connect(stop_callable)
 
 	# ----------------------------
-	# Scrub slider connections
+	# Scrub slider connections (guarded)
 	# ----------------------------
-	if $ScrubSlider != null:
-		$ScrubSlider.value_changed.connect(_on_scrub_changed)
-		$ScrubSlider.drag_started.connect(_on_scrub_started)
-		$ScrubSlider.drag_ended.connect(_on_scrub_ended)
+	if scrub_slider != null:
+		if not scrub_slider.is_connected("value_changed", Callable(self, "_on_scrub_changed")):
+			scrub_slider.value_changed.connect(_on_scrub_changed)
+		if not scrub_slider.is_connected("drag_started", Callable(self, "_on_scrub_started")):
+			scrub_slider.drag_started.connect(_on_scrub_started)
+		if not scrub_slider.is_connected("drag_ended", Callable(self, "_on_scrub_ended")):
+			scrub_slider.drag_ended.connect(_on_scrub_ended)
 
 # ----------------------------
 # Setup
@@ -111,6 +122,20 @@ func set_active_dancer(dancer_node: Node3D) -> void:
 			"is_paused": not DancerState.is_playing
 		})
 
+	# TBS: setup slider to match animation
+	_setup_scrub_slider()
+
+# ----------------------------
+# Setup scrub slider (TBS)
+# ----------------------------
+func _setup_scrub_slider():
+	if dancer != null and dancer.has_method("get_playback_state"):
+		var state = dancer.get_playback_state()
+		if state.has("length") and state.length > 0.0:
+			scrub_slider.min_value = 0
+			scrub_slider.max_value = state.length
+			scrub_slider.value = state.time
+
 # ----------------------------
 # Home / Reset
 # ----------------------------
@@ -129,19 +154,12 @@ func _save_home_state() -> void:
 # Mouse input
 # ----------------------------
 func _gui_input(event: InputEvent) -> void:
-	if camera == null or dancer == null:
-		return
-
-	# Ignore camera input if dragging the slider
-	if scrub_active:
+	if camera == null or dancer == null or scrub_active:
 		return
 
 	if event is InputEventMouseButton:
-		# Camera dragging
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			dragging = event.pressed
-
-		# Zoom with wheel
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				distance = clamp(distance - mouse_zoom_step, zoom_min, zoom_max)
@@ -169,34 +187,26 @@ func _input(event: InputEvent) -> void:
 		_on_exit_button_pressed()
 
 	if Input.is_action_just_pressed("replay_animation") and dancer.has_method("replay_last_animation"):
+		print("Keyboard: replay_animation pressed")
 		dancer.replay_last_animation()
 
-	if Input.is_action_just_pressed("camera_reset"):
-		reset_camera()
-
 	if Input.is_action_just_pressed("pause_animation") and dancer.has_method("toggle_pause_or_resume"):
+		print("Keyboard: pause_animation pressed")
 		dancer.toggle_pause_or_resume()
 		grab_focus()
 
-	if Input.is_action_just_pressed("toggle_loop"):
-		_toggle_loop()
+	if Input.is_action_just_pressed("play_animation") and dancer.has_method("resume_from_scrub"):
+		print("Keyboard: play_animation pressed")
+		dancer.resume_from_scrub()
 		grab_focus()
 
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1 or event.keycode == KEY_KP_1:
-			_on_male_button_pressed()
-		elif event.keycode == KEY_2 or event.keycode == KEY_KP_2:
-			_on_female_button_pressed()
-		elif event.keycode == KEY_S:
-			stop_animation()
-			grab_focus()
-			
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_SPACE:
-			_on_play_button_pressed()
+	if Input.is_action_just_pressed("stop_animation") and dancer.has_method("stop_animation"):
+		print("Keyboard: stop_animation pressed")
+		dancer.stop_animation()
+		grab_focus()
 
 # ----------------------------
-# Update loop (keyboard continuous input)
+# Update loop (TBS: clean slider handling)
 # ----------------------------
 func _process(delta: float) -> void:
 	if camera == null or dancer == null:
@@ -220,16 +230,12 @@ func _process(delta: float) -> void:
 	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 	_update_camera()
 
-
-	# Update scrub slider without pausing animation
-	if not scrub_active and dancer.has_method("get_playback_state"):
+	if scrub_slider != null and not scrub_active and dancer.has_method("get_playback_state"):
 		var state: Dictionary = dancer.get_playback_state()
 		if state.has("length") and state.length > 0.0:
-			scrub_slider.value_changed.disconnect(_on_scrub_changed)
-			var normalized_value: float = float(state.time) / float(state.length)
-			scrub_slider.value = scrub_slider.min_value + normalized_value * (scrub_slider.max_value - scrub_slider.min_value)
-			scrub_slider.value_changed.connect(_on_scrub_changed)
-
+			# Just update the slider value
+			scrub_slider.value = state.time
+			#print("Slider updated to ", state.time)  # optional debug
 
 # ----------------------------
 # Camera math
@@ -248,83 +254,103 @@ func _update_camera() -> void:
 	camera.look_at(Vector3(pivot.x, camera.global_position.y, pivot.z), Vector3.UP)
 
 # ----------------------------
-# Character Buttons
+# Character buttons
 # ----------------------------
 func _on_male_button_pressed() -> void:
 	emit_signal("character_requested", "res://Scenes/male.tscn")
 
 func _on_female_button_pressed() -> void:
 	emit_signal("character_requested", "res://Scenes/female.tscn")
+	
+# ----------------------------
+# Video buttons with debug
+# ----------------------------	
+func _on_pause_button_pressed() -> void:
+	print("Pause button pressed")
+	if dancer != null:
+		print("Dancer exists")
+		if dancer.has_method("pause_animation"):
+			print("Calling pause_animation")
+			dancer.pause_animation()
+		else:
+			print("Dancer missing pause_animation method")
+	else:
+		print("No dancer assigned")
 
-# ----------------------------
-# Replay
-# ----------------------------
-func replay_animation() -> void:
+func _on_play_button_pressed() -> void:
+	print("Play button pressed")
+	if dancer != null:
+		print("Dancer exists")
+		if dancer.has_method("resume_from_scrub"):
+			print("Calling resume_from_scrub")
+			dancer.resume_from_scrub()
+		else:
+			print("Dancer missing resume_from_scrub method")
+	else:
+		print("No dancer assigned")
+
+func _on_replay_button_pressed() -> void:
+	print("Replay button pressed")
 	if dancer != null and dancer.has_method("replay_last_animation"):
 		dancer.replay_last_animation()
-		grab_focus()
 
-# ----------------------------
-# Pause
-# ----------------------------
-func _on_pause_button_pressed() -> void:
-	if dancer != null and dancer.has_method("toggle_pause_or_resume"):
-		dancer.toggle_pause_or_resume()
-		grab_focus()
-
-# ----------------------------
-# Loop
-# ----------------------------
-func _toggle_loop() -> void:
-	if dancer != null and dancer.has_method("loop_current_animation"):
-		dancer.loop_current_animation()
-	grab_focus()
 
 func _on_loop_button_pressed() -> void:
-	_toggle_loop()
+	print("Loop button pressed")
+	if dancer == null:
+		print("Dancer missing")
+		return
+	if dancer.has_method("loop_current_animation"):
+		print("Calling loop_current_animation")
+		dancer.loop_current_animation()
+	else:
+		print("Dancer missing loop_current_animation method")
 
-# ----------------------------
-# Stop
-# ----------------------------
-func stop_animation() -> void:
-	if dancer != null and dancer.has_method("stop_animation"):
-		dancer.stop_animation()
-		grab_focus()
 
 func _on_stop_button_pressed() -> void:
-	stop_animation()
+	print("Stop button pressed")
+	if dancer != null:
+		print("Dancer exists")
+		if dancer.has_method("stop_animation"):
+			print("Calling stop_animation")
+			dancer.stop_animation()
+		else:
+			print("Dancer missing stop_animation method")
+	else:
+		print("No dancer assigned")
 
 # ----------------------------
-# Play
-# ----------------------------	
-func _on_play_button_pressed() -> void:
-	if dancer != null and dancer.has_method("toggle_pause_or_resume"):
-		# If paused, resume; if already playing, do nothing
-		var state = dancer.get_playback_state()
-		if state.has("is_paused") and state.is_paused:
-			dancer.toggle_pause_or_resume()
-		grab_focus()
-
-# ----------------------------
-# Scrub slider logic
+# Scrub slider
 # ----------------------------
 func _on_scrub_started() -> void:
 	scrub_active = true
+	DancerState.scrub_active = true
+	was_playing_before_scrub = DancerState.is_playing
+
+	print("Scrub started at ", DancerState.animation_time)
+
+
+
 
 func _on_scrub_changed(value: float) -> void:
-	if scrub_active and dancer != null and dancer.has_method("seek_to_time"):
+	if dancer != null and dancer.has_method("seek_to_time"):
 		dancer.seek_to_time(value)
-		# Auto-pause while scrubbing
-		var state = dancer.get_playback_state()
-		if state.has("is_paused") and not state.is_paused:
-			dancer.toggle_pause_or_resume()
+		#print("Slider moved to ", value)  # optional debug
 
 func _on_scrub_ended(_value_changed: bool) -> void:
 	scrub_active = false
-	if dancer != null and dancer.has_method("toggle_pause_or_resume"):
-		var state = dancer.get_playback_state()
-		if state.has("is_paused") and not state.is_paused:
-			dancer.toggle_pause_or_resume()  # keep paused at scrubbed position
+	DancerState.scrub_active = false
+
+	if dancer == null:
+		print("Scrub ended, dancer missing")
+		return
+
+	if was_playing_before_scrub:
+		print("Resuming from scrub")
+		dancer.resume_from_scrub()
+	else:
+		print("Scrub ended, staying paused")
+
 
 
 # ----------------------------
