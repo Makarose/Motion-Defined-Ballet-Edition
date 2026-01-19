@@ -1,3 +1,8 @@
+# ----------------------------
+# game_manager.gd
+# ----------------------------
+
+
 extends Node
 
 @export var ballet_move_database: BalletMoveDatabase = preload("res://Definition Resources/ballet_moves_database.tres")

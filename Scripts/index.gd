@@ -1,3 +1,8 @@
+# ----------------------------
+# index.gd
+# ----------------------------
+
+
 extends Control
 
 @onready var search_bar = $VBoxContainer/LineEdit

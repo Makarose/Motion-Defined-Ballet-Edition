@@ -1,3 +1,8 @@
+# ----------------------------
+# node_2d.gd
+# ----------------------------
+
+
 extends Node
 
 # Path to your BalletMoveDatabase resource

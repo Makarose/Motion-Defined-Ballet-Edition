@@ -1,3 +1,7 @@
+# ----------------------------
+# ballet_move.gd
+# ----------------------------
+
 extends Resource
 class_name BalletMove
 
