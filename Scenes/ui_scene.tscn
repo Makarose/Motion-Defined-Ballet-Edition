@@ -1,6 +1,6 @@
 [gd_scene load_steps=16 format=3 uid="uid://crbl3op3bapp6"]
 
-[ext_resource type="Script" path="res://Scripts/ui_scene.gd" id="1_q043w"]
+[ext_resource type="Script" path="res://Scripts/main_scene_ui.gd" id="1_12kqf"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_rnxuq"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_sgoow"]
 [ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_66hya"]
@@ -31,18 +31,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_q043w")
-metadata/_edit_vertical_guides_ = [1817.0, 692.0, -136.0]
+script = ExtResource("1_12kqf")
+metadata/_edit_vertical_guides_ = [1817.0, 692.0]
 metadata/_edit_horizontal_guides_ = [1000.0, 868.0]
 
 [node name="BackgroundColourPanel" type="Panel" parent="."]
 z_index = -100
 custom_minimum_size = Vector2(1920, 1080)
-layout_mode = 0
-offset_left = 10.0
-offset_top = 5.0
-offset_right = 1930.0
-offset_bottom = 1085.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_o433g")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -170,9 +171,10 @@ custom_minimum_size = Vector2(75, 75)
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -175.0
-offset_right = 339.0
-offset_bottom = 15.0
+offset_left = 1.0
+offset_top = -179.0
+offset_right = 354.0
+offset_bottom = 68.0
 grow_vertical = 0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/margin_left = 200
@@ -180,9 +182,9 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Container"]
+[node name="MarginContainer" type="VBoxContainer" parent="CanvasLayer/Container"]
 layout_mode = 2
-theme_override_constants/margin_bottom = 50
+theme_override_constants/separation = 10
 
 [node name="BackButton" type="TextureButton" parent="CanvasLayer/Container/MarginContainer"]
 layout_mode = 2
@@ -192,13 +194,14 @@ texture_normal = ExtResource("3_sgoow")
 texture_pressed = ExtResource("4_66hya")
 texture_hover = ExtResource("5_hpfhr")
 
-[node name="Label" type="Label" parent="CanvasLayer/Container"]
+[node name="Label" type="Label" parent="CanvasLayer/Container/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 8
-text = "BACK"
+text = "BACK 
+[LEFT]"
 label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
-vertical_alignment = 2
+vertical_alignment = 1
 
 [node name="Container2" type="MarginContainer" parent="CanvasLayer"]
 custom_minimum_size = Vector2(75, 75)
@@ -207,10 +210,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -164.0
-offset_top = -174.0
-offset_right = 164.0
-offset_bottom = 16.0
+offset_left = -194.0
+offset_top = -178.0
+offset_right = 192.0
+offset_bottom = 69.0
 grow_horizontal = 0
 grow_vertical = 0
 scale = Vector2(0.5, 0.493487)
@@ -219,10 +222,9 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 200
 theme_override_constants/margin_bottom = 0
 
-[node name="Container" type="MarginContainer" parent="CanvasLayer/Container2"]
+[node name="Container" type="VBoxContainer" parent="CanvasLayer/Container2"]
 layout_mode = 2
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_bottom = 50
+theme_override_constants/separation = 10
 
 [node name="IndexButton" type="TextureButton" parent="CanvasLayer/Container2/Container"]
 layout_mode = 2
@@ -232,10 +234,11 @@ texture_normal = ExtResource("5_0cy04")
 texture_pressed = ExtResource("8_0woyu")
 texture_hover = ExtResource("9_js43b")
 
-[node name="Label" type="Label" parent="CanvasLayer/Container2"]
+[node name="Label" type="Label" parent="CanvasLayer/Container2/Container"]
 layout_mode = 2
 size_flags_vertical = 8
 text = "INDEX
+[RIGHT]
 "
 label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
@@ -293,4 +296,3 @@ vertical_alignment = 2
 [connection signal="text_submitted" from="CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="CanvasLayer/Container/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Container2/Container/IndexButton" to="." method="_on_index_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton" to="." method="_on_fullscreen_button_pressed"]

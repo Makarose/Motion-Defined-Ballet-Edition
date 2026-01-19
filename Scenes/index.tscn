@@ -16,8 +16,6 @@ bg_color = Color(0.643137, 0.729412, 0.776471, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
 font = ExtResource("3_eq036")
 font_size = 40
-font_color = Color(0, 0, 0, 1)
-outline_size = 3
 outline_color = Color(0, 0, 0, 1)
 
 [node name="Index" type="Control"]
@@ -66,9 +64,9 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -170.0
+offset_top = -173.0
 offset_right = 328.0
-offset_bottom = 10.0
+offset_bottom = 52.0
 grow_vertical = 0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/margin_left = 200
@@ -76,9 +74,9 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Back"]
+[node name="MarginContainer" type="VBoxContainer" parent="Back"]
 layout_mode = 2
-theme_override_constants/margin_bottom = 50
+theme_override_constants/separation = 10
 
 [node name="BackButton" type="TextureButton" parent="Back/MarginContainer"]
 layout_mode = 2
@@ -88,10 +86,11 @@ texture_normal = ExtResource("2_l3b18")
 texture_pressed = ExtResource("4_blvt4")
 texture_hover = ExtResource("5_15t15")
 
-[node name="Label" type="Label" parent="Back"]
+[node name="Label" type="Label" parent="Back/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 8
-text = "BACK"
+text = "BACK
+[LEFT]"
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -104,10 +103,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -165.0
-offset_top = -172.0
-offset_right = 164.0
-offset_bottom = 8.0
+offset_left = -175.0
+offset_top = -173.0
+offset_right = 174.0
+offset_bottom = 52.0
 grow_horizontal = 0
 grow_vertical = 0
 scale = Vector2(0.5, 0.5)
@@ -116,9 +115,9 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 200
 theme_override_constants/margin_bottom = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Home"]
+[node name="MarginContainer" type="VBoxContainer" parent="Home"]
 layout_mode = 2
-theme_override_constants/margin_bottom = 50
+theme_override_constants/separation = 10
 
 [node name="HomeButton" type="TextureButton" parent="Home/MarginContainer"]
 layout_mode = 2
@@ -128,10 +127,11 @@ texture_normal = ExtResource("4_j1bci")
 texture_pressed = ExtResource("8_ka0yk")
 texture_hover = ExtResource("9_55g2m")
 
-[node name="Label" type="Label" parent="Home"]
+[node name="Label" type="Label" parent="Home/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 8
-text = "HOME"
+text = "HOME
+[RIGHT]"
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2

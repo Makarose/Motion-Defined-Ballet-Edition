@@ -126,18 +126,36 @@ func _on_character_button_pressed(character_scene_path: String, is_restore: bool
 	current_dancer = new_dancer
 	print("[DEBUG] Instantiated new dancer:", current_dancer)
 
-	# Bulletproof playback state handling
-	if current_dancer.has_method("get_playback_state") and current_dancer.has_method("apply_playback_state"):
-		var saved_state = current_dancer.get_playback_state()
-		# Ensure AnimationPlayer exists
-		if saved_state.has("animation") and saved_state.animation != "":
-			current_dancer.call_deferred("apply_playback_state", saved_state)
-			print("[DEBUG] Applied saved playback state")
-		else:
-			print("[DEBUG] No animation to apply, skipping playback state")
+	# APPLY PLAYBACK STATE
+	if current_dancer.has_method("apply_playback_state"):
+		var state: Dictionary = {}
 
-	# Safety: assign video controls
-	_assign_video_controls_nodes()
+		if is_fullscreen:
+			# Fullscreen: play immediately
+			state = {
+				"animation": DancerState.current_animation,
+				"time": DancerState.animation_time,
+				"is_paused": not DancerState.is_playing,
+				"is_looping": DancerState.is_looping
+			}
+		else:
+			# Main scene: first frame only, paused
+			state = {
+				"animation": DancerState.current_animation,
+				"time": 0.0,           # show first frame
+				"is_paused": true,     # paused until term selection
+				"is_looping": false
+			}
+
+		current_dancer.call_deferred("apply_playback_state", state)
+		print("[DEBUG] Applied playback state (fullscreen=%s)" % is_fullscreen)
+
+	# Reassign video controls only in fullscreen
+	if is_fullscreen:
+		_assign_video_controls_nodes()
+		print("[DEBUG] Video controls reassigned for fullscreen only")
+
+
 
 # ----------------------------
 # Term Selection
@@ -301,13 +319,16 @@ func toggle_viewport_fullscreen() -> void:
 	if not is_fullscreen:
 		print("[DEBUG] --- Entering fullscreen ---")
 
+		# Hide all non-video-control CanvasLayers
 		for child in get_children():
 			if child is CanvasLayer and child.name != "CanvasLayerVideoControls":
 				child.visible = false
 
+		# Store main scene dancer
 		last_main_scene_character_scene_path = last_selected_character_scene_path
 		print("[DEBUG] Stored main scene dancer before fullscreen:", last_main_scene_character_scene_path)
 
+		# Resize viewport for fullscreen
 		prev_position = sub_viewport_container.position
 		prev_size = sub_viewport_container.size
 
@@ -315,33 +336,47 @@ func toggle_viewport_fullscreen() -> void:
 		sub_viewport_container.size = DisplayServer.window_get_size()
 		dancer_viewport.size = sub_viewport_container.size
 
+		# Create or get CanvasLayer for video controls
 		var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
 		if canvas_layer == null:
 			canvas_layer = CanvasLayer.new()
 			canvas_layer.name = "CanvasLayerVideoControls"
 			get_tree().current_scene.add_child(canvas_layer)
 
+		# Free old controls instance
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.free()
 
+		# Instantiate new video controls
 		video_controls_instance = video_controls_scene.instantiate()
 		canvas_layer.add_child(video_controls_instance)
 		video_controls_instance.owner = get_tree().current_scene
 
+		# --- NEW: connect character_requested signal for fullscreen buttons ---
+		if video_controls_instance.has_signal("character_requested"):
+			var target_callable = Callable(self, "_on_character_button_pressed")
+			if not video_controls_instance.is_connected("character_requested", target_callable):
+				video_controls_instance.character_requested.connect(target_callable)
+
+		# Assign camera and active dancer
 		_assign_video_controls_nodes()
+
 		is_fullscreen = true
 
 	else:
 		print("[DEBUG] --- Exiting fullscreen ---")
 
+		# Restore visibility of all CanvasLayers
 		for child in get_children():
 			if child is CanvasLayer:
 				child.visible = true
 
+		# Restore viewport size/position
 		sub_viewport_container.position = prev_position
 		sub_viewport_container.size = prev_size
 		dancer_viewport.size = prev_size
 
+		# Free fullscreen video controls
 		if video_controls_instance and video_controls_instance.is_inside_tree():
 			video_controls_instance.free()
 			video_controls_instance = null
@@ -349,6 +384,7 @@ func toggle_viewport_fullscreen() -> void:
 		is_fullscreen = false
 		get_viewport().gui_release_focus()
 
+		# Restore dancer in main scene
 		var restore_scene_path = last_fullscreen_character_scene_path
 		if restore_scene_path == "":
 			restore_scene_path = last_main_scene_character_scene_path
@@ -358,6 +394,7 @@ func toggle_viewport_fullscreen() -> void:
 			call_deferred("_on_character_button_pressed", restore_scene_path, true)
 
 		last_fullscreen_character_scene_path = ""
+
 
 # ----------------------------
 # Video Control Helper

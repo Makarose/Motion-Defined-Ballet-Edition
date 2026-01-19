@@ -3,6 +3,7 @@
 # ----------------------------
 
 
+
 extends Control
 
 signal character_requested(character_scene_path: String)
@@ -39,7 +40,6 @@ var dragging := false
 var scrub_active: bool = false
 var was_playing_before_scrub: bool = false
 
-# Mouse drag state (NEW)
 var drag_axis: String = ""   # "horizontal" or "vertical"
 var last_mouse_pos: Vector2
 
@@ -63,6 +63,7 @@ func set_camera(cam: Camera3D) -> void:
 	camera = cam
 
 func set_active_dancer(dancer_node: Node3D) -> void:
+	# Remove old dancer if exists
 	if dancer != null and dancer.is_inside_tree():
 		dancer.queue_free()
 
@@ -73,19 +74,8 @@ func set_active_dancer(dancer_node: Node3D) -> void:
 	distance = default_distance
 	horizontal_angle = 0.0
 	vertical_offset = 0.0
-
 	_save_home_state()
 	_update_camera()
-
-	if dancer.has_method("apply_playback_state"):
-		var state: Dictionary = {
-			"animation": DancerState.current_animation,
-			"time": DancerState.animation_time,
-			"is_paused": not DancerState.is_playing,
-			"is_looping": DancerState.is_looping
-		}
-		dancer.call_deferred("apply_playback_state", state)
-
 	_setup_scrub_slider()
 
 # ----------------------------
@@ -101,9 +91,8 @@ func _setup_scrub_slider() -> void:
 
 func _on_scrub_started() -> void:
 	scrub_active = true
-	if dancer != null:
-		was_playing_before_scrub = DancerState.is_playing
-		DancerState.scrub_active = true
+	if dancer != null and dancer.has_method("get_playback_state"):
+		was_playing_before_scrub = dancer.get_playback_state()["is_paused"] == false
 
 func _on_scrub_changed(value: float) -> void:
 	if dancer != null and scrub_active and dancer.has_method("seek_to_time"):
@@ -111,10 +100,8 @@ func _on_scrub_changed(value: float) -> void:
 
 func _on_scrub_ended() -> void:
 	scrub_active = false
-	if dancer != null:
-		DancerState.scrub_active = false
-		if was_playing_before_scrub and dancer.has_method("resume_from_scrub"):
-			dancer.resume_from_scrub()
+	if dancer != null and was_playing_before_scrub and dancer.has_method("resume_from_scrub"):
+		dancer.resume_from_scrub()
 
 # ----------------------------
 # Camera helpers
@@ -123,33 +110,23 @@ func _update_pivot() -> void:
 	if skel == null:
 		return
 	var head_bone_idx = skel.find_bone(head_bone_name)
-	if head_bone_idx >= 0:
-		pivot = skel.global_transform.origin
-	else:
-		pivot = skel.global_transform.origin
+	pivot = skel.global_transform.origin if head_bone_idx >= 0 else skel.global_transform.origin
 
 func _update_camera() -> void:
 	if camera == null:
 		return
 
-	var cam_position := pivot + Vector3(
+	var cam_pos := pivot + Vector3(
 		sin(horizontal_angle) * distance,
 		vertical_offset,
 		cos(horizontal_angle) * distance
 	)
 
-	camera.global_transform.origin = cam_position
+	camera.global_transform.origin = cam_pos
 
-	# Look at dancer horizontally ONLY (no vertical pivot)
-	var look_target := Vector3(
-		pivot.x,
-		cam_position.y,
-		pivot.z
-	)
-
+	# Look at dancer horizontally only
+	var look_target := Vector3(pivot.x, cam_pos.y, pivot.z)
 	camera.look_at(look_target, Vector3.UP)
-
-
 
 # ----------------------------
 # Home / Reset
@@ -174,13 +151,10 @@ func _gui_input(event: InputEvent) -> void:
 
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			dragging = event.pressed
+			drag_axis = ""
 			if event.pressed:
-				dragging = true
-				drag_axis = ""
 				last_mouse_pos = event.position
-			else:
-				dragging = false
-				drag_axis = ""
 
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -191,16 +165,11 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and dragging:
 		var delta: Vector2 = event.position - last_mouse_pos
 
-		# Decide dominant axis once per drag
 		if drag_axis == "":
-			if abs(delta.x) > abs(delta.y):
-				drag_axis = "horizontal"
-			elif abs(delta.y) > abs(delta.x):
-				drag_axis = "vertical"
+			drag_axis = "horizontal" if abs(delta.x) > abs(delta.y) else "vertical"
 
 		if drag_axis == "horizontal":
 			horizontal_angle -= delta.x * mouse_orbit_speed
-
 		elif drag_axis == "vertical":
 			vertical_offset -= delta.y * mouse_vertical_speed
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
@@ -258,18 +227,16 @@ func _on_stop_button_pressed() -> void:
 		dancer.stop_animation()
 
 func _on_exit_button_pressed() -> void:
-	if get_tree().current_scene != null:
-		get_tree().current_scene.free()
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
 func _on_music_button_pressed() -> void:
 	pass
 
 func _on_male_button_pressed() -> void:
-	pass
+	emit_signal("character_requested", "res://Scenes/male.tscn")
 
 func _on_female_button_pressed() -> void:
-	pass
+	emit_signal("character_requested", "res://Scenes/female.tscn")
 
 # ----------------------------
 # Main loop

@@ -3,6 +3,7 @@
 # ----------------------------
 
 
+
 extends Node
 
 @export var ballet_move_database: BalletMoveDatabase = preload("res://Definition Resources/ballet_moves_database.tres")
@@ -10,7 +11,7 @@ extends Node
 var chosen_character: String = ""       # Last selected character
 var selected_term: String = ""          # Last selected term
 var last_played_animation: String = ""  # Last animation played globally
-var coming_from_title := false
+var arrived_from_title_page := false
 
 # ----------------------------
 # Ballet moves
@@ -38,7 +39,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 func _on_back_button_pressed() -> void:
 	# Indicate that the next character selected should start fresh
-	GameManager.coming_from_title = true
+	GameManager.arrived_from_title_page = true
 
 	# Go back to the title page
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")

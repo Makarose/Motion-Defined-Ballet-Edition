@@ -3,20 +3,18 @@
 # ----------------------------
 
 
+
 extends Control
 
 @onready var search_bar = $VBoxContainer/LineEdit
 @onready var term_list = $VBoxContainer/ItemList
 
-var terms = [] # Will load from ResourceManager
-var selected_term: String = "" # store the currently selected term
-var current_index := -1 # tracks highlighted item 
-
+var terms = []          # Will load from GameManager
+var current_index := -1 # Tracks highlighted item for keyboard nav
 
 # ____________________________________
 # Text Normalization
 # ____________________________________
-# Strips user input of accented characters.
 func strip_accents(text: String) -> String:
 	var mapping = {
 		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a","Á":"A","À":"A","Â":"A","Ä":"A","Ã":"A","Å":"A",
@@ -28,10 +26,9 @@ func strip_accents(text: String) -> String:
 	}
 	var result := ""
 	for c in text:
-		result += mapping.get(c, c) # replace if in mapping, else keep original
+		result += mapping.get(c, c)
 	return result
-	
-# Helps to normalize user inputted text.
+
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
 
@@ -40,19 +37,14 @@ func normalize(text: String) -> String:
 # Setup
 # ____________________________________
 func _ready():
-	# Load all terms from ResourceManager
-	terms = GameManager.get_terms() 
-	
-	# Sort accent-insensitive but still display original
+	terms = GameManager.get_terms()
 	terms.sort_custom(func(a, b): return normalize(a) < normalize(b))
-	
-	# Fill List
 	_populate_list(terms)
-	
-	# Connect Signals
+
+	# Connect signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
-	term_list.item_activated.connect(_on_term_selected) # Double click or enter
+	term_list.item_activated.connect(_on_term_selected)
 
 
 # ____________________________________
@@ -63,7 +55,7 @@ func _populate_list(term_array: Array):
 	current_index = -1
 	for t in term_array:
 		var idx = term_list.add_item(t)
-		term_list.set_item_tooltip(idx, "")  # This disables the hover popup
+		term_list.set_item_tooltip(idx, "")
 
 
 # ____________________________________
@@ -72,7 +64,6 @@ func _populate_list(term_array: Array):
 func _on_search_changed(new_text: String):
 	var filtered = []
 	var search_normalized = normalize(new_text)
-	
 	for t in terms:
 		if search_normalized == "" or search_normalized in normalize(t):
 			filtered.append(t)
@@ -83,20 +74,14 @@ func _on_search_changed(new_text: String):
 # Term Selection
 # ____________________________________
 func _on_term_selected(index: int):
-	var selected_term = term_list.get_item_text(index)
-	
-	#Saves globally so GameManager knows what to do
-	GameManager.selected_term = selected_term
-	
+	GameManager.selected_term = term_list.get_item_text(index)
 	if GameManager.chosen_character == "":
-		print(" !!! Warning: No character selected yet, dfault will be used")
-		
-	# Return to main scene, where the animation will automatically play
+		print(" !!! Warning: No character selected yet, default will be used")
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
 
 # ____________________________________
-# Keyboard Navigation
+# Keyboard Navigation (keep exactly as-is)
 # ____________________________________
 func _on_search_bar_gui_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
@@ -128,7 +113,6 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 # ____________________________________
 func _on_back_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
-
 
 func _on_home_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
