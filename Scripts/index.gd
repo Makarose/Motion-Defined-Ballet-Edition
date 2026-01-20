@@ -45,6 +45,20 @@ func _ready():
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	term_list.item_activated.connect(_on_term_selected)
+	
+
+# ----------------------------
+# Input handling
+# ----------------------------
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		# Left arrow triggers back
+		if Input.is_action_just_pressed("ui_left"):
+			_on_back_button_pressed()
+
+		# Right arrow triggers home
+		if Input.is_action_just_pressed("ui_right"):
+			_on_home_button_pressed()
 
 
 # ____________________________________
@@ -81,7 +95,7 @@ func _on_term_selected(index: int):
 
 
 # ____________________________________
-# Keyboard Navigation (keep exactly as-is)
+# Keyboard Navigation
 # ____________________________________
 func _on_search_bar_gui_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:

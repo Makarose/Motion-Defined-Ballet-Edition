@@ -1,5 +1,5 @@
 # ----------------------------
-# main_scene_ui.gd (revised)
+# main_scene_ui.gd
 # ----------------------------
 
 extends Control
@@ -55,6 +55,7 @@ func _ready() -> void:
 	clear_timer.timeout.connect(_clear_search_now)
 	add_child(clear_timer)
 
+	# Connect buttons
 	if fullscreen_button:
 		fullscreen_button.pressed.connect(_on_fullscreen_pressed)
 	if male_button:
@@ -64,6 +65,21 @@ func _ready() -> void:
 
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
+
+
+# ----------------------------
+# Input handling
+# ----------------------------
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		# Left arrow triggers back
+		if Input.is_action_just_pressed("ui_left"):
+			_on_back_button_pressed()
+
+		# Right arrow triggers index
+		if Input.is_action_just_pressed("ui_right"):
+			_on_index_button_pressed()
+
 
 # ----------------------------
 # Search / Item List
@@ -152,7 +168,9 @@ func _clear_search_now() -> void:
 # Fullscreen & Character Controls
 # ----------------------------
 func show_fullscreen_button() -> void:
+	print("SHOW FULLSCREEN BUTTON CALLED")
 	_show_fullscreen_controls(true)
+	# no need to connect gui_input anymore
 
 func hide_fullscreen_button() -> void:
 	_show_fullscreen_controls(false)
@@ -161,7 +179,6 @@ func _show_fullscreen_controls(show: bool) -> void:
 	if not fullscreen_container:
 		push_error("Fullscreen container is NULL")
 		return
-
 	fullscreen_container.visible = show
 
 func _on_fullscreen_pressed() -> void:
@@ -172,6 +189,16 @@ func _on_male_pressed() -> void:
 
 func _on_female_pressed() -> void:
 	emit_signal("character_requested", "res://Scenes/female.tscn")
+
+# ----------------------------
+# F1 keyboard trigger for fullscreen
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	if fullscreen_container.visible and event is InputEventKey and event.pressed:
+		if Input.is_action_just_pressed("launch_fullscreen"):
+			print("launch_fullscreen action detected!")
+			_on_fullscreen_pressed()
+
 
 # ----------------------------
 # Helpers

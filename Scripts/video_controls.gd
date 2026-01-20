@@ -202,6 +202,13 @@ func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("stop_animation") and dancer.has_method("stop_animation"):
 		dancer.stop_animation()
 		grab_focus()
+		
+	if Input.is_action_just_pressed("male_button"):
+		_on_male_button_pressed()
+		
+	if Input.is_action_just_pressed("female_button"):
+		_on_female_button_pressed()
+
 
 # ----------------------------
 # Button handlers

@@ -29,14 +29,19 @@ var last_selected_character_scene_path: String = ""
 # ----------------------------
 func _ready() -> void:
 	print("UI node is:", ui)
+
 	# Connect UI signals
 	if ui:
 		ui.connect("term_selected", Callable(self, "_on_term_selected"))
 		ui.connect("character_requested", Callable(self, "_on_character_selected"))
 
+		# NEW: Connect fullscreen_requested signal so F1 works
+		ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
+
 	# If there is already a chosen character from title
 	if GameManager.chosen_character != "":
 		_on_character_selected(GameManager.chosen_character)
+
 
 # ----------------------------
 # Character spawning
