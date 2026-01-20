@@ -45,6 +45,7 @@ func _ready() -> void:
 	search_bar.text_changed.connect(_on_search_text_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.text_submitted.connect(_on_search_bar_entered)
+	search_bar.grab_focus()
 
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false

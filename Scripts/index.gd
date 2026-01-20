@@ -44,6 +44,7 @@ func _ready():
 	# Connect signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
+	search_bar.grab_focus()
 	term_list.item_activated.connect(_on_term_selected)
 	
 
