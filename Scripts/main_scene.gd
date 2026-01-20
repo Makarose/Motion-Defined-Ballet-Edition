@@ -28,6 +28,7 @@ var last_selected_character_scene_path: String = ""
 # Ready
 # ----------------------------
 func _ready() -> void:
+	print("UI node is:", ui)
 	# Connect UI signals
 	if ui:
 		ui.connect("term_selected", Callable(self, "_on_term_selected"))
@@ -70,9 +71,27 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 # Term selection
 # ----------------------------
 func _on_term_selected(animation_name: String) -> void:
-	if current_dancer and current_dancer.has_method("play_move"):
-		current_dancer.call_deferred("play_move", animation_name)
+	if not current_dancer:
+		return
+	if not current_dancer.has_method("play_animation"):
+		print("Dancer missing play_animation")
+		return
+
+	current_dancer.call_deferred("play_animation", animation_name)
 	GameManager.last_played_animation = animation_name
+
+	_on_playback_started()
+
+
+func _on_playback_started() -> void:
+	print("PLAYBACK STARTED in MainScene")  # must appear
+	if ui:
+		print("UI node exists:", ui)
+		if ui.has_method("show_fullscreen_button"):
+			print("UI has method — calling it")
+			ui.call_deferred("show_fullscreen_button")
+
+
 
 # ----------------------------
 # Fullscreen toggle
@@ -89,7 +108,11 @@ func toggle_viewport_fullscreen() -> void:
 func _enter_fullscreen() -> void:
 	print("[DEBUG] --- Entering fullscreen ---")
 	
-	# Hide all non-video-control CanvasLayers
+	# Hide entire UI.tscn (UI node + all children)
+	if ui:
+		_hide_recursive(ui)
+
+	# Hide all other non-video-control CanvasLayers
 	for child in get_children():
 		if child is CanvasLayer and child.name != "CanvasLayerVideoControls":
 			child.visible = false
@@ -118,6 +141,9 @@ func _enter_fullscreen() -> void:
 	canvas_layer.add_child(video_controls_instance)
 	video_controls_instance.owner = get_tree().current_scene
 
+	# Ensure video controls are on top
+	canvas_layer.layer = 100
+
 	# Connect character_requested signal
 	if video_controls_instance.has_signal("character_requested"):
 		var target_callable = Callable(self, "_on_character_selected")
@@ -129,10 +155,15 @@ func _enter_fullscreen() -> void:
 
 	is_fullscreen = true
 
+
 func _exit_fullscreen() -> void:
 	print("[DEBUG] --- Exiting fullscreen ---")
 
-	# Restore visibility
+	# Restore UI
+	if ui:
+		_show_recursive(ui)
+
+	# Restore visibility of other CanvasLayers
 	for child in get_children():
 		if child is CanvasLayer:
 			child.visible = true
@@ -159,6 +190,23 @@ func _exit_fullscreen() -> void:
 		call_deferred("_on_character_selected", restore_scene_path, true)
 
 	last_fullscreen_character_scene_path = ""
+
+
+# ----------------------------
+# Recursive helpers
+# ----------------------------
+func _hide_recursive(node: Node) -> void:
+	if node is CanvasItem:
+		node.visible = false
+	for child in node.get_children():
+		_hide_recursive(child)
+
+func _show_recursive(node: Node) -> void:
+	if node is CanvasItem:
+		node.visible = true
+	for child in node.get_children():
+		_show_recursive(child)
+
 
 # ----------------------------
 # Video Control Helper

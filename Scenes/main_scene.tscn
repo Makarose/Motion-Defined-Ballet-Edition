@@ -17,6 +17,9 @@ offset_left = 3.0
 offset_right = 1923.0
 offset_bottom = 1080.0
 
+[node name="Fullscreen" parent="UI/CanvasLayer" index="5"]
+visible = false
+
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0

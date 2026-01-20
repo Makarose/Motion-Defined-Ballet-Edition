@@ -1,5 +1,5 @@
 # ----------------------------
-# ui_scene.gd (refactored)
+# main_scene_ui.gd (revised)
 # ----------------------------
 
 extends Control
@@ -15,10 +15,12 @@ signal fullscreen_requested()
 # UI Nodes
 # ----------------------------
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
-@onready var item_list = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
+@onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-@onready var fullscreen_button: Button = $CanvasLayer/Fullscreen/FullscreenButton
+
+@onready var fullscreen_container: MarginContainer = $CanvasLayer/Fullscreen
+@onready var fullscreen_button: TextureButton = $CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton
 @onready var male_button: Button = $CanvasLayer/Fullscreen/MaleButton
 @onready var female_button: Button = $CanvasLayer/Fullscreen/FemaleButton
 
@@ -32,7 +34,7 @@ signal fullscreen_requested()
 # ----------------------------
 var current_index := -1
 var clear_timer: Timer
-var has_selected_term: bool = false
+var has_selected_term := false
 
 # ----------------------------
 # Ready
@@ -42,23 +44,23 @@ func _ready() -> void:
 
 	search_bar.text_changed.connect(_on_search_text_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
-	search_bar.connect("text_submitted", Callable(self, "_on_search_bar_entered"))
+	search_bar.text_submitted.connect(_on_search_bar_entered)
+
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
 
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8
-	clear_timer.connect("timeout", Callable(self, "_clear_search_now"))
+	clear_timer.timeout.connect(_clear_search_now)
 	add_child(clear_timer)
 
-	# Connect buttons
 	if fullscreen_button:
-		fullscreen_button.pressed.connect(Callable(self, "_on_fullscreen_pressed"))
+		fullscreen_button.pressed.connect(_on_fullscreen_pressed)
 	if male_button:
-		male_button.pressed.connect(Callable(self, "_on_male_pressed"))
+		male_button.pressed.connect(_on_male_pressed)
 	if female_button:
-		female_button.pressed.connect(Callable(self, "_on_female_pressed"))
+		female_button.pressed.connect(_on_female_pressed)
 
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
@@ -69,6 +71,7 @@ func _ready() -> void:
 func _on_search_text_changed(new_text: String) -> void:
 	item_list.clear()
 	current_index = -1
+
 	if new_text == "":
 		item_list.visible = false
 		return
@@ -85,7 +88,6 @@ func _on_item_selected(index: int) -> void:
 	_select_item(index)
 
 func _on_search_bar_gui_input(event: InputEvent) -> void:
-	# left unchanged as requested
 	if not item_list.visible:
 		return
 
@@ -102,49 +104,44 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 					item_list.select(current_index)
 					item_list.ensure_current_is_visible()
 			KEY_ENTER, KEY_KP_ENTER:
-				if current_index >= 0 and current_index < item_list.get_item_count():
+				if current_index >= 0:
 					_select_item(current_index)
 
-func _on_search_bar_entered(new_text: String) -> void:
-	if current_index >= 0 and current_index < item_list.get_item_count():
+func _on_search_bar_entered(_text: String) -> void:
+	if current_index >= 0:
 		_select_item(current_index)
-		return
-
-	var normalized_input = normalize(new_text)
-	for i in range(item_list.get_item_count()):
-		if normalize(item_list.get_item_text(i)) == normalized_input:
-			_select_item(i)
-			return
 
 func _select_item(index: int) -> void:
 	if index < 0 or index >= item_list.get_item_count():
 		return
 
-	var selected_move_name = item_list.get_item_text(index)
-	var move_resource: BalletMove = null
-	var norm_selected = normalize(selected_move_name)
+	var selected_name = item_list.get_item_text(index)
+	var move: BalletMove = null
 
 	for balletmove in database.moves:
-		if normalize(balletmove.name) == norm_selected:
-			move_resource = balletmove
+		if normalize(balletmove.name) == normalize(selected_name):
+			move = balletmove
 			break
 
-	if move_resource == null:
+	if not move:
 		return
 
-	title_label.set_text(move_resource.name)
-	definition_label.set_text(move_resource.definition)
-	search_bar.text = selected_move_name
+	title_label.text = move.name
+	definition_label.text = move.definition
+
+	search_bar.text = selected_name
 	item_list.visible = false
 	search_bar.grab_focus()
 	clear_timer.start()
 
 	has_selected_term = true
 
-	var animation_name = move_resource.animation_name.strip_edges()
-	if animation_name != "":
-		emit_signal("term_selected", animation_name)
+	if move.animation_name.strip_edges() != "":
+		emit_signal("term_selected", move.animation_name)
 
+# ----------------------------
+# Clear search
+# ----------------------------
 func _clear_search_now() -> void:
 	search_bar.text = ""
 	current_index = -1
@@ -152,8 +149,21 @@ func _clear_search_now() -> void:
 	item_list.visible = false
 
 # ----------------------------
-# Fullscreen & Character Buttons
+# Fullscreen & Character Controls
 # ----------------------------
+func show_fullscreen_button() -> void:
+	_show_fullscreen_controls(true)
+
+func hide_fullscreen_button() -> void:
+	_show_fullscreen_controls(false)
+
+func _show_fullscreen_controls(show: bool) -> void:
+	if not fullscreen_container:
+		push_error("Fullscreen container is NULL")
+		return
+
+	fullscreen_container.visible = show
+
 func _on_fullscreen_pressed() -> void:
 	emit_signal("fullscreen_requested")
 
@@ -168,13 +178,14 @@ func _on_female_pressed() -> void:
 # ----------------------------
 func strip_accents(text: String) -> String:
 	var mapping = {
-		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a","Á":"A","À":"A","Â":"A","Ä":"A","Ã":"A","Å":"A",
-		"é":"e","è":"e","ë":"e","ê":"e","É":"E","È":"E","Ê":"E","Ë":"E",
-		"í":"i","ì":"i","ï":"i","î":"i","Í":"I","Ì":"I","Ï":"I","Î":"I",
-		"ó":"o","ò":"o","ö":"o","ô":"o","õ":"o","Ó":"O","Ò":"O","Ö":"O","Ô":"O","Õ":"O",
-		"ú":"u","ù":"u","ü":"u","û":"u","Ú":"U","Ù":"U","Û":"U","Ü":"U",
-		"ñ":"n","Ñ":"N","ç":"c","Ç":"C"
+		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a",
+		"é":"e","è":"e","ë":"e","ê":"e",
+		"í":"i","ì":"i","ï":"i","î":"i",
+		"ó":"o","ò":"o","ö":"o","ô":"o","õ":"o",
+		"ú":"u","ù":"u","ü":"u","û":"u",
+		"ñ":"n","ç":"c"
 	}
+
 	var result := ""
 	for c in text:
 		result += mapping.get(c, c)
@@ -183,13 +194,8 @@ func strip_accents(text: String) -> String:
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
 
-func _show_fullscreen_controls(visible: bool) -> void:
-	if fullscreen_button and fullscreen_button.is_inside_tree():
-		fullscreen_button.visible = visible
-
-
 # ----------------------------
-# Navigational Buttons
+# Navigation
 # ----------------------------
 func _on_back_button_pressed() -> void:
 	GameManager.selected_term = ""
