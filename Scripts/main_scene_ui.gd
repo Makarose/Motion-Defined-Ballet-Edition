@@ -71,11 +71,16 @@ func _ready() -> void:
 # Input handling
 # ----------------------------
 func _input(event: InputEvent) -> void:
+	# If the fullscreen button is currently pressed, skip scene navigation
+	if $CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton.pressed:
+		return
+
 	if event is InputEventKey and event.pressed:
 		if Input.is_action_just_pressed("ui_left"):
 			_on_back_button_pressed()
-		if Input.is_action_just_pressed("ui_right"):
+		elif Input.is_action_just_pressed("ui_right"):
 			_on_index_button_pressed()
+
 
 # ----------------------------
 # Search / Item List

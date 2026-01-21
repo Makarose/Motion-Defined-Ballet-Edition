@@ -106,7 +106,6 @@ orbit_speed = 2.0
 vertical_speed = 1.75
 zoom_speed = 3.5
 zoom_min = 1.0
-vertical_min = 1.0
 default_distance = 10.0
 metadata/_edit_vertical_guides_ = [961.0, 1685.0]
 metadata/_edit_horizontal_guides_ = [99.0]
