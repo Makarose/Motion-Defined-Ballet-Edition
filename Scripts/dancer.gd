@@ -21,10 +21,19 @@ var is_scrubbing: bool = false
 # Play animation (resumes if paused)
 # ----------------------------
 func play_animation(anim_name: String) -> void:
-	if not animation_player.has_animation(anim_name):
-		return
+	# Find matching animation ignoring case and accents
+	var target_name: String = ""
+	for anim in animation_player.get_animation_list():
+		if GameManager.normalize(anim) == GameManager.normalize(anim_name):
+			target_name = anim
+			break
 
-	last_animation_name = anim_name
+	if target_name == "":
+		print("Animation not found:", anim_name)
+		return
+		
+	# Set playback state
+	last_animation_name = target_name
 	is_looping = false
 
 	# If paused, resume from paused_time
@@ -38,12 +47,13 @@ func play_animation(anim_name: String) -> void:
 	is_paused = false
 	paused_time = 0.0
 
-	var anim: Animation = animation_player.get_animation(anim_name)
+	var anim: Animation = animation_player.get_animation(target_name)
 	if anim != null:
 		anim.loop_mode = Animation.LOOP_NONE
 
-	animation_player.play(anim_name)
+	animation_player.play(target_name)
 	animation_player.seek(0.0, true)
+
 
 # ----------------------------
 # Loop current animation

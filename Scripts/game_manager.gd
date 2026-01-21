@@ -43,3 +43,29 @@ func _on_back_button_pressed() -> void:
 
 	# Go back to the title page
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+	
+
+# ----------------------------
+# Normalization Helpers
+# ----------------------------
+func strip_accents(text: String) -> String:
+	var mapping = {
+		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a",
+		"Á":"A","À":"A","Â":"A","Ä":"A","Ã":"A","Å":"A",
+		"é":"e","è":"e","ë":"e","ê":"e",
+		"É":"E","È":"E","Ê":"E","Ë":"E",
+		"í":"i","ì":"i","ï":"i","î":"i",
+		"Í":"I","Ì":"I","Ï":"I","Î":"I",
+		"ó":"o","ò":"o","ö":"o","ô":"o","õ":"o",
+		"Ó":"O","Ò":"O","Ö":"O","Ô":"O","Õ":"O",
+		"ú":"u","ù":"u","ü":"u","û":"u",
+		"Ú":"U","Ù":"U","Û":"U","Ü":"U",
+		"ñ":"n","Ñ":"N","ç":"c","Ç":"C"
+	}
+	var result := ""
+	for c in text:
+		result += mapping.get(c, c)
+	return result
+
+func normalize(text: String) -> String:
+	return strip_accents(text).to_lower()

@@ -67,20 +67,15 @@ func _ready() -> void:
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
 
-
 # ----------------------------
 # Input handling
 # ----------------------------
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
-		# Left arrow triggers back
 		if Input.is_action_just_pressed("ui_left"):
 			_on_back_button_pressed()
-
-		# Right arrow triggers index
 		if Input.is_action_just_pressed("ui_right"):
 			_on_index_button_pressed()
-
 
 # ----------------------------
 # Search / Item List
@@ -93,9 +88,9 @@ func _on_search_text_changed(new_text: String) -> void:
 		item_list.visible = false
 		return
 
-	var normalized_input = normalize(new_text)
+	var normalized_input = GameManager.normalize(new_text)
 	for balletmove in database.moves:
-		if normalize(balletmove.name).begins_with(normalized_input):
+		if GameManager.normalize(balletmove.name).begins_with(normalized_input):
 			item_list.add_item(balletmove.name)
 
 	item_list.visible = item_list.get_item_count() > 0
@@ -136,7 +131,7 @@ func _select_item(index: int) -> void:
 	var move: BalletMove = null
 
 	for balletmove in database.moves:
-		if normalize(balletmove.name) == normalize(selected_name):
+		if GameManager.normalize(balletmove.name) == GameManager.normalize(selected_name):
 			move = balletmove
 			break
 
@@ -171,7 +166,6 @@ func _clear_search_now() -> void:
 func show_fullscreen_button() -> void:
 	print("SHOW FULLSCREEN BUTTON CALLED")
 	_show_fullscreen_controls(true)
-	# no need to connect gui_input anymore
 
 func hide_fullscreen_button() -> void:
 	_show_fullscreen_controls(false)
@@ -199,28 +193,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		if Input.is_action_just_pressed("launch_fullscreen"):
 			print("launch_fullscreen action detected!")
 			_on_fullscreen_pressed()
-
-
-# ----------------------------
-# Helpers
-# ----------------------------
-func strip_accents(text: String) -> String:
-	var mapping = {
-		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a",
-		"é":"e","è":"e","ë":"e","ê":"e",
-		"í":"i","ì":"i","ï":"i","î":"i",
-		"ó":"o","ò":"o","ö":"o","ô":"o","õ":"o",
-		"ú":"u","ù":"u","ü":"u","û":"u",
-		"ñ":"n","ç":"c"
-	}
-
-	var result := ""
-	for c in text:
-		result += mapping.get(c, c)
-	return result
-
-func normalize(text: String) -> String:
-	return strip_accents(text).to_lower()
 
 # ----------------------------
 # Navigation

@@ -2,8 +2,6 @@
 # index.gd
 # ----------------------------
 
-
-
 extends Control
 
 @onready var search_bar = $VBoxContainer/LineEdit
@@ -13,32 +11,11 @@ var terms = []          # Will load from GameManager
 var current_index := -1 # Tracks highlighted item for keyboard nav
 
 # ____________________________________
-# Text Normalization
-# ____________________________________
-func strip_accents(text: String) -> String:
-	var mapping = {
-		"á":"a","à":"a","ä":"a","â":"a","ã":"a","å":"a","Á":"A","À":"A","Â":"A","Ä":"A","Ã":"A","Å":"A",
-		"é":"e","è":"e","ë":"e","ê":"e","É":"E","È":"E","Ê":"E","Ë":"E",
-		"í":"i","ì":"i","ï":"i","î":"i","Í":"I","Ì":"I","Ï":"I","Î":"I",
-		"ó":"o","ò":"o","ö":"o","ô":"o","õ":"o","Ó":"O","Ò":"O","Ö":"O","Ô":"O","Õ":"O",
-		"ú":"u","ù":"u","ü":"u","û":"u","Ú":"U","Ù":"U","Û":"U","Ü":"U",
-		"ñ":"n","Ñ":"N","ç":"c","Ç":"C"
-	}
-	var result := ""
-	for c in text:
-		result += mapping.get(c, c)
-	return result
-
-func normalize(text: String) -> String:
-	return strip_accents(text).to_lower()
-
-
-# ____________________________________
 # Setup
 # ____________________________________
 func _ready():
 	terms = GameManager.get_terms()
-	terms.sort_custom(func(a, b): return normalize(a) < normalize(b))
+	terms.sort_custom(func(a, b): return GameManager.normalize(a) < GameManager.normalize(b))
 	_populate_list(terms)
 
 	# Connect signals
@@ -78,9 +55,9 @@ func _populate_list(term_array: Array):
 # ____________________________________
 func _on_search_changed(new_text: String):
 	var filtered = []
-	var search_normalized = normalize(new_text)
+	var search_normalized = GameManager.normalize(new_text)
 	for t in terms:
-		if search_normalized == "" or search_normalized in normalize(t):
+		if search_normalized == "" or search_normalized in GameManager.normalize(t):
 			filtered.append(t)
 	_populate_list(filtered)
 
@@ -116,9 +93,9 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 					_on_term_selected(current_index)
 				else:
 					# fallback: exact match with typed text
-					var normalized_input = normalize(search_bar.text)
+					var normalized_input = GameManager.normalize(search_bar.text)
 					for i in range(term_list.get_item_count()):
-						if normalize(term_list.get_item_text(i)) == normalized_input:
+						if GameManager.normalize(term_list.get_item_text(i)) == normalized_input:
 							_on_term_selected(i)
 							return
 

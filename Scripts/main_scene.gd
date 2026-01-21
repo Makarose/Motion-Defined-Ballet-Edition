@@ -47,18 +47,25 @@ func _ready() -> void:
 # Character spawning
 # ----------------------------
 func _on_character_selected(character_scene_path: String, is_restore: bool = false) -> void:
+	# ----------------------------
+	# Track character paths
+	# ----------------------------
 	if is_fullscreen and not is_restore:
 		last_fullscreen_character_scene_path = character_scene_path
 
 	if not is_restore:
 		last_selected_character_scene_path = character_scene_path
 
+	# ----------------------------
 	# Free previous dancer
+	# ----------------------------
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
+	# ----------------------------
 	# Instantiate new dancer
+	# ----------------------------
 	var char_scene: PackedScene = load(character_scene_path)
 	if not char_scene:
 		push_error("Character scene not found!: " + character_scene_path)
@@ -67,11 +74,24 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
 
+	# ----------------------------
+	# Fix: assign camera and video controls after the dancer is added
+	# ----------------------------
+	call_deferred("_assign_video_controls_nodes")
+
+	# ----------------------------
 	# Assign to video controls if fullscreen
+	# ----------------------------
 	if is_fullscreen and video_controls_instance:
 		if video_controls_instance.has_method("set_active_dancer"):
 			video_controls_instance.set_active_dancer(current_dancer)
 
+	# ----------------------------
+	# Play any pending animation from index (if one was selected)
+	# ----------------------------
+	call_deferred("_try_play_pending_term")
+	
+	
 # ----------------------------
 # Term selection
 # ----------------------------
@@ -81,6 +101,8 @@ func _on_term_selected(animation_name: String) -> void:
 	if not current_dancer.has_method("play_animation"):
 		print("Dancer missing play_animation")
 		return
+	
+	print("Requested animation:", animation_name)
 
 	current_dancer.call_deferred("play_animation", animation_name)
 	GameManager.last_played_animation = animation_name
@@ -237,3 +259,19 @@ func _assign_video_controls_nodes() -> void:
 
 	if current_dancer and current_dancer.is_inside_tree() and video_controls_instance.has_method("set_active_dancer"):
 		video_controls_instance.set_active_dancer(current_dancer)
+		
+
+# ----------------------------
+# Term and Dancer Sync Helper
+# ----------------------------
+func _try_play_pending_term() -> void:
+	if GameManager.selected_term == "":
+		return
+	if not current_dancer:
+		return
+	if not current_dancer.has_method("play_animation"):
+		return
+
+	_on_term_selected(GameManager.selected_term)
+	GameManager.selected_term = ""
+	
