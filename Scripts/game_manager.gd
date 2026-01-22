@@ -2,9 +2,10 @@
 # game_manager.gd
 # ----------------------------
 
-
-
 extends Node
+
+signal nav_left
+signal nav_right
 
 @export var ballet_move_database: BalletMoveDatabase = preload("res://Definition Resources/ballet_moves_database.tres")
 
@@ -12,6 +13,10 @@ var chosen_character: String = ""       # Last selected character
 var selected_term: String = ""          # Last selected term
 var last_played_animation: String = ""  # Last animation played globally
 var arrived_from_title_page := false
+
+func _ready() -> void:
+	set_process_unhandled_input(true)  # Enable _unhandled_input processing
+
 
 # ----------------------------
 # Ballet moves
@@ -23,27 +28,50 @@ func get_terms() -> Array:
 			term_list.append(move.name)
 	return term_list
 
-# Play a move on a dancer and track it
 func play_move_on_dancer(dancer: Node3D, term: String) -> void:
 	if dancer and dancer.has_method("play_move"):
 		dancer.play_move(term)
 		last_played_animation = term
 		selected_term = term
 
+
 # ----------------------------
-# Global input
+# Global input handling
 # ----------------------------
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("quit_app"): # ← Esc
-		get_tree().quit()
-		
+	if event is InputEventKey and event.pressed and not event.echo:
+		var current = get_tree().current_scene
+		if current:
+			var focus = current.get_focus_owner()
+			if focus is LineEdit:
+				# User is typing, ignore arrows
+				pass
+			else:
+				if event.is_action_pressed("quit_app"):
+					get_tree().quit()
+					return
+				if event.is_action_pressed("ui_left"):
+					emit_signal("nav_left")
+					return
+				if event.is_action_pressed("ui_right"):
+					emit_signal("nav_right")
+					return
+		else:
+			# No current scene yet, ignore input
+			pass
+
+
+
+# ----------------------------
+# Back button helper
+# ----------------------------
 func _on_back_button_pressed() -> void:
 	# Indicate that the next character selected should start fresh
-	GameManager.arrived_from_title_page = true
+	arrived_from_title_page = true
 
 	# Go back to the title page
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
-	
+
 
 # ----------------------------
 # Normalization Helpers

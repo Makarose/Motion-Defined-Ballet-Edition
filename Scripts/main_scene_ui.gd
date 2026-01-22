@@ -40,12 +40,17 @@ var has_selected_term := false
 # Ready
 # ----------------------------
 func _ready() -> void:
+	print("[DEBUG] MainScene UI ready")
+	print("[DEBUG] Fullscreen container visibility:", fullscreen_container.visible)
+
 	_show_fullscreen_controls(false)
 
-	search_bar.text_changed.connect(_on_search_text_changed)
+	# Connect signals to expected LineEdit methods
+	search_bar.text_changed.connect(_on_line_edit_text_changed)
+	search_bar.text_submitted.connect(_on_line_edit_text_submitted)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
-	search_bar.text_submitted.connect(_on_search_bar_entered)
 	search_bar.grab_focus()
+	print("[DEBUG] Connected LineEdit signals")
 
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
@@ -55,37 +60,36 @@ func _ready() -> void:
 	clear_timer.wait_time = 0.8
 	clear_timer.timeout.connect(_clear_search_now)
 	add_child(clear_timer)
+	print("[DEBUG] Timer created and connected")
 
 	# Connect buttons
 	if fullscreen_button:
 		fullscreen_button.pressed.connect(_on_fullscreen_pressed)
+		print("[DEBUG] Connected fullscreen_button")
 	if male_button:
 		male_button.pressed.connect(_on_male_pressed)
 	if female_button:
 		female_button.pressed.connect(_on_female_pressed)
 
+	# Connect GameManager navigation signals
+	GameManager.nav_left.connect(_on_nav_left)
+	GameManager.nav_right.connect(_on_nav_right)
+	print("[DEBUG] Connected GameManager nav_left/right signals")
+
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
+		print("[DEBUG] Loaded database")
 
-# ----------------------------
-# Input handling
-# ----------------------------
-func _input(event: InputEvent) -> void:
-	# If the fullscreen button is currently pressed, skip scene navigation
-	if $CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton.pressed:
-		return
-
-	if event is InputEventKey and event.pressed:
-		if Input.is_action_just_pressed("ui_left"):
-			_on_back_button_pressed()
-		elif Input.is_action_just_pressed("ui_right"):
-			_on_index_button_pressed()
-
+	# Ensure unhandled input works even if LineEdit is focused
+	set_process_input(true)
+	set_process_unhandled_input(true)
+	print("[DEBUG] set_process_unhandled_input(true) called")
 
 # ----------------------------
 # Search / Item List
 # ----------------------------
-func _on_search_text_changed(new_text: String) -> void:
+func _on_line_edit_text_changed(new_text: String) -> void:
+	print("[DEBUG] _on_line_edit_text_changed:", new_text)
 	item_list.clear()
 	current_index = -1
 
@@ -101,12 +105,12 @@ func _on_search_text_changed(new_text: String) -> void:
 	item_list.visible = item_list.get_item_count() > 0
 
 func _on_item_selected(index: int) -> void:
+	print("[DEBUG] _on_item_selected:", index)
 	current_index = index
 	_select_item(index)
 
 func _on_search_bar_gui_input(event: InputEvent) -> void:
-	if not item_list.visible:
-		return
+	print("\t[DEBUG] _on_search_bar_gui_input:", event)
 
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
@@ -115,16 +119,30 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 					current_index += 1
 					item_list.select(current_index)
 					item_list.ensure_current_is_visible()
+					print("\t\t[DEBUG] KEY_DOWN, current_index=", current_index)
 			KEY_UP:
 				if current_index > 0:
 					current_index -= 1
 					item_list.select(current_index)
 					item_list.ensure_current_is_visible()
+					print("\t\t[DEBUG] KEY_UP, current_index=", current_index)
 			KEY_ENTER, KEY_KP_ENTER:
 				if current_index >= 0:
+					print("\t\t[DEBUG] ENTER, selecting item at index=", current_index)
 					_select_item(current_index)
 
-func _on_search_bar_entered(_text: String) -> void:
+		# Force left/right navigation even if LineEdit has focus
+		if event.keycode == KEY_LEFT:
+			print("\t\t[DEBUG] LEFT pressed, forwarding nav_left")
+			_on_nav_left()
+		elif event.keycode == KEY_RIGHT:
+			print("\t\t[DEBUG] RIGHT pressed, forwarding nav_right")
+			_on_nav_right()
+
+
+
+func _on_line_edit_text_submitted(_text: String) -> void:
+	print("[DEBUG] _on_line_edit_text_submitted:", _text)
 	if current_index >= 0:
 		_select_item(current_index)
 
@@ -160,6 +178,7 @@ func _select_item(index: int) -> void:
 # Clear search
 # ----------------------------
 func _clear_search_now() -> void:
+	print("[DEBUG] _clear_search_now")
 	search_bar.text = ""
 	current_index = -1
 	item_list.clear()
@@ -169,43 +188,80 @@ func _clear_search_now() -> void:
 # Fullscreen & Character Controls
 # ----------------------------
 func show_fullscreen_button() -> void:
-	print("SHOW FULLSCREEN BUTTON CALLED")
 	_show_fullscreen_controls(true)
 
 func hide_fullscreen_button() -> void:
 	_show_fullscreen_controls(false)
 
-func _show_fullscreen_controls(show: bool) -> void:
+func _show_fullscreen_controls(show_container: bool) -> void:
 	if not fullscreen_container:
 		push_error("Fullscreen container is NULL")
 		return
-	fullscreen_container.visible = show
+	fullscreen_container.visible = show_container
 
 func _on_fullscreen_pressed() -> void:
+	print("[DEBUG] Fullscreen button pressed")
 	emit_signal("fullscreen_requested")
 
 func _on_male_pressed() -> void:
+	print("[DEBUG] Male button pressed")
 	emit_signal("character_requested", "res://Scenes/male.tscn")
 
 func _on_female_pressed() -> void:
+	print("[DEBUG] Female button pressed")
 	emit_signal("character_requested", "res://Scenes/female.tscn")
 
-# ----------------------------
-# F1 keyboard trigger for fullscreen
-# ----------------------------
-func _unhandled_input(event: InputEvent) -> void:
-	if fullscreen_container.visible and event is InputEventKey and event.pressed:
-		if Input.is_action_just_pressed("launch_fullscreen"):
-			print("launch_fullscreen action detected!")
-			_on_fullscreen_pressed()
 
 # ----------------------------
-# Navigation
+# Fullscreen keyboard trigger & navigation
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		# Don't navigate if fullscreen is visible
+		if fullscreen_container.visible:
+			print("[DEBUG] Ignored input because fullscreen active")
+			return
+
+		# Ignore left/right if search bar is focused
+		if search_bar.has_focus() and (event.keycode == KEY_LEFT or event.keycode == KEY_RIGHT):
+			print("[DEBUG] Ignored LEFT/RIGHT because search bar has focus")
+			return
+
+		match event.keycode:
+			KEY_LEFT:
+				print("[DEBUG] LEFT pressed, calling _on_nav_left")
+				_on_nav_left()
+			KEY_RIGHT:
+				print("[DEBUG] RIGHT pressed, calling _on_nav_right")
+				_on_nav_right()
+
+
+# ----------------------------
+# Navigation (scene-specific handlers for GameManager signals)
+# ----------------------------
+func _on_nav_left() -> void:
+	print("[DEBUG] _on_nav_left triggered")
+	if fullscreen_container.visible:
+		print("[DEBUG] Ignored nav_left because fullscreen active")
+		return
+	_on_back_button_pressed()
+
+func _on_nav_right() -> void:
+	print("[DEBUG] _on_nav_right triggered")
+	if fullscreen_container.visible:
+		print("[DEBUG] Ignored nav_right because fullscreen active")
+		return
+	_on_index_button_pressed()
+
+# ----------------------------
+# Actual scene navigation
 # ----------------------------
 func _on_back_button_pressed() -> void:
+	print("[DEBUG] Back button triggered")
 	GameManager.selected_term = ""
 	GameManager.last_played_animation = ""
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
 
 func _on_index_button_pressed() -> void:
+	print("[DEBUG] Index button triggered")
 	get_tree().change_scene_to_file("res://Scenes/index.tscn")
