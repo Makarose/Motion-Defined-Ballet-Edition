@@ -260,8 +260,14 @@ func _on_back_button_pressed() -> void:
 	print("[DEBUG] Back button triggered")
 	GameManager.selected_term = ""
 	GameManager.last_played_animation = ""
-	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+	get_tree().call_deferred(
+	"change_scene_to_file",
+	"res://Scenes/title_page.tscn"
+)
 
 func _on_index_button_pressed() -> void:
 	print("[DEBUG] Index button triggered")
-	get_tree().change_scene_to_file("res://Scenes/index.tscn")
+	get_tree().call_deferred(
+	"change_scene_to_file",
+	"res://Scenes/index.tscn"
+)

@@ -119,8 +119,14 @@ func _on_nav_right() -> void:
 # ----------------------------
 func _on_back_button_pressed() -> void:
 	print("\t[DEBUG] Back button pressed")
-	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
+	get_tree().call_deferred(
+	"change_scene_to_file",
+	"res://Scenes/main_scene.tscn"
+)
 
 func _on_home_button_pressed() -> void:
 	print("\t[DEBUG] Home button pressed")
-	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+	get_tree().call_deferred(
+	"change_scene_to_file",
+	"res://Scenes/title_page.tscn"
+)

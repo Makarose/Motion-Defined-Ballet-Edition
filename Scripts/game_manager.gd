@@ -41,25 +41,22 @@ func play_move_on_dancer(dancer: Node3D, term: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		var current = get_tree().current_scene
-		if current:
-			var focus = current.get_focus_owner()
-			if focus is LineEdit:
-				# User is typing, ignore arrows
-				pass
-			else:
-				if event.is_action_pressed("quit_app"):
-					get_tree().quit()
-					return
-				if event.is_action_pressed("ui_left"):
-					emit_signal("nav_left")
-					return
-				if event.is_action_pressed("ui_right"):
-					emit_signal("nav_right")
-					return
-		else:
-			# No current scene yet, ignore input
-			pass
+		if current and current.name == "TitlePage":
+			return
 
+		var focus = get_viewport().gui_get_focus_owner()
+		if focus is LineEdit:
+			pass
+		else:
+			if event.is_action_pressed("quit_app"):
+				get_tree().quit()
+				return
+			if event.is_action_pressed("ui_left"):
+				emit_signal("nav_left")
+				return
+			if event.is_action_pressed("ui_right"):
+				emit_signal("nav_right")
+				return
 
 
 # ----------------------------

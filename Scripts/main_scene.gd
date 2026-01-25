@@ -109,6 +109,11 @@ func _on_playback_started() -> void:
 func _on_fullscreen_button_pressed() -> void:
 	print("[DEBUG] Fullscreen requested")
 	toggle_viewport_fullscreen()
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("launch_fullscreen"):
+		toggle_viewport_fullscreen()
+
 
 func toggle_viewport_fullscreen() -> void:
 	if not is_fullscreen:
