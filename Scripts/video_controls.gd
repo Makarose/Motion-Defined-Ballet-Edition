@@ -107,26 +107,34 @@ func _on_scrub_ended() -> void:
 # Camera helpers
 # ----------------------------
 func _update_pivot() -> void:
-	if skel == null:
-		return
-	var head_bone_idx = skel.find_bone(head_bone_name)
-	pivot = skel.global_transform.origin if head_bone_idx >= 0 else skel.global_transform.origin
+	if skel != null:
+		var head_idx = skel.find_bone(head_bone_name)
+		if head_idx >= 0:
+			pivot = skel.get_bone_global_pose(head_idx).origin
+			return
+	# fallback
+	pivot = dancer.global_transform.origin
 
+# ----------------------------
+# Camera helpers
+# ----------------------------
 func _update_camera() -> void:
-	if camera == null:
+	if camera == null or dancer == null:
 		return
+
+	var fullscreen_offset = 0.5  # tweak as needed
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+		fullscreen_offset = 1.0  # adjust to taste
 
 	var cam_pos := pivot + Vector3(
 		sin(horizontal_angle) * distance,
-		vertical_offset,
+		vertical_offset + fullscreen_offset,
 		cos(horizontal_angle) * distance
 	)
 
 	camera.global_transform.origin = cam_pos
+	camera.look_at(Vector3(pivot.x, cam_pos.y, pivot.z), Vector3.UP)
 
-	# Look at dancer horizontally only
-	var look_target := Vector3(pivot.x, cam_pos.y, pivot.z)
-	camera.look_at(look_target, Vector3.UP)
 
 # ----------------------------
 # Home / Reset
