@@ -46,12 +46,11 @@ func play_animation(anim_name: String) -> void:
 	paused_time = 0.0
 
 	var anim: Animation = animation_player.get_animation(target_name)
-	if anim != null:
+	if anim:
 		anim.loop_mode = Animation.LOOP_NONE
 
 	animation_player.play(target_name)
 	animation_player.seek(0.0, true)
-
 
 # ----------------------------
 # Loop current animation
@@ -62,14 +61,16 @@ func loop_current_animation() -> void:
 
 	is_looping = true
 	is_paused = false
+	is_scrubbing = false
 	paused_time = 0.0
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim != null:
+	if anim:
 		anim.loop_mode = Animation.LOOP_LINEAR
 
-	animation_player.play(last_animation_name)
-	animation_player.seek(0.0, true)
+	# Only play if not already playing
+	if not animation_player.is_playing():
+		animation_player.play(last_animation_name)
 
 # ----------------------------
 # Replay last animation from start
@@ -83,7 +84,7 @@ func replay_last_animation() -> void:
 	paused_time = 0.0
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim != null:
+	if anim:
 		anim.loop_mode = Animation.LOOP_NONE
 
 	animation_player.play(last_animation_name)
@@ -106,6 +107,9 @@ func resume_animation() -> void:
 	if last_animation_name == "" or not is_paused:
 		return
 	is_paused = false
+	var anim: Animation = animation_player.get_animation(last_animation_name)
+	if anim:
+		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 	animation_player.play(last_animation_name)
 	animation_player.seek(paused_time, true)
 
@@ -121,7 +125,7 @@ func stop_animation() -> void:
 	paused_time = 0.0
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim != null:
+	if anim:
 		anim.loop_mode = Animation.LOOP_NONE
 
 	animation_player.stop()
@@ -147,6 +151,9 @@ func resume_from_scrub() -> void:
 
 	is_scrubbing = false
 	if not is_paused:
+		var anim: Animation = animation_player.get_animation(last_animation_name)
+		if anim:
+			anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 		animation_player.play(last_animation_name)
 		animation_player.seek(animation_player.current_animation_position, true)
 
@@ -163,7 +170,7 @@ func get_playback_state() -> Dictionary:
 
 	if last_animation_name != "" and animation_player.has_animation(last_animation_name):
 		var anim: Animation = animation_player.get_animation(last_animation_name)
-		if anim != null:
+		if anim:
 			state["length"] = anim.length
 			state["time"] = animation_player.current_animation_position
 
@@ -181,7 +188,7 @@ func apply_playback_state(state: Dictionary) -> void:
 	paused_time = state.get("time", 0.0)
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim != null:
+	if anim:
 		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 
 	if is_paused:
