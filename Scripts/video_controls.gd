@@ -2,8 +2,6 @@
 # video_controls.gd
 # ----------------------------
 
-
-
 extends Control
 
 signal character_requested(character_scene_path: String)
@@ -62,8 +60,7 @@ func _ready() -> void:
 func set_camera(cam: Camera3D) -> void:
 	camera = cam
 
-func set_active_dancer(dancer_node: Node3D) -> void:
-	# Remove old dancer if exists
+func set_active_dancer(dancer_node: Node3D, reset_camera: bool = true) -> void:
 	if dancer != null and dancer.is_inside_tree():
 		dancer.queue_free()
 
@@ -71,12 +68,14 @@ func set_active_dancer(dancer_node: Node3D) -> void:
 	skel = dancer.get_node_or_null("Skeleton3D") as Skeleton3D
 
 	_update_pivot()
-	distance = default_distance
-	horizontal_angle = 0.0
-	vertical_offset = 0.0
-	_save_home_state()
+	if reset_camera:
+		distance = default_distance
+		horizontal_angle = 0.0
+		vertical_offset = 0.0
+		_save_home_state()
 	_update_camera()
 	_setup_scrub_slider()
+
 
 # ----------------------------
 # Scrub slider
@@ -93,6 +92,7 @@ func _on_scrub_started() -> void:
 	scrub_active = true
 	if dancer != null and dancer.has_method("get_playback_state"):
 		was_playing_before_scrub = dancer.get_playback_state()["is_paused"] == false
+		dancer.pause_animation()  # pause while scrubbing
 
 func _on_scrub_changed(value: float) -> void:
 	if dancer != null and scrub_active and dancer.has_method("seek_to_time"):
@@ -115,16 +115,13 @@ func _update_pivot() -> void:
 	# fallback
 	pivot = dancer.global_transform.origin
 
-# ----------------------------
-# Camera helpers
-# ----------------------------
 func _update_camera() -> void:
 	if camera == null or dancer == null:
 		return
 
-	var fullscreen_offset = 0.5  # tweak as needed
+	var fullscreen_offset = 0.5
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
-		fullscreen_offset = 1.0  # adjust to taste
+		fullscreen_offset = 1.0
 
 	var cam_pos := pivot + Vector3(
 		sin(horizontal_angle) * distance,
@@ -134,7 +131,6 @@ func _update_camera() -> void:
 
 	camera.global_transform.origin = cam_pos
 	camera.look_at(Vector3(pivot.x, cam_pos.y, pivot.z), Vector3.UP)
-
 
 # ----------------------------
 # Home / Reset
@@ -192,22 +188,23 @@ func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("exit_fullscreen"):
 		_on_exit_button_pressed()
 
-	if Input.is_action_just_pressed("replay_animation") and dancer.has_method("replay_last_animation"):
+	# Map all buttons to updated dancer functions
+	if dancer.has_method("replay_last_animation") and Input.is_action_just_pressed("replay_animation"):
 		dancer.replay_last_animation()
 
-	if Input.is_action_just_pressed("pause_animation") and dancer.has_method("pause_animation"):
+	if dancer.has_method("pause_animation") and Input.is_action_just_pressed("pause_animation"):
 		dancer.pause_animation()
 		grab_focus()
 
-	if Input.is_action_just_pressed("play_animation") and dancer.has_method("resume_animation"):
+	if dancer.has_method("resume_animation") and Input.is_action_just_pressed("play_animation"):
 		dancer.resume_animation()
 		grab_focus()
 
-	if Input.is_action_just_pressed("loop_animation") and dancer.has_method("loop_current_animation"):
+	if dancer.has_method("loop_current_animation") and Input.is_action_just_pressed("loop_animation"):
 		dancer.loop_current_animation()
 		grab_focus()
 
-	if Input.is_action_just_pressed("stop_animation") and dancer.has_method("stop_animation"):
+	if dancer.has_method("stop_animation") and Input.is_action_just_pressed("stop_animation"):
 		dancer.stop_animation()
 		grab_focus()
 		
@@ -216,7 +213,6 @@ func _input(event: InputEvent) -> void:
 		
 	if Input.is_action_just_pressed("female_button"):
 		_on_female_button_pressed()
-
 
 # ----------------------------
 # Button handlers

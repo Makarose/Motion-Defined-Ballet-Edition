@@ -24,6 +24,10 @@ var last_fullscreen_character_scene_path: String = ""
 var last_main_scene_character_scene_path: String = ""
 var last_selected_character_scene_path: String = ""
 
+var saved_playback_state: Dictionary = {}
+var saved_camera_state: Dictionary = {}
+
+
 # ----------------------------
 # Ready
 # ----------------------------
@@ -45,24 +49,45 @@ func _ready() -> void:
 		print("[DEBUG] Spawning chosen character:", GameManager.chosen_character)
 		_on_character_selected(GameManager.chosen_character)
 
+
 # ----------------------------
 # Navigation handlers
 # ----------------------------
 func _on_nav_left() -> void:
-	print("[DEBUG] LEFT pressed")
-	if not is_fullscreen:
+	if is_fullscreen and video_controls_instance and video_controls_instance.is_inside_tree():
+		# Rotate camera left in fullscreen
+		video_controls_instance.horizontal_angle += video_controls_instance.orbit_speed * get_process_delta_time()
+		video_controls_instance._update_camera()
+	else:
 		_on_back_button_pressed()
 
+
 func _on_nav_right() -> void:
-	print("[DEBUG] RIGHT pressed")
-	if not is_fullscreen:
+	if is_fullscreen and video_controls_instance and video_controls_instance.is_inside_tree():
+		# Rotate camera right in fullscreen
+		video_controls_instance.horizontal_angle -= video_controls_instance.orbit_speed * get_process_delta_time()
+		video_controls_instance._update_camera()
+	else:
 		_on_home_button_pressed()
+
 
 # ----------------------------
 # Character spawning
 # ----------------------------
 func _on_character_selected(character_scene_path: String, is_restore: bool = false) -> void:
 	print("[DEBUG] Character selected:", character_scene_path, "is_restore:", is_restore)
+
+	# Save current dancer playback state before switching
+	if current_dancer and current_dancer.is_inside_tree() and current_dancer.has_method("get_playback_state"):
+		saved_playback_state = current_dancer.get_playback_state()
+
+	# Save camera state if in fullscreen
+	if is_fullscreen and video_controls_instance and video_controls_instance.is_inside_tree():
+		saved_camera_state = {
+			"distance": video_controls_instance.distance,
+			"horizontal_angle": video_controls_instance.horizontal_angle,
+			"vertical_offset": video_controls_instance.vertical_offset
+		}
 
 	if is_fullscreen and not is_restore:
 		last_fullscreen_character_scene_path = character_scene_path
@@ -83,8 +108,43 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
 
-	call_deferred("_assign_video_controls_nodes")
+	# Assign dancer to video controls first (important!)
+	if video_controls_instance and video_controls_instance.is_inside_tree():
+		if is_fullscreen:
+			video_controls_instance.set_active_dancer(current_dancer, false) # don't reset camera
+		else:
+			video_controls_instance.set_active_dancer(current_dancer, true)  # normal behavior
+
+	# Restore camera state if saved
+	if saved_camera_state and video_controls_instance and video_controls_instance.is_inside_tree():
+		video_controls_instance.distance = saved_camera_state["distance"]
+		video_controls_instance.horizontal_angle = saved_camera_state["horizontal_angle"]
+		video_controls_instance.vertical_offset = saved_camera_state["vertical_offset"]
+		video_controls_instance._update_camera()
+		saved_camera_state = {}
+
+	# Restore playback AFTER video controls have registered dancer
+	call_deferred("_restore_playback_state")
 	call_deferred("_try_play_pending_term")
+
+
+# ----------------------------
+# Restore playback helper
+# ----------------------------
+func _restore_playback_state() -> void:
+	if saved_playback_state.size() == 0:
+		return
+	if current_dancer and current_dancer.has_method("apply_playback_state"):
+		current_dancer.apply_playback_state(saved_playback_state)
+
+		# Restore animation if saved
+		if saved_playback_state.has("current_animation"):
+			var anim_name = saved_playback_state["current_animation"]
+			var looped = saved_playback_state.get("is_looping", false)
+			current_dancer.call_deferred("play_animation", anim_name, looped)
+
+	saved_playback_state = {}
+
 
 # ----------------------------
 # Term selection
@@ -94,14 +154,18 @@ func _on_term_selected(animation_name: String) -> void:
 	if not current_dancer or not current_dancer.has_method("play_animation"):
 		print("[DEBUG] No dancer or missing play_animation")
 		return
+
+	# Deferred call ensures the dancer is fully instanced in the scene tree
 	current_dancer.call_deferred("play_animation", animation_name)
 	GameManager.last_played_animation = animation_name
 	_on_playback_started()
+
 
 func _on_playback_started() -> void:
 	print("[DEBUG] Playback started")
 	if ui and ui.has_method("show_fullscreen_button"):
 		ui.call_deferred("show_fullscreen_button")
+
 
 # ----------------------------
 # Fullscreen toggle
@@ -120,6 +184,7 @@ func toggle_viewport_fullscreen() -> void:
 		_enter_fullscreen()
 	else:
 		_exit_fullscreen()
+
 
 func _enter_fullscreen() -> void:
 	print("[DEBUG] Entering fullscreen")
@@ -163,6 +228,7 @@ func _enter_fullscreen() -> void:
 	_assign_video_controls_nodes()
 	is_fullscreen = true
 
+
 func _exit_fullscreen() -> void:
 	print("[DEBUG] Exiting fullscreen")
 	if ui:
@@ -191,6 +257,7 @@ func _exit_fullscreen() -> void:
 		call_deferred("_on_character_selected", restore_scene_path, true)
 
 	last_fullscreen_character_scene_path = ""
+
 
 # ----------------------------
 # Helpers
@@ -227,13 +294,38 @@ func _assign_video_controls_nodes() -> void:
 		video_controls_instance.set_camera(camera_node)
 
 	if current_dancer and current_dancer.is_inside_tree() and video_controls_instance.has_method("set_active_dancer"):
-		video_controls_instance.set_active_dancer(current_dancer)
+		if is_fullscreen:
+			video_controls_instance.set_active_dancer(current_dancer, false)
+		else:
+			video_controls_instance.set_active_dancer(current_dancer, true)
+
+
 
 func _try_play_pending_term() -> void:
-	if GameManager.selected_term == "" or not current_dancer or not current_dancer.has_method("play_animation"):
+	if GameManager.selected_term == "":
 		return
-	_on_term_selected(GameManager.selected_term)
+
+	if current_dancer and current_dancer.is_inside_tree() and current_dancer.has_method("play_animation"):
+		var animation_name = GameManager.selected_term
+		print("[DEBUG] Playing pending term:", animation_name)
+
+		# Play the animation
+		current_dancer.call_deferred("play_animation", animation_name)
+
+		# Update scrub slider in video controls if present
+		if video_controls_instance and video_controls_instance.is_inside_tree() and video_controls_instance.has_method("_setup_scrub_slider"):
+			video_controls_instance.call_deferred("_setup_scrub_slider")
+
+		# Update GameManager last played
+		GameManager.last_played_animation = animation_name
+
+		# Show fullscreen button on UI
+		_on_playback_started()
+
+	# Clear pending term
 	GameManager.selected_term = ""
+
+
 
 # ----------------------------
 # Back/Home helpers

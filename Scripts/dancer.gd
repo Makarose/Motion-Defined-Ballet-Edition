@@ -2,8 +2,6 @@
 # dancer.gd
 # ----------------------------
 
-
-
 extends Node3D
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -97,9 +95,7 @@ func replay_last_animation() -> void:
 func pause_animation() -> void:
 	if animation_player.is_playing():
 		is_paused = true
-		# Capture the exact current frame
 		paused_time = animation_player.current_animation_position
-		# Stop the animation to freeze it visually
 		animation_player.stop()
 		animation_player.seek(paused_time, true)
 
@@ -107,11 +103,8 @@ func pause_animation() -> void:
 # Resume from paused frame
 # ----------------------------
 func resume_animation() -> void:
-	if last_animation_name == "":
+	if last_animation_name == "" or not is_paused:
 		return
-	if not is_paused:
-		return
-
 	is_paused = false
 	animation_player.play(last_animation_name)
 	animation_player.seek(paused_time, true)
@@ -138,11 +131,15 @@ func stop_animation() -> void:
 # Scrubbing
 # ----------------------------
 func seek_to_time(time_sec: float) -> void:
-	if last_animation_name == "":
+	if last_animation_name == "" or not animation_player.has_animation(last_animation_name):
 		return
-	if animation_player.has_animation(last_animation_name):
-		is_scrubbing = true
-		animation_player.seek(time_sec, true)
+
+	is_scrubbing = true
+	paused_time = time_sec
+
+	animation_player.stop()
+	animation_player.play(last_animation_name)
+	animation_player.seek(paused_time, true)
 
 func resume_from_scrub() -> void:
 	if last_animation_name == "":
@@ -185,10 +182,7 @@ func apply_playback_state(state: Dictionary) -> void:
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
 	if anim != null:
-		if is_looping:
-			anim.loop_mode = Animation.LOOP_LINEAR
-		else:
-			anim.loop_mode = Animation.LOOP_NONE
+		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 
 	if is_paused:
 		animation_player.stop()
