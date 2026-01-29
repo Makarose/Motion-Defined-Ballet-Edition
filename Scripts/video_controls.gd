@@ -182,6 +182,14 @@ func _gui_input(event: InputEvent) -> void:
 		_update_camera()
 
 func _input(event: InputEvent) -> void:
+	if event.is_action("ui_left") or event.is_action("ui_right"):
+		get_viewport().set_input_as_handled()
+		
+	# Camera Reset
+	if Input.is_action_just_pressed("camera_reset") and dancer != null and camera != null:
+		reset_camera()
+		return
+	
 	if dancer == null or not dancer.is_inside_tree():
 		return
 

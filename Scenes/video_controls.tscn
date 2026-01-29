@@ -93,7 +93,7 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.180392, 0.968627, 0.0392157, 1)
 
-[node name="VideoControls" type="Control"]
+[node name="VideoControls" type="Control" groups=["blocks_nav"]]
 z_index = 100
 layout_mode = 3
 anchors_preset = 15

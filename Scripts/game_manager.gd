@@ -39,10 +39,16 @@ func play_move_on_dancer(dancer: Node3D, term: String) -> void:
 # Global input handling
 # ----------------------------
 func _unhandled_input(event: InputEvent) -> void:
+	print("blocks_nav count: ", get_tree().get_nodes_in_group("blocks_nav").size())
+
 	if event is InputEventKey and event.pressed and not event.echo:
 		var current = get_tree().current_scene
 		if current and current.name == "TitlePage":
 			return
+
+		if get_tree().get_nodes_in_group("blocks_nav").size() > 0:
+			return
+
 
 		var focus = get_viewport().gui_get_focus_owner()
 		if focus is LineEdit:

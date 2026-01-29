@@ -58,7 +58,7 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
 
-[node name="TitlePage" type="Control"]
+[node name="TitlePage" type="Control" groups=["blocks_nav"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
