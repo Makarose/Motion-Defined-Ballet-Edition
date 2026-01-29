@@ -44,10 +44,10 @@ func _ready() -> void:
 		ui.connect("character_requested", Callable(self, "_on_character_selected"))
 		ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
 
-	# Spawn chosen character from GameManager
+	# Spawn last selected character from GameManager
 	if GameManager.chosen_character != "":
-		print("[DEBUG] Spawning chosen character:", GameManager.chosen_character)
-		_on_character_selected(GameManager.chosen_character)
+		print("[DEBUG] Spawning last selected character:", GameManager.chosen_character)
+		_on_character_selected(GameManager.chosen_character, true)
 
 
 # ----------------------------
@@ -76,6 +76,11 @@ func _on_nav_right() -> void:
 # ----------------------------
 func _on_character_selected(character_scene_path: String, is_restore: bool = false) -> void:
 	print("[DEBUG] Character selected:", character_scene_path, "is_restore:", is_restore)
+
+	# Save globally if not restoring
+	if not is_restore:
+		GameManager.chosen_character = character_scene_path
+		DancerState.set_dancer(character_scene_path)
 
 	# Save current dancer playback state before switching
 	if current_dancer and current_dancer.is_inside_tree() and current_dancer.has_method("get_playback_state"):
