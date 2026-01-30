@@ -27,6 +27,8 @@ var last_selected_character_scene_path: String = ""
 var saved_playback_state: Dictionary = {}
 var saved_camera_state: Dictionary = {}
 
+var can_enter_fullscreen: bool = false  # Only true after a term is selected
+var exiting_fullscreen: bool = false
 
 # ----------------------------
 # Ready
@@ -112,6 +114,9 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
+	
+	if current_dancer.has_signal("animation_finished"):
+		current_dancer.animation_finished.connect(Callable(self, "_on_dancer_animation_finished"))
 
 	# Assign dancer to video controls first (important!)
 	if video_controls_instance and video_controls_instance.is_inside_tree():
@@ -131,6 +136,15 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	# Restore playback AFTER video controls have registered dancer
 	call_deferred("_restore_playback_state")
 	call_deferred("_try_play_pending_term")
+	
+	
+# ----------------------------
+# Dancer animation finished
+# ----------------------------	
+func _on_dancer_animation_finished(anim_name: String) -> void:
+	if GameManager.selected_term == anim_name:
+		GameManager.selected_term = ""  # mark no term active
+		_update_fullscreen_visibility() # hides the fullscreen button
 
 
 # ----------------------------
@@ -160,9 +174,15 @@ func _on_term_selected(animation_name: String) -> void:
 		print("[DEBUG] No dancer or missing play_animation")
 		return
 
-	# Deferred call ensures the dancer is fully instanced in the scene tree
 	current_dancer.call_deferred("play_animation", animation_name)
 	GameManager.last_played_animation = animation_name
+	GameManager.selected_term = animation_name
+
+	# Enable fullscreen now that a term exists
+	can_enter_fullscreen = true
+
+	_update_fullscreen_visibility()  # <-- NEW LINE
+
 	_on_playback_started()
 
 
@@ -176,12 +196,21 @@ func _on_playback_started() -> void:
 # Fullscreen toggle
 # ----------------------------
 func _on_fullscreen_button_pressed() -> void:
-	print("[DEBUG] Fullscreen requested")
-	toggle_viewport_fullscreen()
-	
+	if not is_fullscreen and can_enter_fullscreen:
+		_enter_fullscreen()
+	else:
+		print("[DEBUG] Cannot enter fullscreen: no term selected or already fullscreen")
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("launch_fullscreen"):
-		toggle_viewport_fullscreen()
+		if not is_fullscreen and can_enter_fullscreen:
+			_enter_fullscreen()
+		return
+
+	if event.is_action_pressed("exit_fullscreen"):
+		if is_fullscreen:
+			_exit_fullscreen()
+		return
 
 
 func toggle_viewport_fullscreen() -> void:
@@ -194,6 +223,9 @@ func toggle_viewport_fullscreen() -> void:
 
 
 func _enter_fullscreen() -> void:
+	if is_fullscreen:
+		return
+
 	print("[DEBUG] Entering fullscreen")
 
 	var win := get_window()
@@ -203,7 +235,6 @@ func _enter_fullscreen() -> void:
 	if ui:
 		_hide_recursive(ui)
 
-	# Hide other CanvasLayers except video controls
 	for child in get_children():
 		if child is CanvasLayer and child.name != "CanvasLayerVideoControls":
 			child.visible = false
@@ -217,7 +248,6 @@ func _enter_fullscreen() -> void:
 	sub_viewport_container.size = win.size
 	dancer_viewport.size = win.size
 
-	# Video controls
 	var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
 	if canvas_layer == null:
 		canvas_layer = CanvasLayer.new()
@@ -225,14 +255,14 @@ func _enter_fullscreen() -> void:
 		get_tree().current_scene.add_child(canvas_layer)
 
 	if video_controls_instance and video_controls_instance.is_inside_tree():
-		video_controls_instance.free()
+		video_controls_instance.queue_free()
+		video_controls_instance = null
 
 	video_controls_instance = video_controls_scene.instantiate()
 	canvas_layer.add_child(video_controls_instance)
 	video_controls_instance.owner = get_tree().current_scene
 	canvas_layer.layer = 100
 
-	# Connect signals
 	if video_controls_instance.has_signal("character_requested"):
 		var target = Callable(self, "_on_character_selected")
 		if not video_controls_instance.is_connected("character_requested", target):
@@ -240,49 +270,57 @@ func _enter_fullscreen() -> void:
 
 	_assign_video_controls_nodes()
 
-	is_fullscreen = win.mode == Window.MODE_FULLSCREEN
+	is_fullscreen = true
 
 
-
+# ----------------------------
+# Exit fullscreen
+# ----------------------------
 func _exit_fullscreen() -> void:
 	print("[DEBUG] Exiting fullscreen")
+	exiting_fullscreen = true  # prevent deferred triggers
 
 	var win := get_window()
 	win.mode = Window.MODE_WINDOWED
 	await get_tree().process_frame
 
-	if ui:
-		_show_recursive(ui)
+	# Clear current term
+	GameManager.selected_term = ""
+	can_enter_fullscreen = false
 
+	_update_fullscreen_visibility()  # <-- NEW LINE
+
+	# Reset CanvasLayers
 	for child in get_children():
 		if child is CanvasLayer:
 			child.visible = true
 
+	# Reset SubViewport
 	sub_viewport_container.position = prev_position
 	sub_viewport_container.size = prev_size
 	dancer_viewport.size = prev_size
 
-	if video_controls_instance and video_controls_instance.is_inside_tree():
-		video_controls_instance.free()
-		video_controls_instance = null
+	# Stop animation
+	if current_dancer and current_dancer.is_inside_tree():
+		if current_dancer.has_method("stop_animation"):
+			current_dancer.stop_animation()
 
-	is_fullscreen = win.mode == Window.MODE_FULLSCREEN
-	get_viewport().gui_release_focus()
-
-	var restore_scene_path = last_fullscreen_character_scene_path
-	if restore_scene_path == "":
-		restore_scene_path = last_main_scene_character_scene_path
-
-	if restore_scene_path != "":
-		call_deferred("_on_character_selected", restore_scene_path, true)
-
-	last_fullscreen_character_scene_path = ""
-
+	is_fullscreen = false
+	exiting_fullscreen = false  # done
 
 
 # ----------------------------
 # Helpers
 # ----------------------------
+func _update_fullscreen_visibility() -> void:
+	if ui:
+		if GameManager.selected_term != "":
+			ui.call_deferred("show_fullscreen_button")
+			can_enter_fullscreen = true
+		else:
+			ui.call_deferred("hide_fullscreen_button")
+			can_enter_fullscreen = false
+
 func _hide_recursive(node: Node) -> void:
 	if node is CanvasItem:
 		node.visible = false
@@ -323,29 +361,9 @@ func _assign_video_controls_nodes() -> void:
 
 
 func _try_play_pending_term() -> void:
-	if GameManager.selected_term == "":
+	if exiting_fullscreen:
+		print("[DEBUG] Skipping pending term because exiting fullscreen")
 		return
-
-	if current_dancer and current_dancer.is_inside_tree() and current_dancer.has_method("play_animation"):
-		var animation_name = GameManager.selected_term
-		print("[DEBUG] Playing pending term:", animation_name)
-
-		# Play the animation
-		current_dancer.call_deferred("play_animation", animation_name)
-
-		# Update scrub slider in video controls if present
-		if video_controls_instance and video_controls_instance.is_inside_tree() and video_controls_instance.has_method("_setup_scrub_slider"):
-			video_controls_instance.call_deferred("_setup_scrub_slider")
-
-		# Update GameManager last played
-		GameManager.last_played_animation = animation_name
-
-		# Show fullscreen button on UI
-		_on_playback_started()
-
-	# Clear pending term
-	GameManager.selected_term = ""
-
 
 
 # ----------------------------

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dyps5cqt4njr2"
+path="res://.godot/imported/[Non Copyrighted Music] Scott Buckley - Growing Up [Piano].mp3-b13b1c28e95342b315d7a7c77e89df7a.mp3str"
+
+[deps]
+
+source_file="res://MusicSounds/[Non Copyrighted Music] Scott Buckley - Growing Up [Piano].mp3"
+dest_files=["res://.godot/imported/[Non Copyrighted Music] Scott Buckley - Growing Up [Piano].mp3-b13b1c28e95342b315d7a7c77e89df7a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

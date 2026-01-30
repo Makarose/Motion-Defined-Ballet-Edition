@@ -191,6 +191,7 @@ func show_fullscreen_button() -> void:
 	_show_fullscreen_controls(true)
 
 func hide_fullscreen_button() -> void:
+	has_selected_term = false
 	_show_fullscreen_controls(false)
 
 func _show_fullscreen_controls(show_container: bool) -> void:

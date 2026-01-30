@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d2qqt6u11esfe"
+path="res://.godot/imported/🎹 Piano (Free Music) - _ROSALITA_ by The Piano Says 🇨🇦.mp3-1863962f9a11be79647d4513857647af.mp3str"
+
+[deps]
+
+source_file="res://MusicSounds/🎹 Piano (Free Music) - _ROSALITA_ by The Piano Says 🇨🇦.mp3"
+dest_files=["res://.godot/imported/🎹 Piano (Free Music) - _ROSALITA_ by The Piano Says 🇨🇦.mp3-1863962f9a11be79647d4513857647af.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

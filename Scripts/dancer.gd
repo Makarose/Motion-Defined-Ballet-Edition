@@ -4,6 +4,8 @@
 
 extends Node3D
 
+signal animation_finished(anim_name: String)
+
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 # ----------------------------
@@ -14,6 +16,11 @@ var is_paused: bool = false
 var is_looping: bool = false
 var paused_time: float = 0.0
 var is_scrubbing: bool = false
+
+
+func _ready() -> void:
+	if animation_player:
+		animation_player.connect("animation_finished", Callable(self, "_on_animation_finished"))
 
 # ----------------------------
 # Play animation (resumes if paused)
@@ -197,3 +204,10 @@ func apply_playback_state(state: Dictionary) -> void:
 	else:
 		animation_player.play(last_animation_name)
 		animation_player.seek(paused_time, true)
+		
+		
+# ----------------------------
+# Animation finished
+# ----------------------------
+func _on_animation_finished(anim_name: String) -> void:
+	emit_signal("animation_finished", anim_name)
