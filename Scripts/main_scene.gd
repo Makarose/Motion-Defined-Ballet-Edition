@@ -185,14 +185,21 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func toggle_viewport_fullscreen() -> void:
-	if not is_fullscreen:
-		_enter_fullscreen()
-	else:
+	var win := get_window()
+
+	if win.mode == Window.MODE_FULLSCREEN:
 		_exit_fullscreen()
+	else:
+		_enter_fullscreen()
 
 
 func _enter_fullscreen() -> void:
 	print("[DEBUG] Entering fullscreen")
+
+	var win := get_window()
+	win.mode = Window.MODE_FULLSCREEN
+	await get_tree().process_frame
+
 	if ui:
 		_hide_recursive(ui)
 
@@ -205,9 +212,10 @@ func _enter_fullscreen() -> void:
 
 	prev_position = sub_viewport_container.position
 	prev_size = sub_viewport_container.size
+
 	sub_viewport_container.position = Vector2.ZERO
-	sub_viewport_container.size = DisplayServer.window_get_size()
-	dancer_viewport.size = sub_viewport_container.size
+	sub_viewport_container.size = win.size
+	dancer_viewport.size = win.size
 
 	# Video controls
 	var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
@@ -231,11 +239,18 @@ func _enter_fullscreen() -> void:
 			video_controls_instance.character_requested.connect(target)
 
 	_assign_video_controls_nodes()
-	is_fullscreen = true
+
+	is_fullscreen = win.mode == Window.MODE_FULLSCREEN
+
 
 
 func _exit_fullscreen() -> void:
 	print("[DEBUG] Exiting fullscreen")
+
+	var win := get_window()
+	win.mode = Window.MODE_WINDOWED
+	await get_tree().process_frame
+
 	if ui:
 		_show_recursive(ui)
 
@@ -251,7 +266,7 @@ func _exit_fullscreen() -> void:
 		video_controls_instance.free()
 		video_controls_instance = null
 
-	is_fullscreen = false
+	is_fullscreen = win.mode == Window.MODE_FULLSCREEN
 	get_viewport().gui_release_focus()
 
 	var restore_scene_path = last_fullscreen_character_scene_path
@@ -262,6 +277,7 @@ func _exit_fullscreen() -> void:
 		call_deferred("_on_character_selected", restore_scene_path, true)
 
 	last_fullscreen_character_scene_path = ""
+
 
 
 # ----------------------------
