@@ -222,32 +222,30 @@ func toggle_viewport_fullscreen() -> void:
 		_enter_fullscreen()
 
 
+# ----------------------------
+# Enter fullscreen for SubViewportContainer
+# ----------------------------
 func _enter_fullscreen() -> void:
 	if is_fullscreen:
 		return
 
 	print("[DEBUG] Entering fullscreen")
 
-	var win := get_window()
-	win.mode = Window.MODE_FULLSCREEN
-	await get_tree().process_frame
-
-	if ui:
-		_hide_recursive(ui)
-
-	for child in get_children():
-		if child is CanvasLayer and child.name != "CanvasLayerVideoControls":
-			child.visible = false
-
-	last_main_scene_character_scene_path = last_selected_character_scene_path
-
+	# Save original container state
 	prev_position = sub_viewport_container.position
 	prev_size = sub_viewport_container.size
 
+	# Make the container fill the window
+	var viewport_size = get_viewport().size
 	sub_viewport_container.position = Vector2.ZERO
-	sub_viewport_container.size = win.size
-	dancer_viewport.size = win.size
+	sub_viewport_container.size = viewport_size
+	dancer_viewport.size = viewport_size
 
+	# Hide all UI except video controls
+	if ui:
+		_hide_recursive(ui)
+
+	# CanvasLayer for video controls
 	var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
 	if canvas_layer == null:
 		canvas_layer = CanvasLayer.new()
@@ -271,42 +269,42 @@ func _enter_fullscreen() -> void:
 	_assign_video_controls_nodes()
 
 	is_fullscreen = true
+	print("[DEBUG] SubViewport container fullscreen activated")
+
 
 
 # ----------------------------
-# Exit fullscreen
+# Exit fullscreen for SubViewportContainer
 # ----------------------------
 func _exit_fullscreen() -> void:
 	print("[DEBUG] Exiting fullscreen")
 	exiting_fullscreen = true  # prevent deferred triggers
 
-	var win := get_window()
-	win.mode = Window.MODE_WINDOWED
-	await get_tree().process_frame
+	# Restore SubViewportContainer position and size
+	sub_viewport_container.position = prev_position
+	sub_viewport_container.size = prev_size
+	dancer_viewport.size = prev_size
 
-	# Clear current term
-	GameManager.selected_term = ""
-	can_enter_fullscreen = false
-
-	_update_fullscreen_visibility()  # <-- NEW LINE
+	# Show all UI elements again
+	if ui:
+		_show_recursive(ui)
 
 	# Reset CanvasLayers
 	for child in get_children():
 		if child is CanvasLayer:
 			child.visible = true
 
-	# Reset SubViewport
-	sub_viewport_container.position = prev_position
-	sub_viewport_container.size = prev_size
-	dancer_viewport.size = prev_size
-
-	# Stop animation
+	# Stop current dancer animation
 	if current_dancer and current_dancer.is_inside_tree():
 		if current_dancer.has_method("stop_animation"):
 			current_dancer.stop_animation()
 
+	# Clear fullscreen state
 	is_fullscreen = false
-	exiting_fullscreen = false  # done
+	exiting_fullscreen = false
+	can_enter_fullscreen = false
+	_update_fullscreen_visibility()
+	print("[DEBUG] SubViewport container fullscreen exited")
 
 
 # ----------------------------
