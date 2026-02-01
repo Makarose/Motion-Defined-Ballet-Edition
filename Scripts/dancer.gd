@@ -184,6 +184,8 @@ func get_playback_state() -> Dictionary:
 	return state
 
 func apply_playback_state(state: Dictionary) -> void:
+	print("[DANCER] apply_playback_state", state)
+
 	if not state.has("animation") or state["animation"] == "":
 		return
 	if not animation_player.has_animation(state["animation"]):
@@ -194,16 +196,20 @@ func apply_playback_state(state: Dictionary) -> void:
 	is_looping = state.get("is_looping", false)
 	paused_time = state.get("time", 0.0)
 
+	print("[DANCER] paused?", is_paused, "time:", paused_time)
+
 	var anim: Animation = animation_player.get_animation(last_animation_name)
 	if anim:
 		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 
-	if is_paused:
-		animation_player.stop()
-		animation_player.seek(paused_time, true)
-	else:
+	animation_player.stop()
+	animation_player.seek(paused_time, true)
+
+	if not is_paused:
+		print("[DANCER] PLAYING")
 		animation_player.play(last_animation_name)
-		animation_player.seek(paused_time, true)
+	else:
+		print("[DANCER] STAYING PAUSED")
 		
 		
 # ----------------------------

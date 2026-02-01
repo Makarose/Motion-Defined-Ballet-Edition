@@ -53,6 +53,12 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	focus_mode = Control.FOCUS_ALL
 	set_process_input(true)
+	
+	# Scrub slider signals
+	scrub_slider.drag_started.connect(Callable(self, "_on_scrub_started"))
+	scrub_slider.value_changed.connect(Callable(self, "_on_scrub_changed"))
+	scrub_slider.drag_ended.connect(Callable(self, "_on_scrub_ended"))
+
 
 # ----------------------------
 # Setup dancer and camera
@@ -88,6 +94,10 @@ func _setup_scrub_slider() -> void:
 			scrub_slider.max_value = state["length"]
 			scrub_slider.value = state["time"]
 
+			scrub_slider.drag_started.connect(Callable(self, "_on_scrub_started"))
+			scrub_slider.value_changed.connect(Callable(self, "_on_scrub_changed"))
+			scrub_slider.drag_ended.connect(Callable(self, "_on_scrub_ended"))
+			
 func _on_scrub_started() -> void:
 	scrub_active = true
 	if dancer != null and dancer.has_method("get_playback_state"):
@@ -232,6 +242,7 @@ func _on_pause_button_pressed() -> void:
 func _on_replay_button_pressed() -> void:
 	if dancer != null and dancer.has_method("replay_last_animation"):
 		dancer.replay_last_animation()
+		scrub_slider.value = 0
 
 func _on_play_button_pressed() -> void:
 	if dancer != null and dancer.has_method("resume_animation"):
@@ -239,11 +250,16 @@ func _on_play_button_pressed() -> void:
 
 func _on_loop_button_pressed() -> void:
 	if dancer != null and dancer.has_method("loop_current_animation"):
+		var state = dancer.get_playback_state()
 		dancer.loop_current_animation()
+		# Reset slider only if at the end of animation
+		if state.has("time") and state.has("length") and state["time"] >= state["length"]:
+			scrub_slider.value = 0
 
 func _on_stop_button_pressed() -> void:
 	if dancer != null and dancer.has_method("stop_animation"):
 		dancer.stop_animation()
+		scrub_slider.value = 0
 
 func _on_exit_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
@@ -264,6 +280,7 @@ func _process(delta: float) -> void:
 	if camera == null or dancer == null:
 		return
 
+	# Camera controls
 	if Input.is_action_pressed("camera_left"):
 		horizontal_angle += orbit_speed * delta
 	if Input.is_action_pressed("camera_right"):
@@ -280,3 +297,10 @@ func _process(delta: float) -> void:
 	distance = clamp(distance, zoom_min, zoom_max)
 	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 	_update_camera()
+
+	# ----------------------------
+	# Update scrub slider in real time
+	# ----------------------------
+	if dancer != null and dancer.has_method("get_playback_state") and not scrub_active:
+		var state = dancer.get_playback_state()
+		scrub_slider.value = state.get("time", 0.0)
