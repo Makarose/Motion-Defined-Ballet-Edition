@@ -216,16 +216,11 @@ func _on_female_pressed() -> void:
 # ----------------------------
 # Fullscreen keyboard trigger & navigation
 # ----------------------------
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		# Don't navigate if fullscreen is visible
 		if fullscreen_container.visible:
 			print("[DEBUG] Ignored input because fullscreen active")
-			return
-
-		# Ignore left/right if search bar is focused
-		if search_bar.has_focus() and (event.keycode == KEY_LEFT or event.keycode == KEY_RIGHT):
-			print("[DEBUG] Ignored LEFT/RIGHT because search bar has focus")
 			return
 
 		match event.keycode:
@@ -242,17 +237,12 @@ func _unhandled_input(event: InputEvent) -> void:
 # ----------------------------
 func _on_nav_left() -> void:
 	print("[DEBUG] _on_nav_left triggered")
-	if fullscreen_container.visible:
-		print("[DEBUG] Ignored nav_left because fullscreen active")
-		return
-	_on_back_button_pressed()
+	_on_back_button_pressed()  # just do the nav, don’t check fullscreen
 
 func _on_nav_right() -> void:
 	print("[DEBUG] _on_nav_right triggered")
-	if fullscreen_container.visible:
-		print("[DEBUG] Ignored nav_right because fullscreen active")
-		return
-	_on_index_button_pressed()
+	_on_index_button_pressed()  # just do the nav, don’t check fullscreen
+
 
 # ----------------------------
 # Actual scene navigation
