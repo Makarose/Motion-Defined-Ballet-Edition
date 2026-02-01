@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://Scripts/game_manager.gd"
 DancerState="*res://Scripts/dancer_state.gd"
+FullscreenManager="*res://Scripts/fullscreen_manager.gd"
 
 [display]
 
