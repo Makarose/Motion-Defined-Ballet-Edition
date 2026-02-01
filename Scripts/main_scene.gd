@@ -7,7 +7,7 @@ extends Node2D
 # ----------------------------
 # Scene Nodes
 # ----------------------------
-@onready var ui: Control = $UI
+@onready var main_scene_ui: Control = $MainSceneUI
 @onready var sub_viewport_container: SubViewportContainer = $SubViewportContainer
 @onready var dancer_viewport: SubViewport = $SubViewportContainer/DancerViewport
 @onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
@@ -44,10 +44,10 @@ func _ready() -> void:
 	GameManager.nav_right.connect(Callable(self, "_on_nav_right"))
 
 	# Connect UI signals
-	if ui:
-		ui.connect("term_selected", Callable(self, "_on_term_selected"))
-		ui.connect("character_requested", Callable(self, "_on_character_selected"))
-		ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
+	if main_scene_ui:
+		main_scene_ui.connect("term_selected", Callable(self, "_on_term_selected"))
+		main_scene_ui.connect("character_requested", Callable(self, "_on_character_selected"))
+		main_scene_ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
 
 	# Spawn last selected character from GameManager
 	if GameManager.chosen_character != "":
@@ -220,8 +220,8 @@ func _on_term_selected(animation_name: String) -> void:
 
 func _on_playback_started() -> void:
 	print("[DEBUG] Playback started")
-	if ui and ui.has_method("show_fullscreen_button"):
-		ui.call_deferred("show_fullscreen_button")
+	if main_scene_ui and main_scene_ui.has_method("show_fullscreen_button"):
+		main_scene_ui.call_deferred("show_fullscreen_button")
 
 
 # ----------------------------
@@ -271,8 +271,8 @@ func _enter_fullscreen() -> void:
 	sub_viewport_container.size = viewport_size
 	dancer_viewport.size = viewport_size
 
-	if ui:
-		_hide_recursive(ui)
+	if main_scene_ui:
+		_hide_recursive(main_scene_ui)
 
 	var canvas_layer := get_tree().current_scene.get_node_or_null("CanvasLayerVideoControls")
 	if canvas_layer == null:
@@ -311,8 +311,8 @@ func _exit_fullscreen() -> void:
 	sub_viewport_container.size = prev_size
 	dancer_viewport.size = prev_size
 
-	if ui:
-		_show_recursive(ui)
+	if main_scene_ui:
+		_show_recursive(main_scene_ui)
 
 	for child in get_children():
 		if child is CanvasLayer:
@@ -333,12 +333,12 @@ func _exit_fullscreen() -> void:
 # Helpers
 # ----------------------------
 func _update_fullscreen_visibility() -> void:
-	if ui:
+	if main_scene_ui:
 		if GameManager.selected_term != "":
-			ui.call_deferred("show_fullscreen_button")
+			main_scene_ui.call_deferred("show_fullscreen_button")
 			can_enter_fullscreen = true
 		else:
-			ui.call_deferred("hide_fullscreen_button")
+			main_scene_ui.call_deferred("hide_fullscreen_button")
 			can_enter_fullscreen = false
 
 func _hide_recursive(node: Node) -> void:
