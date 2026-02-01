@@ -51,6 +51,11 @@ func _ready() -> void:
 		print("[DEBUG] Spawning last selected character:", GameManager.chosen_character)
 		_on_character_selected(GameManager.chosen_character, true)
 
+	# -----------------------
+	# FAIL SAFE: ensure any pending term gets played
+	# -----------------------
+	call_deferred("_try_play_pending_term")
+
 
 # ----------------------------
 # Navigation handlers
@@ -135,7 +140,7 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 
 	# Restore playback AFTER video controls have registered dancer
 	call_deferred("_restore_playback_state")
-	call_deferred("_try_play_pending_term")
+	call_deferred("_try_play_pending_term")  # <-- this now auto-plays selected_term
 	
 	
 # ----------------------------
@@ -362,6 +367,10 @@ func _try_play_pending_term() -> void:
 	if exiting_fullscreen:
 		print("[DEBUG] Skipping pending term because exiting fullscreen")
 		return
+
+	if current_dancer and GameManager.selected_term != "":
+		print("[DEBUG] Playing pending term:", GameManager.selected_term)
+		_on_term_selected(GameManager.selected_term)
 
 
 # ----------------------------
