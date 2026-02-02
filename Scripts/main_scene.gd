@@ -85,6 +85,24 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	call_deferred("_try_play_pending_term")
 
 # ----------------------------
+# Term selection handler
+# ----------------------------
+func _on_term_selected(animation_name: String) -> void:
+	print("[DEBUG] MainScene received term_selected:", animation_name)
+
+	if current_dancer:
+		# Play the selected animation
+		current_dancer.play_animation(animation_name)
+
+		# Show fullscreen button if it exists
+		var fs_button = main_scene_ui.get_node_or_null("FullscreenButton")
+		if fs_button:
+			fs_button.visible = true
+	else:
+		# Store for later if dancer hasn't spawned yet
+		pending_term = animation_name
+
+# ----------------------------
 # Fullscreen button handler
 # ----------------------------
 func _on_fullscreen_button_pressed() -> void:
@@ -92,10 +110,10 @@ func _on_fullscreen_button_pressed() -> void:
 		fs_manager.launch_fullscreen(current_dancer)
 	else:
 		push_warning("Cannot launch fullscreen: no dancer selected")
-			
+
 # ----------------------------
 # Fullscreen signal handlers
-# ----------------------------			
+# ----------------------------
 func _on_fullscreen_started() -> void:
 	print("[MainScene] Fullscreen started")
 	is_fullscreen = true
@@ -135,7 +153,7 @@ func _assign_video_controls_nodes() -> void:
 
 	if video_controls_instance.has_method("set_camera"):
 		video_controls_instance.set_camera(camera_node)
-		
+
 func _hide_recursive(node: Node) -> void:
 	if node is CanvasItem:
 		# Skip fullscreen container so it remains visible
