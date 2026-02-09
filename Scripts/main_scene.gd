@@ -9,7 +9,7 @@ extends Node2D
 # ----------------------------
 @onready var main_scene_ui: Control = $MainSceneUI
 @onready var sub_viewport_container: SubViewportContainer = $SubViewportContainer
-@onready var dancer_viewport: SubViewport = $SubViewportContainer/DancerViewport
+@onready var dancer_viewport: SubViewport = $FullscreenContainer/SubViewportContainer/DancerViewport
 @onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
 @onready var fs_manager := get_node("/root/FullscreenManager")  # Fullscreen manager reference
 
@@ -39,12 +39,9 @@ func _ready() -> void:
 		main_scene_ui.connect("character_requested", Callable(self, "_on_character_selected"))
 		main_scene_ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
 
-	# Connect fullscreen manager signals and assign references
+	# Connect fullscreen manager signals
 	fs_manager.connect("fullscreen_started", Callable(self, "_on_fullscreen_started"))
 	fs_manager.connect("fullscreen_exited", Callable(self, "_on_fullscreen_exited"))
-	fs_manager.assign_fullscreen_container(main_scene_ui.get_node("CanvasLayer/Fullscreen"))
-	fs_manager.assign_dancer_viewport(dancer_viewport)
-	fs_manager.assign_video_controls(video_controls_instance)
 
 	# Spawn last selected character from GameManager
 	if GameManager.chosen_character != "":
@@ -71,18 +68,18 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
 
-	# Assign dancer to VideoControls
+	# Assign dancer to VideoControls if already present
 	if video_controls_instance and video_controls_instance.is_inside_tree():
-		video_controls_instance.set_active_dancer(current_dancer, not is_fullscreen)
+		video_controls_instance.set_active_dancer(current_dancer, not fs_manager.is_fullscreen)
 		_assign_video_controls_nodes()
 
-	# Forward references to FullscreenManager
+	# Assign dancer to FullscreenManager (2 args only)
 	if fs_manager:
-		fs_manager.assign_current_dancer(current_dancer)
-		fs_manager.assign_video_controls(video_controls_instance)
-		fs_manager.assign_dancer_viewport(dancer_viewport)
+		fs_manager.set_dancer(current_dancer, dancer_viewport)
 
+	# Try to play pending term if needed
 	call_deferred("_try_play_pending_term")
+
 
 # ----------------------------
 # Term selection handler
@@ -98,6 +95,8 @@ func _on_term_selected(animation_name: String) -> void:
 		var fs_button = main_scene_ui.get_node_or_null("FullscreenButton")
 		if fs_button:
 			fs_button.visible = true
+			# Assign dancer node to UI for fullscreen
+			main_scene_ui.current_dancer_node = current_dancer
 	else:
 		# Store for later if dancer hasn't spawned yet
 		pending_term = animation_name
@@ -106,34 +105,74 @@ func _on_term_selected(animation_name: String) -> void:
 # Fullscreen button handler
 # ----------------------------
 func _on_fullscreen_button_pressed() -> void:
-	if current_dancer and fs_manager:
-		fs_manager.launch_fullscreen(current_dancer)
-	else:
+	if not current_dancer:
 		push_warning("Cannot launch fullscreen: no dancer selected")
+		return
+
+	if not fs_manager:
+		push_warning("Cannot launch fullscreen: FullscreenManager not found")
+		return
+
+	if not is_fullscreen:
+		print("[DEBUG] Launching fullscreen for dancer:", current_dancer)
+		fs_manager.launch_fullscreen(self, current_dancer)
+	else:
+		print("[DEBUG] Fullscreen already active; exiting")
+		fs_manager.exit_fullscreen(self)
+
+
 
 # ----------------------------
 # Fullscreen signal handlers
 # ----------------------------
-func _on_fullscreen_started() -> void:
+func _on_fullscreen_started(dancer: Node3D) -> void:
 	print("[MainScene] Fullscreen started")
 	is_fullscreen = true
-	# Hide MainScene UI when fullscreen is active
-	if main_scene_ui:
-		_hide_recursive(main_scene_ui)
 
 func _on_fullscreen_exited() -> void:
 	print("[MainScene] Fullscreen exited")
 	is_fullscreen = false
-	# Restore MainScene UI
-	if main_scene_ui:
-		_show_recursive(main_scene_ui)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if fs_manager:
-		fs_manager.handle_input(event)
 
 # ----------------------------
-# Helpers
+# Unhandled input
+# ----------------------------
+func _unhandled_input(event: InputEvent) -> void:
+	# Forward input to UI or handle fullscreen toggling here if needed
+	pass
+
+# ----------------------------
+# Navigation handlers
+# ----------------------------
+func _on_nav_left() -> void:
+	print("[DEBUG] _on_nav_left triggered")
+	_on_back_button_pressed()  # just call back button logic
+
+func _on_nav_right() -> void:
+	print("[DEBUG] _on_nav_right triggered")
+	_on_index_button_pressed()  # just call index button logic
+
+# ----------------------------
+# Actual scene navigation
+# ----------------------------
+func _on_back_button_pressed() -> void:
+	print("[DEBUG] Back button triggered")
+	GameManager.selected_term = ""
+	GameManager.last_played_animation = ""
+	get_tree().call_deferred(
+		"change_scene_to_file",
+		"res://Scenes/title_page.tscn"
+	)
+
+func _on_index_button_pressed() -> void:
+	print("[DEBUG] Index button triggered")
+	get_tree().call_deferred(
+		"change_scene_to_file",
+		"res://Scenes/index.tscn"
+	)
+
+# ----------------------------
+# VideoControls helpers
 # ----------------------------
 func _assign_video_controls_nodes() -> void:
 	if not video_controls_instance or not video_controls_instance.is_inside_tree():
@@ -154,18 +193,17 @@ func _assign_video_controls_nodes() -> void:
 	if video_controls_instance.has_method("set_camera"):
 		video_controls_instance.set_camera(camera_node)
 
+# ----------------------------
+# Helpers to hide/show UI
+# ----------------------------
 func _hide_recursive(node: Node) -> void:
 	if node is CanvasItem:
-		# Skip fullscreen container so it remains visible
-		if node != main_scene_ui.get_node("CanvasLayer/Fullscreen"):
-			node.visible = false
+		node.visible = false
 	for child in node.get_children():
 		_hide_recursive(child)
 
 func _show_recursive(node: Node) -> void:
 	if node is CanvasItem:
-		# Skip fullscreen container; it's controlled separately
-		if node != main_scene_ui.get_node("CanvasLayer/Fullscreen"):
-			node.visible = true
+		node.visible = true
 	for child in node.get_children():
 		_show_recursive(child)

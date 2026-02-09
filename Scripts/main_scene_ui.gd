@@ -37,13 +37,39 @@ var clear_timer: Timer
 var has_selected_term := false
 
 # ----------------------------
+# Fullscreen Manager reference
+# ----------------------------
+var fs_manager: Node = null
+var current_dancer_node: Node3D = null
+
+# ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
 	print("[DEBUG] MainScene UI ready")
-	print("[DEBUG] Fullscreen container visibility:", fullscreen_container.visible)
+	
+	has_selected_term = false
 
-	_show_fullscreen_controls(false)
+	if fullscreen_container:
+		fullscreen_container.visible = false
+
+	# Defensive: ensure nothing else shows it
+	call_deferred("_force_fullscreen_hidden")
+	
+	# Get FullscreenManager (autoload or scene node)
+	fs_manager = get_node_or_null("/root/FullscreenManager")
+
+	if fs_manager:
+		fs_manager.fullscreen_started.connect(_on_fullscreen_started)
+		fs_manager.fullscreen_exited.connect(_on_fullscreen_exited)
+		print("[DEBUG] Connected FullscreenManager signals")
+	else:
+		push_warning("FullscreenManager not found")
+
+	# Force fullscreen container hidden at start
+	if fullscreen_container:
+		fullscreen_container.visible = false
+	has_selected_term = false
 
 	# Connect signals to expected LineEdit methods
 	search_bar.text_changed.connect(_on_line_edit_text_changed)
@@ -84,6 +110,7 @@ func _ready() -> void:
 	set_process_input(true)
 	set_process_unhandled_input(true)
 	print("[DEBUG] set_process_unhandled_input(true) called")
+
 
 # ----------------------------
 # Search / Item List
@@ -140,7 +167,6 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 			_on_nav_right()
 
 
-
 func _on_line_edit_text_submitted(_text: String) -> void:
 	print("[DEBUG] _on_line_edit_text_submitted:", _text)
 	if current_index >= 0:
@@ -163,7 +189,6 @@ func _select_item(index: int) -> void:
 
 	title_label.text = move.name
 	definition_label.text = move.definition
-
 	search_bar.text = selected_name
 	item_list.visible = false
 	search_bar.grab_focus()
@@ -171,8 +196,15 @@ func _select_item(index: int) -> void:
 
 	has_selected_term = true
 
+	# Show fullscreen button only if animation exists
 	if move.animation_name.strip_edges() != "":
 		emit_signal("term_selected", move.animation_name)
+		# DO NOT launch fullscreen automatically
+		# current_dancer_node = GameManager.current_dancer
+		show_fullscreen_button()
+	else:
+		hide_fullscreen_button()
+
 
 # ----------------------------
 # Clear search
@@ -184,11 +216,14 @@ func _clear_search_now() -> void:
 	item_list.clear()
 	item_list.visible = false
 
+
 # ----------------------------
 # Fullscreen & Character Controls
 # ----------------------------
 func show_fullscreen_button() -> void:
-	_show_fullscreen_controls(true)
+	# Only show if a term with animation is selected
+	if has_selected_term and fullscreen_container:
+		_show_fullscreen_controls(true)
 
 func hide_fullscreen_button() -> void:
 	has_selected_term = false
@@ -201,8 +236,22 @@ func _show_fullscreen_controls(show_container: bool) -> void:
 	fullscreen_container.visible = show_container
 
 func _on_fullscreen_pressed() -> void:
-	print("[DEBUG] Fullscreen button pressed")
-	emit_signal("fullscreen_requested")
+	print("[DEBUG] Fullscreen requested")
+
+	if not fs_manager:
+		push_warning("FullscreenManager missing")
+		return
+
+	# Do nothing if already fullscreen
+	if fs_manager.is_fullscreen:
+		return
+
+	if not current_dancer_node:
+		push_warning("No dancer available for fullscreen")
+		return
+
+	fs_manager.launch_fullscreen(current_dancer_node)
+
 
 func _on_male_pressed() -> void:
 	print("[DEBUG] Male button pressed")
@@ -212,17 +261,44 @@ func _on_female_pressed() -> void:
 	print("[DEBUG] Female button pressed")
 	emit_signal("character_requested", "res://Scenes/female.tscn")
 
+# Hide fullscreen container helper. 
+func _force_fullscreen_hidden() -> void:
+	if not has_selected_term and fullscreen_container:
+		fullscreen_container.visible = false
+
+# ----------------------------
+# Fullscreen signal handlers
+# ----------------------------
+func _on_fullscreen_started(dancer: Node3D) -> void:
+	print("[DEBUG] Fullscreen started")
+	fullscreen_container.visible = true
+
+	# Adjust viewport or other children as needed
+	if has_node("DancerViewport"):
+		var viewport = $DancerViewport
+		viewport.position = Vector2.ZERO
+		viewport.size = get_viewport().size
+
+	_show_fullscreen_controls(true)
+
+func _on_fullscreen_exited() -> void:
+	print("[DEBUG] Fullscreen exited")
+	fullscreen_container.visible = false
+
+	if has_node("DancerViewport"):
+		var viewport = $DancerViewport
+		# Restore default layout
+		viewport.size = Vector2(800, 600)
+		viewport.position = Vector2(100, 100)
+
+	_show_fullscreen_controls(false)
+
 
 # ----------------------------
 # Fullscreen keyboard trigger & navigation
 # ----------------------------
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
-		# Don't navigate if fullscreen is visible
-		if fullscreen_container.visible:
-			print("[DEBUG] Ignored input because fullscreen active")
-			return
-
 		match event.keycode:
 			KEY_LEFT:
 				print("[DEBUG] LEFT pressed, calling _on_nav_left")
@@ -230,6 +306,12 @@ func _input(event: InputEvent) -> void:
 			KEY_RIGHT:
 				print("[DEBUG] RIGHT pressed, calling _on_nav_right")
 				_on_nav_right()
+			KEY_F1:
+				if fullscreen_container and fullscreen_container.visible:
+					print("[DEBUG] F1 pressed → request fullscreen")
+					emit_signal("fullscreen_requested")
+				else:
+					print("[DEBUG] F1 pressed but fullscreen container is hidden; ignoring")
 
 
 # ----------------------------
@@ -252,13 +334,13 @@ func _on_back_button_pressed() -> void:
 	GameManager.selected_term = ""
 	GameManager.last_played_animation = ""
 	get_tree().call_deferred(
-	"change_scene_to_file",
-	"res://Scenes/title_page.tscn"
+		"change_scene_to_file",
+		"res://Scenes/title_page.tscn"
 )
 
 func _on_index_button_pressed() -> void:
 	print("[DEBUG] Index button triggered")
 	get_tree().call_deferred(
-	"change_scene_to_file",
-	"res://Scenes/index.tscn"
+		"change_scene_to_file",
+		"res://Scenes/index.tscn"
 )

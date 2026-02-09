@@ -15,7 +15,18 @@ offset_top = 540.0
 offset_right = 960.0
 offset_bottom = 540.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="FullscreenContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="FullscreenContainer"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,13 +40,14 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 
-[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="DancerViewport" type="SubViewport" parent="FullscreenContainer/SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(1125, 500)
 render_target_update_mode = 4
 
-[node name="Background" parent="SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
+[node name="Background" parent="FullscreenContainer/SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
 
-[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport"]
+[node name="CharacterSlot" type="Node3D" parent="FullscreenContainer/SubViewportContainer/DancerViewport"]
 
-[editable path="SubViewportContainer/DancerViewport/Background"]
+[editable path="MainSceneUI"]
+[editable path="FullscreenContainer/SubViewportContainer/DancerViewport/Background"]

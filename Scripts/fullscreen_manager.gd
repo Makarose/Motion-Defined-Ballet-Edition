@@ -3,114 +3,96 @@
 # ----------------------------
 extends Node
 
-signal fullscreen_started
+# ----------------------------
+# Signals
+# ----------------------------
+signal fullscreen_started(dancer: Node3D)
 signal fullscreen_exited
 
 # ----------------------------
-# References from MainScene
-# ----------------------------
-var fullscreen_container: Control = null      # MarginContainer in MainSceneUI
-var dancer_viewport: SubViewport = null
-var video_controls: Node = null
-var current_dancer: Node3D = null
-
-# ----------------------------
-# Fullscreen state
+# State
 # ----------------------------
 var is_fullscreen: bool = false
-var prev_viewport_size: Vector2 = Vector2.ZERO
-var prev_viewport_position: Vector2 = Vector2.ZERO
+var current_dancer: Node3D = null
+var dancer_viewport: SubViewport = null
+var video_controls_instance: Control = null
+var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
 
 # ----------------------------
-# Assign references
+# Assign dancer & viewport
 # ----------------------------
-func assign_fullscreen_container(container: Control) -> void:
-	fullscreen_container = container
-
-func assign_dancer_viewport(viewport: SubViewport) -> void:
-	dancer_viewport = viewport
-
-func assign_video_controls(vc: Node) -> void:
-	video_controls = vc
-
-func assign_current_dancer(dancer: Node3D) -> void:
+func set_dancer(dancer: Node3D, viewport: SubViewport) -> void:
 	current_dancer = dancer
+	dancer_viewport = viewport
+	print("[FullscreenManager] Dancer assigned:", current_dancer)
+
+# ----------------------------
+# Recursive UI hide/show for CanvasLayer children
+# ----------------------------
+func _hide_recursive(node: Node) -> void:
+	if node is CanvasItem:
+		node.visible = false
+	for child in node.get_children():
+		_hide_recursive(child)
+
+func _show_recursive(node: Node) -> void:
+	if node is CanvasItem:
+		node.visible = true
+	for child in node.get_children():
+		_show_recursive(child)
 
 # ----------------------------
 # Launch fullscreen
 # ----------------------------
-func launch_fullscreen(dancer: Node3D) -> void:
-	if not dancer_viewport or not video_controls or not fullscreen_container:
-		push_warning("Cannot enter fullscreen: missing references")
+func launch_fullscreen(main_scene_root: Node, dancer: Node3D) -> void:
+	if is_fullscreen or not dancer:
+		push_warning("[FullscreenManager] Cannot launch fullscreen")
 		return
 
-	if is_fullscreen:
-		return  # Already fullscreen
+	# Assign dancer and SubViewport
+	var subviewport = main_scene_root.get_node("FullscreenContainer/SubViewportContainer/SubViewport")
+	set_dancer(dancer, subviewport)
 
-	current_dancer = dancer
+	# Hide MainSceneUI (CanvasLayer included)
+	var main_ui = main_scene_root.get_node("MainSceneUI")
+	if main_ui:
+		_hide_recursive(main_ui)
 
-	# Save previous viewport state
-	prev_viewport_size = dancer_viewport.size
-	prev_viewport_position = dancer_viewport.position
+	# Instantiate video controls if needed
+	if not video_controls_instance:
+		video_controls_instance = video_controls_scene.instantiate()
+		main_scene_root.add_child(video_controls_instance)
+	video_controls_instance.visible = true
 
-	# Show container
-	fullscreen_container.visible = true
+	# Set OS fullscreen
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
-	# Resize viewport to fullscreen
-	var screen_size = get_viewport().size
-	dancer_viewport.position = Vector2.ZERO
-	dancer_viewport.size = screen_size
-
-	# Update VideoControls camera if needed
-	if video_controls and video_controls.has_method("_update_camera"):
-		video_controls._update_camera()
-
+	# Update state & emit signal
 	is_fullscreen = true
-	emit_signal("fullscreen_started")
-	print("[FullscreenManager] Fullscreen started")
+	emit_signal("fullscreen_started", current_dancer)
+	print("[FullscreenManager] Fullscreen started for:", current_dancer)
 
 # ----------------------------
 # Exit fullscreen
 # ----------------------------
-func exit_fullscreen() -> void:
-	if not is_fullscreen or not dancer_viewport or not fullscreen_container:
+func exit_fullscreen(main_scene_root: Node) -> void:
+	if not is_fullscreen:
 		return
 
-	# Restore viewport
-	dancer_viewport.size = prev_viewport_size
-	dancer_viewport.position = prev_viewport_position
+	# Show MainSceneUI (CanvasLayer included)
+	var main_ui = main_scene_root.get_node("MainSceneUI")
+	if main_ui:
+		_show_recursive(main_ui)
 
-	# Hide container
-	fullscreen_container.visible = false
+	# Hide video controls
+	if video_controls_instance:
+		video_controls_instance.visible = false
 
+	# Exit OS fullscreen
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+	# Reset state
+	current_dancer = null
 	is_fullscreen = false
 	emit_signal("fullscreen_exited")
 	print("[FullscreenManager] Fullscreen exited")
-
-# ----------------------------
-# Input handling
-# ----------------------------
-func handle_input(event: InputEvent) -> void:
-	# Forward all events to VideoControls first
-	if video_controls and video_controls.is_inside_tree() and video_controls.has_method("_input"):
-		video_controls._input(event)
-
-	# Hotkeys
-	if event is InputEventKey and event.pressed:
-		# Exit fullscreen hotkey
-		if Input.is_action_just_pressed("exit_fullscreen"):
-			exit_fullscreen()
-			return
-
-		# Dancer hotkeys
-		if current_dancer and current_dancer.is_inside_tree():
-			if current_dancer.has_method("replay_last_animation") and Input.is_action_just_pressed("replay_animation"):
-				current_dancer.replay_last_animation()
-			if current_dancer.has_method("pause_animation") and Input.is_action_just_pressed("pause_animation"):
-				current_dancer.pause_animation()
-			if current_dancer.has_method("resume_animation") and Input.is_action_just_pressed("play_animation"):
-				current_dancer.resume_animation()
-			if current_dancer.has_method("loop_current_animation") and Input.is_action_just_pressed("loop_animation"):
-				current_dancer.loop_current_animation()
-			if current_dancer.has_method("stop_animation") and Input.is_action_just_pressed("stop_animation"):
-				current_dancer.stop_animation()

@@ -6,7 +6,7 @@ extends Control
 
 signal character_requested(character_scene_path: String)
 
-@onready var scrub_slider: HSlider = $ScrubSlider
+@onready var scrub_slider: HSlider = $SliderContainer/ScrubSlider
 
 # ----------------------------
 # Camera / Dancer Tunables
