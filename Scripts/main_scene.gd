@@ -2,25 +2,20 @@
 # main_scene.gd
 # ----------------------------
 
-extends Node2D
+extends Control
 
 # ----------------------------
 # Scene Nodes
 # ----------------------------
 @onready var main_scene_ui: Control = $MainSceneUI
-@onready var sub_viewport_container: SubViewportContainer = $SubViewportContainer
-@onready var dancer_viewport: SubViewport = $FullscreenContainer/SubViewportContainer/DancerViewport
-@onready var video_controls_scene: PackedScene = preload("res://Scenes/video_controls.tscn")
-@onready var fs_manager := get_node("/root/FullscreenManager")  # Fullscreen manager reference
+@onready var dancer_viewport: SubViewport = $SubViewportContainer/DancerViewport
+@onready var fullscreen_scene_instance: Control = $FullscreenScene  # already in tree
 
 # ----------------------------
 # Runtime state
 # ----------------------------
 var current_dancer: Node3D = null
-var video_controls_instance: Control = null
 var is_fullscreen: bool = false
-var prev_position: Vector2 = Vector2.ZERO
-var prev_size: Vector2 = Vector2.ZERO
 var pending_term: String = ""
 
 # ----------------------------
@@ -28,6 +23,8 @@ var pending_term: String = ""
 # ----------------------------
 func _ready() -> void:
 	print("[DEBUG] MainScene ready")
+
+	fullscreen_scene_instance.hide()  # ensure hidden at start
 
 	# Connect GameManager navigation
 	GameManager.nav_left.connect(Callable(self, "_on_nav_left"))
@@ -39,27 +36,22 @@ func _ready() -> void:
 		main_scene_ui.connect("character_requested", Callable(self, "_on_character_selected"))
 		main_scene_ui.connect("fullscreen_requested", Callable(self, "_on_fullscreen_button_pressed"))
 
-	# Connect fullscreen manager signals
-	fs_manager.connect("fullscreen_started", Callable(self, "_on_fullscreen_started"))
-	fs_manager.connect("fullscreen_exited", Callable(self, "_on_fullscreen_exited"))
-
 	# Spawn last selected character from GameManager
 	if GameManager.chosen_character != "":
 		print("[DEBUG] Spawning last selected character:", GameManager.chosen_character)
 		_on_character_selected(GameManager.chosen_character, true)
 
-	call_deferred("_try_play_pending_term")
 
 # ----------------------------
 # Character spawning
 # ----------------------------
 func _on_character_selected(character_scene_path: String, is_restore: bool = false) -> void:
-	# Remove old dancer
+	#Remove previous dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Instantiate new dancer
+	# Load and instantiate new dancer
 	var char_scene: PackedScene = load(character_scene_path)
 	if not char_scene:
 		push_error("Character scene not found!: " + character_scene_path)
@@ -68,17 +60,11 @@ func _on_character_selected(character_scene_path: String, is_restore: bool = fal
 	current_dancer = char_scene.instantiate()
 	dancer_viewport.add_child(current_dancer)
 
-	# Assign dancer to VideoControls if already present
-	if video_controls_instance and video_controls_instance.is_inside_tree():
-		video_controls_instance.set_active_dancer(current_dancer, not fs_manager.is_fullscreen)
-		_assign_video_controls_nodes()
-
-	# Assign dancer to FullscreenManager (2 args only)
-	if fs_manager:
-		fs_manager.set_dancer(current_dancer, dancer_viewport)
-
-	# Try to play pending term if needed
-	call_deferred("_try_play_pending_term")
+	# Play pending term if one exists
+	if pending_term != "":
+		print("[DEBUG] Playing pending term:", pending_term)
+		current_dancer.play_animation(pending_term)
+		pending_term = ""
 
 
 # ----------------------------
@@ -88,17 +74,12 @@ func _on_term_selected(animation_name: String) -> void:
 	print("[DEBUG] MainScene received term_selected:", animation_name)
 
 	if current_dancer:
-		# Play the selected animation
 		current_dancer.play_animation(animation_name)
-
-		# Show fullscreen button if it exists
 		var fs_button = main_scene_ui.get_node_or_null("FullscreenButton")
 		if fs_button:
 			fs_button.visible = true
-			# Assign dancer node to UI for fullscreen
 			main_scene_ui.current_dancer_node = current_dancer
 	else:
-		# Store for later if dancer hasn't spawned yet
 		pending_term = animation_name
 
 # ----------------------------
@@ -109,89 +90,43 @@ func _on_fullscreen_button_pressed() -> void:
 		push_warning("Cannot launch fullscreen: no dancer selected")
 		return
 
-	if not fs_manager:
-		push_warning("Cannot launch fullscreen: FullscreenManager not found")
-		return
+	if fullscreen_scene_instance.has_method("set_dancer"):
+		fullscreen_scene_instance.set_dancer(current_dancer)
 
-	if not is_fullscreen:
-		print("[DEBUG] Launching fullscreen for dancer:", current_dancer)
-		fs_manager.launch_fullscreen(self, current_dancer)
-	else:
-		print("[DEBUG] Fullscreen already active; exiting")
-		fs_manager.exit_fullscreen(self)
-
-
-
-# ----------------------------
-# Fullscreen signal handlers
-# ----------------------------
-func _on_fullscreen_started(dancer: Node3D) -> void:
-	print("[MainScene] Fullscreen started")
+	fullscreen_scene_instance.show()
+	_hide_recursive(main_scene_ui)  # hide main UI
 	is_fullscreen = true
+	print("[DEBUG] Fullscreen started")
 
-func _on_fullscreen_exited() -> void:
-	print("[MainScene] Fullscreen exited")
+# ----------------------------
+# Exiting fullscreen
+# ----------------------------
+func _exit_fullscreen() -> void:
+	if fullscreen_scene_instance:
+		fullscreen_scene_instance.hide()
+
+	_show_recursive(main_scene_ui)  # restore main UI
 	is_fullscreen = false
+	print("[DEBUG] Fullscreen exited")
 
-
-# ----------------------------
-# Unhandled input
-# ----------------------------
-func _unhandled_input(event: InputEvent) -> void:
-	# Forward input to UI or handle fullscreen toggling here if needed
-	pass
 
 # ----------------------------
 # Navigation handlers
 # ----------------------------
 func _on_nav_left() -> void:
-	print("[DEBUG] _on_nav_left triggered")
-	_on_back_button_pressed()  # just call back button logic
+	_on_back_button_pressed()
 
 func _on_nav_right() -> void:
-	print("[DEBUG] _on_nav_right triggered")
-	_on_index_button_pressed()  # just call index button logic
+	_on_index_button_pressed()
 
-# ----------------------------
-# Actual scene navigation
-# ----------------------------
 func _on_back_button_pressed() -> void:
-	print("[DEBUG] Back button triggered")
 	GameManager.selected_term = ""
 	GameManager.last_played_animation = ""
-	get_tree().call_deferred(
-		"change_scene_to_file",
-		"res://Scenes/title_page.tscn"
-	)
+	get_tree().call_deferred("change_scene_to_file", "res://Scenes/title_page.tscn")
 
 func _on_index_button_pressed() -> void:
-	print("[DEBUG] Index button triggered")
-	get_tree().call_deferred(
-		"change_scene_to_file",
-		"res://Scenes/index.tscn"
-	)
+	get_tree().call_deferred("change_scene_to_file", "res://Scenes/index.tscn")
 
-# ----------------------------
-# VideoControls helpers
-# ----------------------------
-func _assign_video_controls_nodes() -> void:
-	if not video_controls_instance or not video_controls_instance.is_inside_tree():
-		return
-	if not dancer_viewport or not dancer_viewport.is_inside_tree():
-		return
-
-	var background_node = dancer_viewport.get_node_or_null("Background")
-	if not background_node:
-		push_warning("Background node not found")
-		return
-
-	var camera_node = background_node.get_node_or_null("Camera3D")
-	if not camera_node:
-		push_warning("Camera3D node not found under Background")
-		return
-
-	if video_controls_instance.has_method("set_camera"):
-		video_controls_instance.set_camera(camera_node)
 
 # ----------------------------
 # Helpers to hide/show UI

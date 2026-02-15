@@ -1,53 +1,69 @@
-[gd_scene load_steps=4 format=3 uid="uid://dyr2srv21e1ql"]
+[gd_scene load_steps=5 format=3 uid="uid://dyr2srv21e1ql"]
 
 [ext_resource type="Script" path="res://Scripts/main_scene.gd" id="1_fcans"]
 [ext_resource type="PackedScene" uid="uid://btkmkmqv4x7r6" path="res://Scenes/main_scene_ui.tscn" id="2_n4he7"]
 [ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_h6s4l"]
+[ext_resource type="PackedScene" uid="uid://bel5h8cknb8rx" path="res://Scenes/fullscreen_scene.tscn" id="4_65qtm"]
 
-[node name="MainScene" type="Node2D"]
+[node name="MainScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_fcans")
 metadata/_edit_vertical_guides_ = [692.0, 1816.0]
 metadata/_edit_horizontal_guides_ = [163.0, 1000.0]
 
 [node name="MainSceneUI" parent="." instance=ExtResource("2_n4he7")]
-offset_left = 960.0
-offset_top = 540.0
-offset_right = 960.0
-offset_bottom = 540.0
+layout_mode = 1
 
-[node name="FullscreenContainer" type="Control" parent="."]
-layout_mode = 3
+[node name="BackgroundColourPanel" parent="MainSceneUI" index="0"]
+custom_minimum_size = Vector2(1125, 1080)
 anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 40.0
-offset_bottom = 40.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="FullscreenContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 695.0
 offset_top = 163.0
-offset_right = 1820.0
-offset_bottom = 663.0
+offset_right = -100.0
+offset_bottom = -417.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
+stretch = true
 
-[node name="DancerViewport" type="SubViewport" parent="FullscreenContainer/SubViewportContainer"]
+[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(1125, 500)
 render_target_update_mode = 4
 
-[node name="Background" parent="FullscreenContainer/SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
+[node name="Background" parent="SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
 
-[node name="CharacterSlot" type="Node3D" parent="FullscreenContainer/SubViewportContainer/DancerViewport"]
+[node name="Camera3D" parent="SubViewportContainer/DancerViewport/Background" index="1"]
+current = true
+
+[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport"]
+
+[node name="FullscreenScene" parent="." instance=ExtResource("4_65qtm")]
+visible = false
+layout_mode = 1
 
 [editable path="MainSceneUI"]
-[editable path="FullscreenContainer/SubViewportContainer/DancerViewport/Background"]
+[editable path="SubViewportContainer/DancerViewport/Background"]

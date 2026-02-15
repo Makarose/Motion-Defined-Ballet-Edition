@@ -45,8 +45,8 @@ visible = false
 
 [node name="StageRightHigher" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
-light_color = Color(0.913654, 0.897891, 0.91555, 1)
-light_energy = 3.5
+light_color = Color(0.812414, 0.780222, 0.816335, 1)
+light_energy = 3.0
 light_specular = 0.1
 shadow_enabled = true
 shadow_normal_bias = 3.5

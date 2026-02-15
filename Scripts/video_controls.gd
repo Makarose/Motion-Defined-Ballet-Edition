@@ -262,7 +262,7 @@ func _on_stop_button_pressed() -> void:
 		scrub_slider.value = 0
 
 func _on_exit_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
+	pass
 
 func _on_music_button_pressed() -> void:
 	pass

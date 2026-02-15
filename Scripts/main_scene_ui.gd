@@ -21,8 +21,6 @@ signal fullscreen_requested()
 
 @onready var fullscreen_container: MarginContainer = $CanvasLayer/Fullscreen
 @onready var fullscreen_button: TextureButton = $CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton
-@onready var male_button: Button = $CanvasLayer/Fullscreen/MaleButton
-@onready var female_button: Button = $CanvasLayer/Fullscreen/FemaleButton
 
 # ----------------------------
 # Resources
@@ -37,12 +35,6 @@ var clear_timer: Timer
 var has_selected_term := false
 
 # ----------------------------
-# Fullscreen Manager reference
-# ----------------------------
-var fs_manager: Node = null
-var current_dancer_node: Node3D = null
-
-# ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
@@ -50,58 +42,47 @@ func _ready() -> void:
 	
 	has_selected_term = false
 
-	if fullscreen_container:
-		fullscreen_container.visible = false
-
-	# Defensive: ensure nothing else shows it
-	call_deferred("_force_fullscreen_hidden")
-	
-	# Get FullscreenManager (autoload or scene node)
-	fs_manager = get_node_or_null("/root/FullscreenManager")
-
-	if fs_manager:
-		fs_manager.fullscreen_started.connect(_on_fullscreen_started)
-		fs_manager.fullscreen_exited.connect(_on_fullscreen_exited)
-		print("[DEBUG] Connected FullscreenManager signals")
-	else:
-		push_warning("FullscreenManager not found")
-
 	# Force fullscreen container hidden at start
 	if fullscreen_container:
 		fullscreen_container.visible = false
-	has_selected_term = false
 
-	# Connect signals to expected LineEdit methods
-	search_bar.text_changed.connect(_on_line_edit_text_changed)
-	search_bar.text_submitted.connect(_on_line_edit_text_submitted)
-	search_bar.gui_input.connect(_on_search_bar_gui_input)
+	# LineEdit signals
+	if not search_bar.text_changed.is_connected(Callable(self, "_on_line_edit_text_changed")):
+		search_bar.text_changed.connect(Callable(self, "_on_line_edit_text_changed"))
+
+	if not search_bar.text_submitted.is_connected(Callable(self, "_on_line_edit_text_submitted")):
+		search_bar.text_submitted.connect(Callable(self, "_on_line_edit_text_submitted"))
+
+	if not search_bar.gui_input.is_connected(Callable(self, "_on_search_bar_gui_input")):
+		search_bar.gui_input.connect(Callable(self, "_on_search_bar_gui_input"))
+
 	search_bar.grab_focus()
 	print("[DEBUG] Connected LineEdit signals")
 
-	item_list.item_selected.connect(_on_item_selected)
+	# ItemList signals
+	if not item_list.item_selected.is_connected(Callable(self, "_on_item_selected")):
+		item_list.item_selected.connect(Callable(self, "_on_item_selected"))
+
 	item_list.visible = false
 
+	# Clear timer
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8
-	clear_timer.timeout.connect(_clear_search_now)
+	clear_timer.timeout.connect(Callable(self, "_clear_search_now"))
 	add_child(clear_timer)
 	print("[DEBUG] Timer created and connected")
 
-	# Connect buttons
-	if fullscreen_button:
-		fullscreen_button.pressed.connect(_on_fullscreen_pressed)
-		print("[DEBUG] Connected fullscreen_button")
-	if male_button:
-		male_button.pressed.connect(_on_male_pressed)
-	if female_button:
-		female_button.pressed.connect(_on_female_pressed)
+	# GameManager navigation signals
+	if not GameManager.nav_left.is_connected(Callable(self, "_on_nav_left")):
+		GameManager.nav_left.connect(Callable(self, "_on_nav_left"))
 
-	# Connect GameManager navigation signals
-	GameManager.nav_left.connect(_on_nav_left)
-	GameManager.nav_right.connect(_on_nav_right)
+	if not GameManager.nav_right.is_connected(Callable(self, "_on_nav_right")):
+		GameManager.nav_right.connect(Callable(self, "_on_nav_right"))
+
 	print("[DEBUG] Connected GameManager nav_left/right signals")
 
+	# Database fallback
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
 		print("[DEBUG] Loaded database")
@@ -110,6 +91,7 @@ func _ready() -> void:
 	set_process_input(true)
 	set_process_unhandled_input(true)
 	print("[DEBUG] set_process_unhandled_input(true) called")
+
 
 
 # ----------------------------
@@ -238,60 +220,7 @@ func _show_fullscreen_controls(show_container: bool) -> void:
 func _on_fullscreen_pressed() -> void:
 	print("[DEBUG] Fullscreen requested")
 
-	if not fs_manager:
-		push_warning("FullscreenManager missing")
-		return
-
-	# Do nothing if already fullscreen
-	if fs_manager.is_fullscreen:
-		return
-
-	if not current_dancer_node:
-		push_warning("No dancer available for fullscreen")
-		return
-
-	fs_manager.launch_fullscreen(current_dancer_node)
-
-
-func _on_male_pressed() -> void:
-	print("[DEBUG] Male button pressed")
-	emit_signal("character_requested", "res://Scenes/male.tscn")
-
-func _on_female_pressed() -> void:
-	print("[DEBUG] Female button pressed")
-	emit_signal("character_requested", "res://Scenes/female.tscn")
-
-# Hide fullscreen container helper. 
-func _force_fullscreen_hidden() -> void:
-	if not has_selected_term and fullscreen_container:
-		fullscreen_container.visible = false
-
-# ----------------------------
-# Fullscreen signal handlers
-# ----------------------------
-func _on_fullscreen_started(dancer: Node3D) -> void:
-	print("[DEBUG] Fullscreen started")
-	fullscreen_container.visible = true
-
-	# Adjust viewport or other children as needed
-	if has_node("DancerViewport"):
-		var viewport = $DancerViewport
-		viewport.position = Vector2.ZERO
-		viewport.size = get_viewport().size
-
-	_show_fullscreen_controls(true)
-
-func _on_fullscreen_exited() -> void:
-	print("[DEBUG] Fullscreen exited")
-	fullscreen_container.visible = false
-
-	if has_node("DancerViewport"):
-		var viewport = $DancerViewport
-		# Restore default layout
-		viewport.size = Vector2(800, 600)
-		viewport.position = Vector2(100, 100)
-
-	_show_fullscreen_controls(false)
+	emit_signal("fullscreen_requested")
 
 
 # ----------------------------
