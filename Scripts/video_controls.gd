@@ -264,9 +264,6 @@ func _on_stop_button_pressed() -> void:
 func _on_exit_button_pressed() -> void:
 	pass
 
-func _on_music_button_pressed() -> void:
-	pass
-
 func _on_male_button_pressed() -> void:
 	emit_signal("character_requested", "res://Scenes/male.tscn")
 
