@@ -65,5 +65,7 @@ current = true
 visible = false
 layout_mode = 1
 
+[connection signal="fullscreen_requested" from="MainSceneUI" to="." method="_on_fullscreen_button_pressed"]
+
 [editable path="MainSceneUI"]
 [editable path="SubViewportContainer/DancerViewport/Background"]
