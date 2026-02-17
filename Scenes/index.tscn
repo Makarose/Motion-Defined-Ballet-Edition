@@ -157,6 +157,3 @@ custom_minimum_size = Vector2(0, 550)
 layout_mode = 2
 theme = ExtResource("1_vndco")
 theme_override_font_sizes/font_size = 40
-
-[connection signal="pressed" from="Back/MarginContainer/BackButton" to="." method="_on_back_button_pressed"]
-[connection signal="pressed" from="Home/MarginContainer/HomeButton" to="." method="_on_home_button_pressed"]

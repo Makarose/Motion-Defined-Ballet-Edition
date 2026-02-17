@@ -1,7 +1,7 @@
 # ----------------------------
 # dancer.gd
+# Attach to the root node of male.tscn and female.tscn
 # ----------------------------
-
 extends Node3D
 
 signal animation_finished(anim_name: String)
@@ -15,49 +15,90 @@ var last_animation_name: String = ""
 var is_paused: bool = false
 var is_looping: bool = false
 var paused_time: float = 0.0
-var is_scrubbing: bool = false
 
 
 func _ready() -> void:
 	if animation_player:
-		animation_player.connect("animation_finished", Callable(self, "_on_animation_finished"))
+		animation_player.animation_finished.connect(_on_animation_finished)
+
 
 # ----------------------------
-# Play animation (resumes if paused)
+# Play a named animation from the beginning
+# Expects the exact animation clip name (normalization done by caller)
 # ----------------------------
 func play_animation(anim_name: String) -> void:
-	# Find matching animation ignoring case and accents
-	var target_name: String = ""
-	for anim in animation_player.get_animation_list():
-		if GameManager.normalize(anim) == GameManager.normalize(anim_name):
-			target_name = anim
-			break
-
-	if target_name == "":
-		print("Animation not found:", anim_name)
-		return
-		
-	# Set playback state
-	last_animation_name = target_name
-	is_looping = false
-
-	# If paused, resume from paused_time
-	if is_paused and paused_time > 0.0:
-		is_paused = false
-		animation_player.play(last_animation_name)
-		animation_player.seek(paused_time, true)
+	if not animation_player.has_animation(anim_name):
+		push_warning("[Dancer] Animation not found: " + anim_name)
 		return
 
-	# Otherwise, start from beginning
+	last_animation_name = anim_name
 	is_paused = false
+	is_looping = false
 	paused_time = 0.0
 
-	var anim: Animation = animation_player.get_animation(target_name)
+	var anim: Animation = animation_player.get_animation(anim_name)
 	if anim:
 		anim.loop_mode = Animation.LOOP_NONE
 
-	animation_player.play(target_name)
+	animation_player.play(anim_name)
 	animation_player.seek(0.0, true)
+
+
+# ----------------------------
+# Play idle / waiting pose
+# Freezes on frame 0 of plie — no animation plays
+# Call this when dancer first loads before any term is selected
+# ----------------------------
+func play_idle() -> void:
+	if animation_player.has_animation("plie"):
+		animation_player.play("plie")
+		animation_player.seek(0.0, true)
+		animation_player.pause()
+		last_animation_name = ""  # empty so scrub bar doesn't activate
+		is_paused = false         # not "paused" in the playback sense
+	else:
+		animation_player.stop()
+
+
+# ----------------------------
+# Pause at current frame
+# ----------------------------
+func pause_animation() -> void:
+	if animation_player.is_playing():
+		is_paused = true
+		paused_time = animation_player.current_animation_position
+		animation_player.pause()
+
+
+# ----------------------------
+# Resume from paused frame
+# ----------------------------
+func resume_animation() -> void:
+	if last_animation_name == "" or not is_paused:
+		return
+	is_paused = false
+	animation_player.play(last_animation_name)
+	animation_player.seek(paused_time, true)
+
+
+# ----------------------------
+# Replay from the beginning
+# ----------------------------
+func replay_last_animation() -> void:
+	if last_animation_name == "":
+		return
+
+	is_paused = false
+	is_looping = false
+	paused_time = 0.0
+
+	var anim: Animation = animation_player.get_animation(last_animation_name)
+	if anim:
+		anim.loop_mode = Animation.LOOP_NONE
+
+	animation_player.play(last_animation_name)
+	animation_player.seek(0.0, true)
+
 
 # ----------------------------
 # Loop current animation
@@ -68,60 +109,18 @@ func loop_current_animation() -> void:
 
 	is_looping = true
 	is_paused = false
-	is_scrubbing = false
 	paused_time = 0.0
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
 	if anim:
 		anim.loop_mode = Animation.LOOP_LINEAR
 
-	# Only play if not already playing
 	if not animation_player.is_playing():
 		animation_player.play(last_animation_name)
 
-# ----------------------------
-# Replay last animation from start
-# ----------------------------
-func replay_last_animation() -> void:
-	if last_animation_name == "":
-		return
-
-	is_looping = false
-	is_paused = false
-	paused_time = 0.0
-
-	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim:
-		anim.loop_mode = Animation.LOOP_NONE
-
-	animation_player.play(last_animation_name)
-	animation_player.seek(0.0, true)
 
 # ----------------------------
-# Pause at current frame
-# ----------------------------
-func pause_animation() -> void:
-	if animation_player.is_playing():
-		is_paused = true
-		paused_time = animation_player.current_animation_position
-		animation_player.stop()
-		animation_player.seek(paused_time, true)
-
-# ----------------------------
-# Resume from paused frame
-# ----------------------------
-func resume_animation() -> void:
-	if last_animation_name == "" or not is_paused:
-		return
-	is_paused = false
-	var anim: Animation = animation_player.get_animation(last_animation_name)
-	if anim:
-		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
-	animation_player.play(last_animation_name)
-	animation_player.seek(paused_time, true)
-
-# ----------------------------
-# Stop animation
+# Stop and return to frame 0
 # ----------------------------
 func stop_animation() -> void:
 	if last_animation_name == "":
@@ -138,34 +137,27 @@ func stop_animation() -> void:
 	animation_player.stop()
 	animation_player.seek(0.0, true)
 
+
 # ----------------------------
-# Scrubbing
+# Scrub to a specific time
+# Does not change play/pause state
 # ----------------------------
 func seek_to_time(time_sec: float) -> void:
-	if last_animation_name == "" or not animation_player.has_animation(last_animation_name):
-		return
-
-	is_scrubbing = true
-	paused_time = time_sec
-
-	animation_player.stop()
-	animation_player.play(last_animation_name)
-	animation_player.seek(paused_time, true)
-
-func resume_from_scrub() -> void:
 	if last_animation_name == "":
 		return
 
-	is_scrubbing = false
-	if not is_paused:
-		var anim: Animation = animation_player.get_animation(last_animation_name)
-		if anim:
-			anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
+	if animation_player.current_animation != last_animation_name:
 		animation_player.play(last_animation_name)
-		animation_player.seek(animation_player.current_animation_position, true)
+		animation_player.pause()
+		is_paused = true
+
+	animation_player.seek(time_sec, true)
+	paused_time = time_sec
+
 
 # ----------------------------
-# Save / restore playback state
+# Get current playback state as a Dictionary
+# Used by scrub bar and GameManager.save_playback_state()
 # ----------------------------
 func get_playback_state() -> Dictionary:
 	var state: Dictionary = {}
@@ -183,20 +175,21 @@ func get_playback_state() -> Dictionary:
 
 	return state
 
-func apply_playback_state(state: Dictionary) -> void:
-	print("[DANCER] apply_playback_state", state)
 
+# ----------------------------
+# Restore playback state (e.g. after character swap)
+# ----------------------------
+func apply_playback_state(state: Dictionary) -> void:
 	if not state.has("animation") or state["animation"] == "":
 		return
 	if not animation_player.has_animation(state["animation"]):
+		push_warning("[Dancer] Cannot restore state — animation not found: " + state["animation"])
 		return
 
 	last_animation_name = state["animation"]
 	is_paused = state.get("is_paused", false)
 	is_looping = state.get("is_looping", false)
 	paused_time = state.get("time", 0.0)
-
-	print("[DANCER] paused?", is_paused, "time:", paused_time)
 
 	var anim: Animation = animation_player.get_animation(last_animation_name)
 	if anim:
@@ -206,14 +199,12 @@ func apply_playback_state(state: Dictionary) -> void:
 	animation_player.seek(paused_time, true)
 
 	if not is_paused:
-		print("[DANCER] PLAYING")
 		animation_player.play(last_animation_name)
-	else:
-		print("[DANCER] STAYING PAUSED")
-		
-		
+		animation_player.seek(paused_time, true)
+
+
 # ----------------------------
-# Animation finished
+# Animation finished callback
 # ----------------------------
 func _on_animation_finished(anim_name: String) -> void:
-	emit_signal("animation_finished", anim_name)
+	animation_finished.emit(anim_name)

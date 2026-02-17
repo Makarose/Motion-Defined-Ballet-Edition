@@ -1,25 +1,39 @@
 # ----------------------------
 # game_manager.gd
 # ----------------------------
-
 extends Node
 
+# ----------------------------
+# Signals
+# ----------------------------
 signal nav_left
 signal nav_right
 
-@export var ballet_move_database: BalletMoveDatabase = preload("res://Definition Resources/ballet_moves_database.tres")
-
-var chosen_character: String = ""       # Last selected character
-var selected_term: String = ""          # Last selected term
-var last_played_animation: String = ""  # Last animation played globally
-var arrived_from_title_page := false
-
-func _ready() -> void:
-	set_process_unhandled_input(true)  # Enable _unhandled_input processing
-
+# ----------------------------
+# Persistent state
+# All cross-scene state lives here and nowhere else
+# ----------------------------
+var chosen_character: String = ""       # Scene path e.g. "res://Scenes/male.tscn"
+var selected_term: String = ""          # Display name e.g. "Arabesque"
+var selected_animation: String = ""     # Animation clip name e.g. "arabesque"
+var selected_definition: String = ""    # Definition text for the selected term
+var playback_time: float = 0.0          # Where in the animation we were
+var is_paused: bool = false             # Was it paused when we left?
+var is_looping: bool = false            # Was it looping?
 
 # ----------------------------
-# Ballet moves
+# Database
+# ----------------------------
+@export var ballet_move_database: BalletMoveDatabase = preload("res://Definition Resources/ballet_moves_database.tres")
+
+# ----------------------------
+# Ready
+# ----------------------------
+func _ready() -> void:
+	set_process_unhandled_input(true)
+
+# ----------------------------
+# Database helpers
 # ----------------------------
 func get_terms() -> Array:
 	var term_list: Array = []
@@ -28,54 +42,72 @@ func get_terms() -> Array:
 			term_list.append(move.name)
 	return term_list
 
-func play_move_on_dancer(dancer: Node3D, term: String) -> void:
-	if dancer and dancer.has_method("play_move"):
-		dancer.play_move(term)
-		last_played_animation = term
-		selected_term = term
-
+func get_move_by_name(term: String) -> BalletMove:
+	if not ballet_move_database:
+		return null
+	for move in ballet_move_database.moves:
+		if normalize(move.name) == normalize(term):
+			return move
+	return null
 
 # ----------------------------
-# Global input handling
+# Save playback state from a dancer node
+# Call this before any scene transition
+# ----------------------------
+func save_playback_state(dancer: Node3D) -> void:
+	if dancer == null or not dancer.has_method("get_playback_state"):
+		return
+	var state: Dictionary = dancer.get_playback_state()
+	playback_time = state.get("time", 0.0)
+	is_paused = state.get("is_paused", false)
+	is_looping = state.get("is_looping", false)
+
+# ----------------------------
+# Clear term state
+# Call this when navigating back to title
+# ----------------------------
+func clear_term_state() -> void:
+	selected_term = ""
+	selected_animation = ""
+	selected_definition = ""
+	playback_time = 0.0
+	is_paused = false
+	is_looping = false
+
+# ----------------------------
+# Global input
 # ----------------------------
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.is_action_pressed("quit_app"):
-			get_tree().quit()
-			return
+	if not event is InputEventKey:
+		return
+	if not event.pressed or event.echo:
+		return
 
-		var current = get_tree().current_scene
-		if current and current.name == "TitlePage":
-			return
+	if event.is_action_pressed("quit_app"):
+		get_tree().quit()
+		return
 
-		if get_tree().get_nodes_in_group("blocks_nav").size() > 0:
-			return
+	# Don't fire nav signals on title page
+	var current = get_tree().current_scene
+	if current and current.name == "TitlePage":
+		return
 
-		var focus = get_viewport().gui_get_focus_owner()
-		if focus is LineEdit:
-			return
+	# Don't fire nav if something is blocking (e.g. a modal)
+	if get_tree().get_nodes_in_group("blocks_nav").size() > 0:
+		return
 
-		if event.is_action_pressed("ui_left"):
-			emit_signal("nav_left")
-			return
-		if event.is_action_pressed("ui_right"):
-			emit_signal("nav_right")
-			return
+	# Don't fire nav if a text field has focus
+	var focus = get_viewport().gui_get_focus_owner()
+	if focus is LineEdit:
+		return
 
-
-# ----------------------------
-# Back button helper
-# ----------------------------
-func _on_back_button_pressed() -> void:
-	# Indicate that the next character selected should start fresh
-	arrived_from_title_page = true
-
-	# Go back to the title page
-	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
-
+	if event.is_action_pressed("ui_left"):
+		emit_signal("nav_left")
+	elif event.is_action_pressed("ui_right"):
+		emit_signal("nav_right")
 
 # ----------------------------
-# Normalization Helpers
+# Normalization utilities
 # ----------------------------
 func strip_accents(text: String) -> String:
 	var mapping = {

@@ -1,37 +1,50 @@
 # ----------------------------
-# fullscreenScene.gd
+# fullscreen_scene.gd
 # ----------------------------
-
 extends Control
 
 # ----------------------------
-# Scene Nodes
+# Signals emitted up to MainScene
 # ----------------------------
-@onready var video_controls: Control = $VideoControls
-@onready var character_slot: Node3D = $SubViewportContainer/DancerViewport/CharacterSlot
+signal exit_requested
+signal character_changed(scene_path: String)
 
 # ----------------------------
-# Runtime state
+# Nodes
 # ----------------------------
-var dancer_node: Node3D = null
+@onready var video_controls: Control = $VideoControls
+@onready var dancer_viewport: SubViewport = $SubViewportContainer/DancerViewport
 
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
-	hide()  # ensure hidden initially
+	# Wire up signals from VideoControls
+	video_controls.exit_requested.connect(_on_exit_requested)
+	video_controls.character_requested.connect(_on_character_requested)
+
 
 # ----------------------------
-# Set dancer
+# Called by MainScene when fullscreen is shown
+# Passes the current dancer down to VideoControls
 # ----------------------------
 func set_dancer(dancer: Node3D) -> void:
 	if not dancer:
-		push_warning("No dancer passed to fullscreen scene")
+		push_warning("[FullscreenScene] No dancer passed to set_dancer")
 		return
+	video_controls.set_dancer(dancer)
+	print("[FullscreenScene] Dancer set")
 
-	# Reparent dancer into this fullscreen scene
-	if dancer.get_parent():
-		dancer.get_parent().remove_child(dancer)
-	character_slot.add_child(dancer)
-	dancer_node = dancer
-	print("[DEBUG] Dancer assigned to fullscreen scene")
+
+# ----------------------------
+# Exit requested from VideoControls
+# ----------------------------
+func _on_exit_requested() -> void:
+	emit_signal("exit_requested")
+
+
+# ----------------------------
+# Character swap requested from VideoControls
+# ----------------------------
+func _on_character_requested(scene_path: String) -> void:
+	emit_signal("character_changed", scene_path)

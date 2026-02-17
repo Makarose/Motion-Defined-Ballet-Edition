@@ -1,15 +1,29 @@
 # ----------------------------
 # video_controls.gd
 # ----------------------------
-
 extends Control
 
-signal character_requested(character_scene_path: String)
+# ----------------------------
+# Signals emitted up to FullscreenScene
+# ----------------------------
+signal exit_requested
+signal character_requested(scene_path: String)
 
+# ----------------------------
+# Nodes
+# ----------------------------
+@onready var pause_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/PauseContainer/Pause/PauseButton
+@onready var play_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/PlayContainer/Play/PlayButton
+@onready var replay_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/ReplayContainer/Replay/ReplayButton
+@onready var loop_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/LoopContainer/Loop/LoopButton
+@onready var stop_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/StopContainer/Stop/StopButton
+@onready var exit_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/ExitContainer/Exit/ExitButton
+@onready var male_button: Button = $CharacterButtonContainer/MaleButton/MaleButton
+@onready var female_button: Button = $CharacterButtonContainer/FemaleButton/FemaleButton
 @onready var scrub_slider: HSlider = $SliderContainer/ScrubSlider
 
 # ----------------------------
-# Camera / Dancer Tunables
+# Camera tunables
 # ----------------------------
 @export var orbit_speed: float = 1.5
 @export var vertical_speed: float = 1.5
@@ -22,29 +36,26 @@ signal character_requested(character_scene_path: String)
 @export var vertical_min: float = -1.5
 @export var vertical_max: float = 2.5
 @export var default_distance: float = 5.0
-@export var head_bone_name: String = "Head"
 
 # ----------------------------
 # Runtime state
 # ----------------------------
-var camera: Camera3D
-var dancer: Node3D
-var skel: Skeleton3D
-var distance: float
-var horizontal_angle: float
-var vertical_offset: float
-var pivot: Vector3
-var dragging := false
+var camera: Camera3D = null
+var dancer: Node3D = null
+var distance: float = 5.0
+var horizontal_angle: float = 0.0
+var vertical_offset: float = 0.0
+var pivot: Vector3 = Vector3.ZERO
+var dragging: bool = false
+var drag_axis: String = ""
+var last_mouse_pos: Vector2 = Vector2.ZERO
 var scrub_active: bool = false
 var was_playing_before_scrub: bool = false
 
-var drag_axis: String = ""   # "horizontal" or "vertical"
-var last_mouse_pos: Vector2
-
-# Home state
-var home_distance: float
-var home_horizontal_angle: float
-var home_vertical_offset: float
+# Home state for camera reset
+var home_distance: float = 5.0
+var home_horizontal_angle: float = 0.0
+var home_vertical_offset: float = 0.0
 
 # ----------------------------
 # Ready
@@ -52,115 +63,177 @@ var home_vertical_offset: float
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	focus_mode = Control.FOCUS_ALL
-	set_process_input(true)
-	
-	# Scrub slider signals
-	scrub_slider.drag_started.connect(Callable(self, "_on_scrub_started"))
-	scrub_slider.value_changed.connect(Callable(self, "_on_scrub_changed"))
-	scrub_slider.drag_ended.connect(Callable(self, "_on_scrub_ended"))
+
+	# Wire up buttons
+	pause_button.pressed.connect(_on_pause_pressed)
+	play_button.pressed.connect(_on_play_pressed)
+	replay_button.pressed.connect(_on_replay_pressed)
+	loop_button.pressed.connect(_on_loop_pressed)
+	stop_button.pressed.connect(_on_stop_pressed)
+	exit_button.pressed.connect(_on_exit_pressed)
+	male_button.pressed.connect(_on_male_pressed)
+	female_button.pressed.connect(_on_female_pressed)
+
+	# Wire up scrub slider
+	scrub_slider.drag_started.connect(_on_scrub_started)
+	scrub_slider.value_changed.connect(_on_scrub_changed)
+	scrub_slider.drag_ended.connect(_on_scrub_ended)
+	scrub_slider.min_value = 0.0
+	scrub_slider.value = 0.0
 
 
 # ----------------------------
-# Setup dancer and camera
+# Set active dancer
+# Called by FullscreenScene.set_dancer()
 # ----------------------------
-func set_camera(cam: Camera3D) -> void:
-	camera = cam
-
-func set_active_dancer(dancer_node: Node3D, reset_camera: bool = true) -> void:
-	if dancer != null and dancer.is_inside_tree():
-		dancer.queue_free()
-
+func set_dancer(dancer_node: Node3D) -> void:
 	dancer = dancer_node
-	skel = dancer.get_node_or_null("Skeleton3D") as Skeleton3D
 
+	# Find camera via known path in fullscreen scene
+	camera = get_node_or_null("../SubViewportContainer/DancerViewport/Background/Camera3D")
+
+	# Setup camera position
 	_update_pivot()
-	if reset_camera:
-		distance = default_distance
-		horizontal_angle = 0.0
-		vertical_offset = 0.0
-		_save_home_state()
+	distance = default_distance
+	horizontal_angle = 0.0
+	vertical_offset = 0.0
+	_save_home_state()
 	_update_camera()
+
+	# Setup scrub slider from current animation state
 	_setup_scrub_slider()
 
+	print("[VideoControls] Dancer set:", dancer.name)
+
 
 # ----------------------------
-# Scrub slider
+# Setup scrub slider from dancer's current animation
 # ----------------------------
 func _setup_scrub_slider() -> void:
-	if dancer != null and dancer.has_method("get_playback_state"):
-		var state: Dictionary = dancer.get_playback_state()
-		if state.has("length") and state["length"] > 0.0:
-			scrub_slider.min_value = 0
-			scrub_slider.max_value = state["length"]
-			scrub_slider.value = state["time"]
+	if dancer == null:
+		return
 
-			scrub_slider.drag_started.connect(Callable(self, "_on_scrub_started"))
-			scrub_slider.value_changed.connect(Callable(self, "_on_scrub_changed"))
-			scrub_slider.drag_ended.connect(Callable(self, "_on_scrub_ended"))
-			
+	var state: Dictionary = dancer.get_playback_state()
+	var length: float = state.get("length", 0.0)
+
+	if length > 0.0:
+		scrub_slider.max_value = length
+		scrub_slider.value = state.get("time", 0.0)
+		print("[VideoControls] Scrub slider set, length:", length)
+	else:
+		scrub_slider.max_value = 1.0
+		scrub_slider.value = 0.0
+		print("[VideoControls] No animation length yet")
+
+
+# ----------------------------
+# Scrub bar handlers
+# ----------------------------
 func _on_scrub_started() -> void:
 	scrub_active = true
-	if dancer != null and dancer.has_method("get_playback_state"):
-		was_playing_before_scrub = dancer.get_playback_state()["is_paused"] == false
-		dancer.pause_animation()  # pause while scrubbing
+	if dancer != null:
+		var state = dancer.get_playback_state()
+		was_playing_before_scrub = not state.get("is_paused", false)
+		dancer.pause_animation()
 
 func _on_scrub_changed(value: float) -> void:
-	if dancer != null and scrub_active and dancer.has_method("seek_to_time"):
+	if dancer != null and scrub_active:
 		dancer.seek_to_time(value)
 
-func _on_scrub_ended() -> void:
+func _on_scrub_ended(_value_changed: bool = false) -> void:
 	scrub_active = false
-	if dancer != null and was_playing_before_scrub and dancer.has_method("resume_from_scrub"):
-		dancer.resume_from_scrub()
+	if dancer != null and was_playing_before_scrub:
+		dancer.resume_animation()
+
+
+# ----------------------------
+# Playback button handlers
+# ----------------------------
+func _on_pause_pressed() -> void:
+	if dancer != null:
+		dancer.pause_animation()
+
+func _on_play_pressed() -> void:
+	if dancer != null:
+		dancer.resume_animation()
+
+func _on_replay_pressed() -> void:
+	if dancer != null:
+		dancer.replay_last_animation()
+		scrub_slider.value = 0.0
+		_setup_scrub_slider()
+
+func _on_loop_pressed() -> void:
+	if dancer != null:
+		dancer.loop_current_animation()
+
+func _on_stop_pressed() -> void:
+	if dancer != null:
+		dancer.stop_animation()
+		scrub_slider.value = 0.0
+
+func _on_exit_pressed() -> void:
+	emit_signal("exit_requested")
+
+
+# ----------------------------
+# Character swap handlers
+# ----------------------------
+func _on_male_pressed() -> void:
+	emit_signal("character_requested", "res://Scenes/male.tscn")
+
+func _on_female_pressed() -> void:
+	emit_signal("character_requested", "res://Scenes/female.tscn")
+
 
 # ----------------------------
 # Camera helpers
 # ----------------------------
 func _update_pivot() -> void:
-	if skel != null:
-		var head_idx = skel.find_bone(head_bone_name)
+	if dancer == null:
+		return
+	var skel: Skeleton3D = dancer.get_node_or_null("Skeleton3D")
+	if skel:
+		var head_idx = skel.find_bone("Head")
 		if head_idx >= 0:
 			pivot = skel.get_bone_global_pose(head_idx).origin
 			return
-	# fallback
 	pivot = dancer.global_transform.origin
 
 func _update_camera() -> void:
 	if camera == null or dancer == null:
 		return
 
-	var fullscreen_offset = 0.5
-	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
-		fullscreen_offset = 1.0
-
 	var cam_pos := pivot + Vector3(
 		sin(horizontal_angle) * distance,
-		vertical_offset + fullscreen_offset,
+		vertical_offset + 0.5,
 		cos(horizontal_angle) * distance
 	)
 
 	camera.global_transform.origin = cam_pos
 	camera.look_at(Vector3(pivot.x, cam_pos.y, pivot.z), Vector3.UP)
 
-# ----------------------------
-# Home / Reset
-# ----------------------------
-func reset_camera() -> void:
-	distance = home_distance
-	horizontal_angle = home_horizontal_angle
-	vertical_offset = home_vertical_offset
-	_update_camera()
-
 func _save_home_state() -> void:
 	home_distance = distance
 	home_horizontal_angle = horizontal_angle
 	home_vertical_offset = vertical_offset
 
+func reset_camera() -> void:
+	distance = home_distance
+	horizontal_angle = home_horizontal_angle
+	home_vertical_offset = vertical_offset
+	_update_camera()
+
+
 # ----------------------------
-# Input
+# Mouse input for camera orbit and zoom
 # ----------------------------
 func _gui_input(event: InputEvent) -> void:
-	if camera == null or dancer == null or scrub_active:
+	if camera == null or dancer == null:
+		return
+
+	# Don't orbit if mouse is over scrub slider
+	if scrub_slider.get_global_rect().has_point(get_global_mouse_position()):
 		return
 
 	if event is InputEventMouseButton:
@@ -173,8 +246,10 @@ func _gui_input(event: InputEvent) -> void:
 		if event.pressed:
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				distance = clamp(distance - mouse_zoom_step, zoom_min, zoom_max)
+				_update_camera()
 			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 				distance = clamp(distance + mouse_zoom_step, zoom_min, zoom_max)
+				_update_camera()
 
 	if event is InputEventMouseMotion and dragging:
 		var delta: Vector2 = event.position - last_mouse_pos
@@ -191,93 +266,51 @@ func _gui_input(event: InputEvent) -> void:
 		last_mouse_pos = event.position
 		_update_camera()
 
+
+# ----------------------------
+# Keyboard input
+# ----------------------------
 func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+
+	# Consume left/right so GameManager nav doesn't fire in fullscreen
 	if event.is_action("ui_left") or event.is_action("ui_right"):
 		get_viewport().set_input_as_handled()
-		
-	# Camera Reset
-	if Input.is_action_just_pressed("camera_reset") and dancer != null and camera != null:
+
+	if Input.is_action_just_pressed("camera_reset"):
 		reset_camera()
-		return
-	
-	if dancer == null or not dancer.is_inside_tree():
-		return
 
 	if Input.is_action_just_pressed("exit_fullscreen"):
-		_on_exit_button_pressed()
+		emit_signal("exit_requested")
 
-	# Map all buttons to updated dancer functions
-	if dancer.has_method("replay_last_animation") and Input.is_action_just_pressed("replay_animation"):
-		dancer.replay_last_animation()
-
-	if dancer.has_method("pause_animation") and Input.is_action_just_pressed("pause_animation"):
-		dancer.pause_animation()
-		grab_focus()
-
-	if dancer.has_method("resume_animation") and Input.is_action_just_pressed("play_animation"):
-		dancer.resume_animation()
-		grab_focus()
-
-	if dancer.has_method("loop_current_animation") and Input.is_action_just_pressed("loop_animation"):
-		dancer.loop_current_animation()
-		grab_focus()
-
-	if dancer.has_method("stop_animation") and Input.is_action_just_pressed("stop_animation"):
-		dancer.stop_animation()
-		grab_focus()
-		
-	if Input.is_action_just_pressed("male_button"):
-		_on_male_button_pressed()
-		
-	if Input.is_action_just_pressed("female_button"):
-		_on_female_button_pressed()
-
-# ----------------------------
-# Button handlers
-# ----------------------------
-func _on_pause_button_pressed() -> void:
-	if dancer != null and dancer.has_method("pause_animation"):
-		dancer.pause_animation()
-
-func _on_replay_button_pressed() -> void:
-	if dancer != null and dancer.has_method("replay_last_animation"):
-		dancer.replay_last_animation()
-		scrub_slider.value = 0
-
-func _on_play_button_pressed() -> void:
-	if dancer != null and dancer.has_method("resume_animation"):
-		dancer.resume_animation()
-
-func _on_loop_button_pressed() -> void:
-	if dancer != null and dancer.has_method("loop_current_animation"):
-		var state = dancer.get_playback_state()
-		dancer.loop_current_animation()
-		# Reset slider only if at the end of animation
-		if state.has("time") and state.has("length") and state["time"] >= state["length"]:
-			scrub_slider.value = 0
-
-func _on_stop_button_pressed() -> void:
-	if dancer != null and dancer.has_method("stop_animation"):
-		dancer.stop_animation()
-		scrub_slider.value = 0
-
-func _on_exit_button_pressed() -> void:
-	pass
-
-func _on_male_button_pressed() -> void:
-	emit_signal("character_requested", "res://Scenes/male.tscn")
-
-func _on_female_button_pressed() -> void:
-	emit_signal("character_requested", "res://Scenes/female.tscn")
-
-# ----------------------------
-# Main loop
-# ----------------------------
-func _process(delta: float) -> void:
-	if camera == null or dancer == null:
+	if dancer == null:
 		return
 
-	# Camera controls
+	if Input.is_action_just_pressed("replay_animation"):
+		dancer.replay_last_animation()
+	if Input.is_action_just_pressed("pause_animation"):
+		dancer.pause_animation()
+	if Input.is_action_just_pressed("play_animation"):
+		dancer.resume_animation()
+	if Input.is_action_just_pressed("loop_animation"):
+		dancer.loop_current_animation()
+	if Input.is_action_just_pressed("stop_animation"):
+		dancer.stop_animation()
+	if Input.is_action_just_pressed("male_button"):
+		_on_male_pressed()
+	if Input.is_action_just_pressed("female_button"):
+		_on_female_pressed()
+
+
+# ----------------------------
+# Process — camera controls and scrub bar update
+# ----------------------------
+func _process(delta: float) -> void:
+	if not visible or camera == null or dancer == null:
+		return
+
+	# Keyboard camera controls
 	if Input.is_action_pressed("camera_left"):
 		horizontal_angle += orbit_speed * delta
 	if Input.is_action_pressed("camera_right"):
@@ -295,9 +328,11 @@ func _process(delta: float) -> void:
 	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 	_update_camera()
 
-	# ----------------------------
-	# Update scrub slider in real time
-	# ----------------------------
-	if dancer != null and dancer.has_method("get_playback_state") and not scrub_active:
+	# Update scrub slider position in real time
+	if not scrub_active:
 		var state = dancer.get_playback_state()
-		scrub_slider.value = state.get("time", 0.0)
+		var current_time = state.get("time", 0.0)
+		var length = state.get("length", 0.0)
+		if length > 0.0 and scrub_slider.max_value != length:
+			scrub_slider.max_value = length
+		scrub_slider.value = current_time

@@ -1,26 +1,25 @@
 # ----------------------------
 # main_scene_ui.gd
 # ----------------------------
-
 extends Control
 
 # ----------------------------
 # Signals
 # ----------------------------
-signal term_selected(animation_name: String)
-signal character_requested(character_scene_path: String)
-signal fullscreen_requested()
+signal term_selected(term: String, anim_name: String, definition: String)
+signal fullscreen_requested
+signal back_pressed
+signal index_pressed
 
 # ----------------------------
-# UI Nodes
+# Nodes
 # ----------------------------
 @onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-
-@onready var fullscreen_container: MarginContainer = $CanvasLayer/Fullscreen
-@onready var fullscreen_button: TextureButton = $CanvasLayer/Fullscreen/HBoxContainer/FullscreenButton
+@onready var fullscreen_container: Control = $CanvasLayer/FullscreenContainer
+@onready var fullscreen_button: TextureButton = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenButton
 
 # ----------------------------
 # Resources
@@ -30,146 +29,162 @@ signal fullscreen_requested()
 # ----------------------------
 # Runtime state
 # ----------------------------
-var current_index := -1
+var current_index: int = -1
 var clear_timer: Timer
-var has_selected_term := false
-var current_dancer_node: Node3D = null  # reference to currently active dancer
 
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
-	print("[DEBUG] MainScene UI ready")
-	has_selected_term = false
+	print("[MainSceneUI] Ready")
 
-	if fullscreen_container:
-		fullscreen_container.visible = false
+	# Hide fullscreen button until a term is selected
+	fullscreen_container.visible = false
 
-	if fullscreen_button and not fullscreen_button.is_connected("pressed", Callable(self, "_on_fullscreen_button_pressed")):
-		fullscreen_button.pressed.connect(Callable(self, "_on_fullscreen_button_pressed"))
+	# Load database if not set in inspector
+	if not database:
+		database = load("res://Definition Resources/ballet_moves_database.tres")
 
-	if not search_bar.text_changed.is_connected(Callable(self, "_on_line_edit_text_changed")):
-		search_bar.text_changed.connect(Callable(self, "_on_line_edit_text_changed"))
-
-	if not search_bar.text_submitted.is_connected(Callable(self, "_on_line_edit_text_submitted")):
-		search_bar.text_submitted.connect(Callable(self, "_on_line_edit_text_submitted"))
-
-	if not search_bar.gui_input.is_connected(Callable(self, "_on_search_bar_gui_input")):
-		search_bar.gui_input.connect(Callable(self, "_on_search_bar_gui_input"))
-
+	# Search bar signals
+	search_bar.text_changed.connect(_on_search_changed)
+	search_bar.text_submitted.connect(_on_text_submitted)
+	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.grab_focus()
-	print("[DEBUG] Connected LineEdit signals")
 
-	if not item_list.item_selected.is_connected(Callable(self, "_on_item_selected")):
-		item_list.item_selected.connect(Callable(self, "_on_item_selected"))
-
+	# Item list signals
+	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
 
+	# Fullscreen button
+	fullscreen_button.pressed.connect(_on_fullscreen_button_pressed)
+
+	# Clear timer — clears search bar shortly after selection
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8
-	clear_timer.timeout.connect(Callable(self, "_clear_search_now"))
+	clear_timer.timeout.connect(_clear_search_now)
 	add_child(clear_timer)
-	print("[DEBUG] Timer created and connected")
 
-	if not GameManager.nav_left.is_connected(Callable(self, "_on_nav_left")):
-		GameManager.nav_left.connect(Callable(self, "_on_nav_left"))
-
-	if not GameManager.nav_right.is_connected(Callable(self, "_on_nav_right")):
-		GameManager.nav_right.connect(Callable(self, "_on_nav_right"))
-
-	print("[DEBUG] Connected GameManager nav_left/right signals")
-
-	if not database:
-		database = load("res://Definition Resources/ballet_moves_database.tres")
-		print("[DEBUG] Loaded database")
-
-	set_process_input(true)
-	set_process_unhandled_input(true)
-	print("[DEBUG] set_process_unhandled_input(true) called")
+	# GameManager nav signals
+	GameManager.nav_left.connect(_on_nav_left)
+	GameManager.nav_right.connect(_on_nav_right)
 
 
 # ----------------------------
-# Search / Item List
+# Search bar text changed
+# Filters item list as user types
 # ----------------------------
-func _on_line_edit_text_changed(new_text: String) -> void:
+func _on_search_changed(new_text: String) -> void:
 	item_list.clear()
 	current_index = -1
 
-	if new_text == "":
+	if new_text.strip_edges() == "":
 		item_list.visible = false
 		return
 
 	var normalized_input = GameManager.normalize(new_text)
-	for balletmove in database.moves:
-		if GameManager.normalize(balletmove.name).begins_with(normalized_input):
-			item_list.add_item(balletmove.name)
+	for move in database.moves:
+		if GameManager.normalize(move.name).begins_with(normalized_input):
+			item_list.add_item(move.name)
 
 	item_list.visible = item_list.get_item_count() > 0
 
+
+# ----------------------------
+# Keyboard navigation in search bar
+# ----------------------------
+func _on_search_bar_gui_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed:
+		return
+
+	match event.keycode:
+		KEY_DOWN:
+			if current_index < item_list.get_item_count() - 1:
+				current_index += 1
+				item_list.select(current_index)
+				item_list.ensure_current_is_visible()
+		KEY_UP:
+			if current_index > 0:
+				current_index -= 1
+				item_list.select(current_index)
+				item_list.ensure_current_is_visible()
+		KEY_ENTER, KEY_KP_ENTER:
+			if current_index >= 0:
+				_select_item(current_index)
+			else:
+				var normalized_input = GameManager.normalize(search_bar.text)
+				for i in range(item_list.get_item_count()):
+					if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
+						_select_item(i)
+						return
+		KEY_F1:
+			if fullscreen_container.visible:
+				emit_signal("fullscreen_requested")
+
+
+# ----------------------------
+# Item clicked directly in list
+# ----------------------------
 func _on_item_selected(index: int) -> void:
 	current_index = index
 	_select_item(index)
 
-func _on_search_bar_gui_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		match event.keycode:
-			KEY_DOWN:
-				if current_index < item_list.get_item_count() - 1:
-					current_index += 1
-					item_list.select(current_index)
-					item_list.ensure_current_is_visible()
-			KEY_UP:
-				if current_index > 0:
-					current_index -= 1
-					item_list.select(current_index)
-					item_list.ensure_current_is_visible()
-			KEY_ENTER, KEY_KP_ENTER:
-				if current_index >= 0:
-					_select_item(current_index)
 
-		if event.keycode == KEY_LEFT:
-			_on_nav_left()
-		elif event.keycode == KEY_RIGHT:
-			_on_nav_right()
-
-func _on_line_edit_text_submitted(_text: String) -> void:
+# ----------------------------
+# Enter pressed on search bar
+# ----------------------------
+func _on_text_submitted(_text: String) -> void:
 	if current_index >= 0:
 		_select_item(current_index)
 
+
+# ----------------------------
+# Core selection logic
+# Finds the move, updates UI, emits signal up to MainScene
+# ----------------------------
 func _select_item(index: int) -> void:
 	if index < 0 or index >= item_list.get_item_count():
 		return
 
-	var selected_name = item_list.get_item_text(index)
-	var move: BalletMove = null
-
-	for balletmove in database.moves:
-		if GameManager.normalize(balletmove.name) == GameManager.normalize(selected_name):
-			move = balletmove
-			break
+	var selected_name: String = item_list.get_item_text(index)
+	var move: BalletMove = database.get_move_by_name(selected_name)
 
 	if not move:
+		push_warning("[MainSceneUI] Move not found in database: " + selected_name)
 		return
 
+	# Update UI
 	title_label.text = move.name
 	definition_label.text = move.definition
-	search_bar.text = selected_name
+	search_bar.text = move.name
 	item_list.visible = false
 	search_bar.grab_focus()
+
+	# Show fullscreen button
+	fullscreen_container.visible = true
+
+	# Start timer to clear search bar
 	clear_timer.start()
 
-	has_selected_term = true
-
+	# Emit up to MainScene with all three pieces of info
 	if move.animation_name.strip_edges() != "":
-		emit_signal("term_selected", move.animation_name)
-		show_fullscreen_button()
+		emit_signal("term_selected", move.name, move.animation_name, move.definition)
 	else:
-		hide_fullscreen_button()
+		push_warning("[MainSceneUI] No animation name set for move: " + move.name)
 
 
 # ----------------------------
-# Clear search
+# Restore term when arriving from index page
+# Called by MainScene on _ready() if GameManager has a selected term
+# ----------------------------
+func restore_term(term: String, definition: String) -> void:
+	title_label.text = term
+	definition_label.text = definition
+	fullscreen_container.visible = true
+
+
+# ----------------------------
+# Clear search bar after selection
 # ----------------------------
 func _clear_search_now() -> void:
 	search_bar.text = ""
@@ -179,62 +194,27 @@ func _clear_search_now() -> void:
 
 
 # ----------------------------
-# Fullscreen & Character Controls
+# Show / hide fullscreen button
 # ----------------------------
 func show_fullscreen_button() -> void:
-	if has_selected_term and fullscreen_container:
-		fullscreen_container.visible = true
-		if fullscreen_button:
-			fullscreen_button.visible = true   # <--- ensure button shows
+	fullscreen_container.visible = true
 
 func hide_fullscreen_button() -> void:
-	has_selected_term = false
-	if fullscreen_container:
-		fullscreen_container.visible = false
-	if fullscreen_button:
-		fullscreen_button.visible = false  # <--- ensure button hides
+	fullscreen_container.visible = false
 
 
+# ----------------------------
+# Fullscreen button pressed
+# ----------------------------
 func _on_fullscreen_button_pressed() -> void:
-	print("[DEBUG] Fullscreen requested")
 	emit_signal("fullscreen_requested")
 
 
 # ----------------------------
-# Fullscreen keyboard trigger & navigation
-# ----------------------------
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
-		match event.keycode:
-			KEY_LEFT:
-				_on_nav_left()
-			KEY_RIGHT:
-				_on_nav_right()
-			KEY_F1:
-				if fullscreen_container and fullscreen_container.visible:
-					print("[DEBUG] F1 pressed → emit fullscreen_requested")
-					emit_signal("fullscreen_requested")
-				else:
-					print("[DEBUG] F1 pressed but fullscreen container hidden; ignoring")
-
-
-# ----------------------------
-# Navigation
+# Navigation — emit signals up, never change scene directly
 # ----------------------------
 func _on_nav_left() -> void:
-	_on_back_button_pressed()
+	emit_signal("back_pressed")
 
 func _on_nav_right() -> void:
-	_on_index_button_pressed()
-
-
-# ----------------------------
-# Actual scene navigation
-# ----------------------------
-func _on_back_button_pressed() -> void:
-	GameManager.selected_term = ""
-	GameManager.last_played_animation = ""
-	get_tree().call_deferred("change_scene_to_file", "res://Scenes/title_page.tscn")
-
-func _on_index_button_pressed() -> void:
-	get_tree().call_deferred("change_scene_to_file", "res://Scenes/index.tscn")
+	emit_signal("index_pressed")
