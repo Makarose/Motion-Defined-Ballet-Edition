@@ -29,7 +29,7 @@ func _on_female_pressed() -> void:
 # ----------------------------
 # Keyboard shortcuts
 # ----------------------------
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	match event.keycode:

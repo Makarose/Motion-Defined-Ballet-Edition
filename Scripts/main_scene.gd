@@ -127,10 +127,7 @@ func _on_term_selected(term: String, anim_name: String, definition: String) -> v
 # Fullscreen requested
 # ----------------------------
 func _on_fullscreen_requested() -> void:
-	if current_dancer == null:
-		push_warning("[MainScene] Cannot enter fullscreen — no dancer")
-		return
-	print("[MainScene] Entering fullscreen")
+	GameManager.is_fullscreen = true
 	main_scene_ui.hide()
 	fullscreen_scene.show()
 
@@ -139,7 +136,7 @@ func _on_fullscreen_requested() -> void:
 # Exit fullscreen
 # ----------------------------
 func _on_fullscreen_exit() -> void:
-	print("[MainScene] Exiting fullscreen")
+	GameManager.is_fullscreen = false
 	fullscreen_scene.hide()
 	main_scene_ui.show()
 
@@ -185,3 +182,16 @@ func _on_back_button_pressed() -> void:
 
 func _on_index_button_pressed() -> void:
 	_on_nav_right()
+	
+func _input(event: InputEvent) -> void:
+	print("[MainScene] _input fired:", event.get_class())
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	print("[MainScene] Key:", event.keycode, " LEFT=", KEY_LEFT)
+	
+	if event.keycode == KEY_LEFT:
+		get_viewport().set_input_as_handled()
+		_on_nav_left()
+	elif event.keycode == KEY_RIGHT:
+		get_viewport().set_input_as_handled()
+		_on_nav_right()

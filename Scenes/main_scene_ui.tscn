@@ -1,8 +1,9 @@
-[gd_scene load_steps=16 format=3 uid="uid://btkmkmqv4x7r6"]
+[gd_scene load_steps=17 format=3 uid="uid://btkmkmqv4x7r6"]
 
 [ext_resource type="Script" path="res://Scripts/main_scene_ui.gd" id="1_kdlrg"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_5chal"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_6830r"]
+[ext_resource type="Script" path="res://Scripts/search_line_edit.gd" id="3_yxyst"]
 [ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_qcv70"]
 [ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="5_8xnki"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="6_k4h06"]
@@ -147,6 +148,7 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
+script = ExtResource("3_yxyst")
 
 [node name="ItemList" type="ItemList" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)

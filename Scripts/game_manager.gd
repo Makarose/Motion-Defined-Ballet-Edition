@@ -20,6 +20,7 @@ var selected_definition: String = ""    # Definition text for the selected term
 var playback_time: float = 0.0          # Where in the animation we were
 var is_paused: bool = false             # Was it paused when we left?
 var is_looping: bool = false            # Was it looping?
+var is_fullscreen: bool = false
 
 # ----------------------------
 # Database
@@ -77,33 +78,16 @@ func clear_term_state() -> void:
 # ----------------------------
 # Global input
 # ----------------------------
-func _unhandled_input(event: InputEvent) -> void:
-	if not event is InputEventKey:
+func _shortcut_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if not event.pressed or event.echo:
-		return
-
-	if event.is_action_pressed("quit_app"):
-		get_tree().quit()
-		return
-
-	# Don't fire nav signals on title page
-	var current = get_tree().current_scene
-	if current and current.name == "TitlePage":
-		return
-
-	# Don't fire nav if something is blocking (e.g. a modal)
-	if get_tree().get_nodes_in_group("blocks_nav").size() > 0:
-		return
-
-	# Don't fire nav if a text field has focus
-	var focus = get_viewport().gui_get_focus_owner()
-	if focus is LineEdit:
-		return
-
-	if event.is_action_pressed("ui_left"):
+	print("[GameManager] KEY pressed:", event.keycode)
+	
+	if event.keycode == KEY_Q and not is_fullscreen:
+		get_viewport().set_input_as_handled()
 		emit_signal("nav_left")
-	elif event.is_action_pressed("ui_right"):
+	elif event.keycode == KEY_E and not is_fullscreen:
+		get_viewport().set_input_as_handled()
 		emit_signal("nav_right")
 
 # ----------------------------

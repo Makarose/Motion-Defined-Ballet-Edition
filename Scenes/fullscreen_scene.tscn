@@ -1,32 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bel5h8cknb8rx"]
+[gd_scene load_steps=4 format=3 uid="uid://bel5h8cknb8rx"]
 
 [ext_resource type="PackedScene" uid="uid://bgixxv1jqc70l" path="res://Scenes/video_controls.tscn" id="1_oehyg"]
 [ext_resource type="Script" path="res://Scripts/fullscreen_scene.gd" id="1_selid"]
 [ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_teif8"]
-
-[sub_resource type="GDScript" id="GDScript_wnb33"]
-script/source = "extends SubViewportContainer
-
-func _ready():
-	print(\"Initial container size:\", size)
-	print(\"Initial viewport size:\", get_viewport().size)
-	print(\"Initial subviewport size:\", get_child(0).size)
-
-func _notification(what):
-	if what == NOTIFICATION_RESIZED:
-		print(\"Container resized to:\", size)
-		print(\"SubViewport size is:\", get_child(0).size)
-
-func _process(_delta):
-	# Optional: prints when window changes size
-	if DisplayServer.window_get_size() != get_viewport().size:
-		print(\"Window size:\", DisplayServer.window_get_size())
-		print(\"Root viewport size:\", get_viewport().size)
-
-	if size == Vector2(1125, 500):
-		print(\"⚠️ Something forced size back to 1125x500\")
-		print_stack()
-"
 
 [node name="FullscreenScene" type="Control"]
 layout_mode = 3
@@ -51,7 +27,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 stretch = true
-script = SubResource("GDScript_wnb33")
 
 [node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false

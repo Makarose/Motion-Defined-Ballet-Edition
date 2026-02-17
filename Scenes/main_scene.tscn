@@ -44,6 +44,7 @@ current = true
 
 [node name="MainSceneUI" parent="." instance=ExtResource("2_n4he7")]
 layout_mode = 1
+mouse_filter = 1
 
 [node name="FullscreenScene" parent="." instance=ExtResource("4_65qtm")]
 visible = false

@@ -14,12 +14,14 @@ signal index_pressed
 # ----------------------------
 # Nodes
 # ----------------------------
-@onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
+@onready var search_bar: SearchLineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
 @onready var fullscreen_container: Control = $CanvasLayer/FullscreenContainer
 @onready var fullscreen_button: TextureButton = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenButton
+@onready var back_button: TextureButton = $CanvasLayer/BackButtonContainer/MarginContainer/BackButton
+@onready var index_button: TextureButton = $CanvasLayer/IndexButtonContainer/Container/IndexButton
 
 # ----------------------------
 # Resources
@@ -48,15 +50,20 @@ func _ready() -> void:
 	# Search bar signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.text_submitted.connect(_on_text_submitted)
-	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.grab_focus()
+	search_bar.fullscreen_pressed.connect(_on_fullscreen_key_pressed)
+	search_bar.nav_left_pressed.connect(_on_nav_left)
+	search_bar.nav_right_pressed.connect(_on_nav_right)
+	search_bar.move_up.connect(_on_search_move_up)
+	search_bar.move_down.connect(_on_search_move_down)
+	search_bar.item_confirmed.connect(_on_search_confirmed)
 
 	# Item list signals
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
 
 	# Fullscreen button
-	fullscreen_button.pressed.connect(_on_fullscreen_button_pressed)
+	fullscreen_button.pressed.connect(_on_fullscreen_key_pressed)
 
 	# Clear timer — clears search bar shortly after selection
 	clear_timer = Timer.new()
@@ -68,6 +75,10 @@ func _ready() -> void:
 	# GameManager nav signals
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
+	
+	# Navigation buttons connected
+	back_button.pressed.connect(_on_nav_left)
+	index_button.pressed.connect(_on_nav_right)
 
 
 # ----------------------------
@@ -88,38 +99,6 @@ func _on_search_changed(new_text: String) -> void:
 			item_list.add_item(move.name)
 
 	item_list.visible = item_list.get_item_count() > 0
-
-
-# ----------------------------
-# Keyboard navigation in search bar
-# ----------------------------
-func _on_search_bar_gui_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed:
-		return
-
-	match event.keycode:
-		KEY_DOWN:
-			if current_index < item_list.get_item_count() - 1:
-				current_index += 1
-				item_list.select(current_index)
-				item_list.ensure_current_is_visible()
-		KEY_UP:
-			if current_index > 0:
-				current_index -= 1
-				item_list.select(current_index)
-				item_list.ensure_current_is_visible()
-		KEY_ENTER, KEY_KP_ENTER:
-			if current_index >= 0:
-				_select_item(current_index)
-			else:
-				var normalized_input = GameManager.normalize(search_bar.text)
-				for i in range(item_list.get_item_count()):
-					if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
-						_select_item(i)
-						return
-		KEY_F1:
-			if fullscreen_container.visible:
-				emit_signal("fullscreen_requested")
 
 
 # ----------------------------
@@ -206,8 +185,9 @@ func hide_fullscreen_button() -> void:
 # ----------------------------
 # Fullscreen button pressed
 # ----------------------------
-func _on_fullscreen_button_pressed() -> void:
-	emit_signal("fullscreen_requested")
+func _on_fullscreen_key_pressed() -> void:
+	if fullscreen_container.visible:
+		emit_signal("fullscreen_requested")
 
 
 # ----------------------------
@@ -218,3 +198,30 @@ func _on_nav_left() -> void:
 
 func _on_nav_right() -> void:
 	emit_signal("index_pressed")
+	
+
+
+# ----------------------------
+# Arrow key functions?
+# ----------------------------
+func _on_search_move_up() -> void:
+	if current_index > 0:
+		current_index -= 1
+		item_list.select(current_index)
+		item_list.ensure_current_is_visible()
+
+func _on_search_move_down() -> void:
+	if current_index < item_list.get_item_count() - 1:
+		current_index += 1
+		item_list.select(current_index)
+		item_list.ensure_current_is_visible()
+
+func _on_search_confirmed() -> void:
+	if current_index >= 0:
+		_select_item(current_index)
+	else:
+		var normalized_input = GameManager.normalize(search_bar.text)
+		for i in range(item_list.get_item_count()):
+			if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
+				_select_item(i)
+				return
