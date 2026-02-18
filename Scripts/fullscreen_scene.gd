@@ -12,29 +12,86 @@ signal character_changed(scene_path: String)
 # ----------------------------
 # Nodes
 # ----------------------------
-@onready var video_controls: Control = $VideoControls
-@onready var dancer_viewport: SubViewport = $SubViewportContainer/DancerViewport
+@onready var video_controls: Control = $CanvasLayer/VideoControls
+@onready var dancer_viewport: SubViewport = $CanvasLayer/SubViewportContainer/DancerViewport
+@onready var character_slot: Node3D = $CanvasLayer/SubViewportContainer/DancerViewport/CharacterSlot
+# ----------------------------
+# Runtime state
+# ----------------------------
+var current_dancer: Node3D = null
 
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
-	# Wire up signals from VideoControls
+	$CanvasLayer.hide()
 	video_controls.exit_requested.connect(_on_exit_requested)
 	video_controls.character_requested.connect(_on_character_requested)
 
-
 # ----------------------------
 # Called by MainScene when fullscreen is shown
-# Passes the current dancer down to VideoControls
+# Spawns a fresh dancer into the fullscreen viewport
 # ----------------------------
-func set_dancer(dancer: Node3D) -> void:
-	if not dancer:
-		push_warning("[FullscreenScene] No dancer passed to set_dancer")
+func set_dancer(_dancer: Node3D) -> void:
+	# Remove existing dancer
+	if current_dancer and current_dancer.is_inside_tree():
+		current_dancer.queue_free()
+		current_dancer = null
+
+	# Load and spawn fresh copy into fullscreen viewport
+	var char_path: String = GameManager.chosen_character
+	if char_path == "":
+		push_warning("[FullscreenScene] No chosen character in GameManager")
 		return
-	video_controls.set_dancer(dancer)
+
+	var char_packed: PackedScene = load(char_path)
+	if not char_packed:
+		push_error("[FullscreenScene] Could not load character scene: " + char_path)
+		return
+
+	current_dancer = char_packed.instantiate()
+	character_slot.add_child(current_dancer)
+
+	# Wait one frame for dancer _ready() to complete
+	await get_tree().process_frame
+
+	# Restore animation state from GameManager
+	if GameManager.selected_animation != "":
+		current_dancer.apply_playback_state({
+			"animation": GameManager.selected_animation,
+			"time": GameManager.playback_time,
+			"is_paused": GameManager.is_paused,
+			"is_looping": GameManager.is_looping
+		})
+
+	video_controls.set_dancer(current_dancer)
 	print("[FullscreenScene] Dancer set")
 
+	# Load and spawn fresh copy into fullscreen viewport
+	var scene_path: String = GameManager.chosen_character
+	if scene_path == "":
+		push_warning("[FullscreenScene] No chosen character in GameManager")
+		return
+
+	var packed: PackedScene = load(scene_path)
+	if not packed:
+		push_error("[FullscreenScene] Could not load character scene: " + scene_path)
+		return
+
+	current_dancer = packed.instantiate()
+	character_slot.add_child(current_dancer)
+
+	# Restore animation state from GameManager
+	if GameManager.selected_animation != "":
+		current_dancer.apply_playback_state({
+			"animation": GameManager.selected_animation,
+			"time": GameManager.playback_time,
+			"is_paused": GameManager.is_paused,
+			"is_looping": GameManager.is_looping
+		})
+
+	video_controls.set_dancer(current_dancer)
+	print("[FullscreenScene] Dancer set")
 
 # ----------------------------
 # Exit requested from VideoControls
@@ -42,9 +99,10 @@ func set_dancer(dancer: Node3D) -> void:
 func _on_exit_requested() -> void:
 	emit_signal("exit_requested")
 
-
 # ----------------------------
 # Character swap requested from VideoControls
 # ----------------------------
 func _on_character_requested(scene_path: String) -> void:
+	GameManager.chosen_character = scene_path
+	set_dancer(null)
 	emit_signal("character_changed", scene_path)

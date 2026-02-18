@@ -39,6 +39,7 @@ var clear_timer: Timer
 # ----------------------------
 func _ready() -> void:
 	print("[MainSceneUI] Ready")
+	search_bar.release_focus()
 
 	# Hide fullscreen button until a term is selected
 	fullscreen_container.visible = false

@@ -14,8 +14,8 @@ signal fullscreen_pressed
 func _ready() -> void:
 	set_process_unhandled_key_input(true)
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	print("[SearchLineEdit] _unhandled_key_input keycode:", event.keycode, " LEFT=", KEY_LEFT)
+
+func _gui_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	match event.keycode:

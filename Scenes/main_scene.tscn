@@ -47,10 +47,12 @@ layout_mode = 1
 mouse_filter = 1
 
 [node name="FullscreenScene" parent="." instance=ExtResource("4_65qtm")]
-visible = false
 layout_mode = 1
 
 [connection signal="fullscreen_requested" from="MainSceneUI" to="." method="_on_fullscreen_button_pressed"]
 
 [editable path="SubViewportContainer/DancerViewport/Background"]
 [editable path="MainSceneUI"]
+[editable path="FullscreenScene"]
+[editable path="FullscreenScene/CanvasLayer/VideoControls"]
+[editable path="FullscreenScene/CanvasLayer/SubViewportContainer/DancerViewport/Background"]

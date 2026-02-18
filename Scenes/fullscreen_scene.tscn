@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_teif8"]
 
 [node name="FullscreenScene" type="Control"]
+visible = false
+z_index = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,11 +15,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_selid")
 
-[node name="VideoControls" parent="." instance=ExtResource("1_oehyg")]
-layout_mode = 1
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
-layout_mode = 1
+[node name="VideoControls" parent="CanvasLayer" instance=ExtResource("1_oehyg")]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -28,17 +30,17 @@ size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 stretch = true
 
-[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="DancerViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
-[node name="Background" parent="SubViewportContainer/DancerViewport" instance=ExtResource("3_teif8")]
+[node name="Background" parent="CanvasLayer/SubViewportContainer/DancerViewport" instance=ExtResource("3_teif8")]
 
-[node name="Camera3D" parent="SubViewportContainer/DancerViewport/Background" index="1"]
+[node name="Camera3D" parent="CanvasLayer/SubViewportContainer/DancerViewport/Background" index="1"]
 current = true
 
-[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport"]
+[node name="CharacterSlot" type="Node3D" parent="CanvasLayer/SubViewportContainer/DancerViewport"]
 
-[editable path="VideoControls"]
-[editable path="SubViewportContainer/DancerViewport/Background"]
+[editable path="CanvasLayer/VideoControls"]
+[editable path="CanvasLayer/SubViewportContainer/DancerViewport/Background"]

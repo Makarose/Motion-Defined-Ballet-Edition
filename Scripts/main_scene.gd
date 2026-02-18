@@ -19,6 +19,7 @@ var current_dancer: Node3D = null
 # Ready
 # ----------------------------
 func _ready() -> void:
+	print("[MainScene] SubViewportContainer mouse filter:", $SubViewportContainer.mouse_filter)
 	print("[MainScene] Ready")
 	fullscreen_scene.hide()
 
@@ -70,10 +71,6 @@ func _spawn_dancer(scene_path: String) -> void:
 
 	# Put dancer in starting pose
 	current_dancer.play_idle()
-
-	# Give dancer reference to fullscreen scene
-	if fullscreen_scene.has_method("set_dancer"):
-		fullscreen_scene.set_dancer(current_dancer)
 
 
 # ----------------------------
@@ -128,8 +125,11 @@ func _on_term_selected(term: String, anim_name: String, definition: String) -> v
 # ----------------------------
 func _on_fullscreen_requested() -> void:
 	GameManager.is_fullscreen = true
+	if current_dancer:
+		GameManager.save_playback_state(current_dancer)
 	main_scene_ui.hide()
-	fullscreen_scene.show()
+	fullscreen_scene.get_node("CanvasLayer").show()
+	fullscreen_scene.set_dancer(current_dancer)
 
 
 # ----------------------------
@@ -137,7 +137,7 @@ func _on_fullscreen_requested() -> void:
 # ----------------------------
 func _on_fullscreen_exit() -> void:
 	GameManager.is_fullscreen = false
-	fullscreen_scene.hide()
+	fullscreen_scene.get_node("CanvasLayer").hide()
 	main_scene_ui.show()
 
 
@@ -184,10 +184,10 @@ func _on_index_button_pressed() -> void:
 	_on_nav_right()
 	
 func _input(event: InputEvent) -> void:
-	print("[MainScene] _input fired:", event.get_class())
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	print("[MainScene] Key:", event.keycode, " LEFT=", KEY_LEFT)
+	var key_event := event as InputEventKey
+	print("[MainScene] Key:", key_event.keycode, " Physical:", key_event.physical_keycode, " LEFT=", KEY_LEFT)
 	
 	if event.keycode == KEY_LEFT:
 		get_viewport().set_input_as_handled()
