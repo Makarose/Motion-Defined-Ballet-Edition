@@ -21,6 +21,10 @@ var current_dancer: Node3D = null
 func _ready() -> void:
 	print("[MainScene] SubViewportContainer mouse filter:", $SubViewportContainer.mouse_filter)
 	print("[MainScene] Ready")
+	
+	print("[MainScene] SubViewportContainer mouse filter:", $SubViewportContainer.mouse_filter)
+	print("[MainScene] SubViewportContainer process mode:", $SubViewportContainer.process_mode)
+	print("[MainScene] SubViewport handle_input_locally:", $SubViewportContainer/DancerViewport.handle_input_locally)
 	fullscreen_scene.hide()
 
 	# Wire up MainSceneUI signals
@@ -32,10 +36,6 @@ func _ready() -> void:
 	# Wire up FullscreenScene signals
 	fullscreen_scene.exit_requested.connect(_on_fullscreen_exit)
 	fullscreen_scene.character_changed.connect(_on_character_changed)
-
-	# Wire up GameManager nav signals
-	GameManager.nav_left.connect(_on_nav_left)
-	GameManager.nav_right.connect(_on_nav_right)
 
 	# Spawn character — there should always be one from title page
 	if GameManager.chosen_character != "":
@@ -186,12 +186,9 @@ func _on_index_button_pressed() -> void:
 func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	var key_event := event as InputEventKey
-	print("[MainScene] Key:", key_event.keycode, " Physical:", key_event.physical_keycode, " LEFT=", KEY_LEFT)
-	
-	if event.keycode == KEY_LEFT:
-		get_viewport().set_input_as_handled()
-		_on_nav_left()
-	elif event.keycode == KEY_RIGHT:
-		get_viewport().set_input_as_handled()
-		_on_nav_right()
+	print("[MainScene] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	print("[MainScene] _unhandled keycode:", event.keycode, " ctrl:", event.ctrl_pressed)

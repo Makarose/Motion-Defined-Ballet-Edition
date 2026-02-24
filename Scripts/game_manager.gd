@@ -78,18 +78,17 @@ func clear_term_state() -> void:
 # ----------------------------
 # Global input
 # ----------------------------
-func _shortcut_input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	print("[GameManager] KEY pressed:", event.keycode, " is_action nav_left:", event.is_action("nav_left"), " ui_cancel:", event.is_action("ui_cancel"))
 	
-	if event.is_action("nav_left") and not is_fullscreen:
+	if event.ctrl_pressed and event.physical_keycode == KEY_LEFT and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_left")
-	elif event.is_action("nav_right") and not is_fullscreen:
+	elif event.ctrl_pressed and event.physical_keycode == KEY_RIGHT and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_right")
-	elif event.is_action("ui_cancel"):
+	elif event.is_action("quit_app"):
 		get_tree().quit()
 
 # ----------------------------

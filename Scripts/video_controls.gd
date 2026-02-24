@@ -271,7 +271,7 @@ func _gui_input(event: InputEvent) -> void:
 # Keyboard input
 # ----------------------------
 func _input(event: InputEvent) -> void:
-	if not visible:
+	if not GameManager.is_fullscreen:
 		return
 
 	# Consume left/right so GameManager nav doesn't fire in fullscreen

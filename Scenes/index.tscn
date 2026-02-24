@@ -90,7 +90,7 @@ texture_hover = ExtResource("5_15t15")
 layout_mode = 2
 size_flags_vertical = 8
 text = "BACK
-[LEFT]"
+[CTRL+L]"
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -131,7 +131,7 @@ texture_hover = ExtResource("9_55g2m")
 layout_mode = 2
 size_flags_vertical = 8
 text = "HOME
-[RIGHT]"
+[CTRL+R]"
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2

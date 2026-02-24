@@ -14,7 +14,7 @@ signal index_pressed
 # ----------------------------
 # Nodes
 # ----------------------------
-@onready var search_bar: SearchLineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
+@onready var search_bar: LineEdit = $CanvasLayer/Search/MarginContainerText/VBoxContainer/LineEdit
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
@@ -39,7 +39,9 @@ var clear_timer: Timer
 # ----------------------------
 func _ready() -> void:
 	print("[MainSceneUI] Ready")
+	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
 	search_bar.release_focus()
+	grab_focus()
 
 	# Hide fullscreen button until a term is selected
 	fullscreen_container.visible = false
@@ -51,13 +53,8 @@ func _ready() -> void:
 	# Search bar signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.text_submitted.connect(_on_text_submitted)
-	search_bar.grab_focus()
-	search_bar.fullscreen_pressed.connect(_on_fullscreen_key_pressed)
-	search_bar.nav_left_pressed.connect(_on_nav_left)
-	search_bar.nav_right_pressed.connect(_on_nav_right)
-	search_bar.move_up.connect(_on_search_move_up)
-	search_bar.move_down.connect(_on_search_move_down)
-	search_bar.item_confirmed.connect(_on_search_confirmed)
+	search_bar.gui_input.connect(_on_search_bar_gui_input)
+	#search_bar.grab_focus()
 
 	# Item list signals
 	item_list.item_selected.connect(_on_item_selected)
@@ -80,6 +77,38 @@ func _ready() -> void:
 	# Navigation buttons connected
 	back_button.pressed.connect(_on_nav_left)
 	index_button.pressed.connect(_on_nav_right)
+	
+	
+# ----------------------------
+# Search Bar Input
+# ----------------------------
+func _on_search_bar_gui_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+		
+	print("[SearchBar] keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
+	
+	if event.ctrl_pressed:
+		if event.keycode == KEY_LEFT or event.physical_keycode == KEY_LEFT:
+			accept_event()
+			_on_nav_left()
+		elif event.keycode == KEY_RIGHT or event.physical_keycode == KEY_RIGHT:
+			accept_event()
+			_on_nav_right()
+		return
+	
+	if event.keycode == KEY_UP:
+		accept_event()
+		_on_search_move_up()
+	elif event.keycode == KEY_DOWN:
+		accept_event()
+		_on_search_move_down()
+	elif event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+		accept_event()
+		_on_search_confirmed()
+	elif event.keycode == KEY_F1:
+		accept_event()
+		_on_fullscreen_key_pressed()
 
 
 # ----------------------------
@@ -138,7 +167,7 @@ func _select_item(index: int) -> void:
 	definition_label.text = move.definition
 	search_bar.text = move.name
 	item_list.visible = false
-	search_bar.grab_focus()
+	search_bar.release_focus()
 
 	# Show fullscreen button
 	fullscreen_container.visible = true
@@ -226,3 +255,8 @@ func _on_search_confirmed() -> void:
 			if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
 				_select_item(i)
 				return
+				
+func _input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	print("[MainSceneUI] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
