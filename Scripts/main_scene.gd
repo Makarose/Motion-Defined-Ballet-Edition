@@ -129,7 +129,7 @@ func _on_fullscreen_requested() -> void:
 		GameManager.save_playback_state(current_dancer)
 	main_scene_ui.hide()
 	fullscreen_scene.get_node("CanvasLayer").show()
-	fullscreen_scene.set_dancer(current_dancer)
+	await fullscreen_scene.set_dancer(current_dancer)
 
 
 # ----------------------------

@@ -17,8 +17,6 @@ script = ExtResource("1_selid")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="VideoControls" parent="CanvasLayer" instance=ExtResource("1_oehyg")]
-
 [node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,5 +40,7 @@ current = true
 
 [node name="CharacterSlot" type="Node3D" parent="CanvasLayer/SubViewportContainer/DancerViewport"]
 
-[editable path="CanvasLayer/VideoControls"]
+[node name="VideoControls" parent="CanvasLayer" instance=ExtResource("1_oehyg")]
+
 [editable path="CanvasLayer/SubViewportContainer/DancerViewport/Background"]
+[editable path="CanvasLayer/VideoControls"]

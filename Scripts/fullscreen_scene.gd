@@ -33,12 +33,10 @@ func _ready() -> void:
 # Spawns a fresh dancer into the fullscreen viewport
 # ----------------------------
 func set_dancer(_dancer: Node3D) -> void:
-	# Remove existing dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Load and spawn fresh copy into fullscreen viewport
 	var char_path: String = GameManager.chosen_character
 	if char_path == "":
 		push_warning("[FullscreenScene] No chosen character in GameManager")
@@ -52,36 +50,8 @@ func set_dancer(_dancer: Node3D) -> void:
 	current_dancer = char_packed.instantiate()
 	character_slot.add_child(current_dancer)
 
-	# Wait one frame for dancer _ready() to complete
 	await get_tree().process_frame
 
-	# Restore animation state from GameManager
-	if GameManager.selected_animation != "":
-		current_dancer.apply_playback_state({
-			"animation": GameManager.selected_animation,
-			"time": GameManager.playback_time,
-			"is_paused": GameManager.is_paused,
-			"is_looping": GameManager.is_looping
-		})
-
-	video_controls.set_dancer(current_dancer)
-	print("[FullscreenScene] Dancer set")
-
-	# Load and spawn fresh copy into fullscreen viewport
-	var scene_path: String = GameManager.chosen_character
-	if scene_path == "":
-		push_warning("[FullscreenScene] No chosen character in GameManager")
-		return
-
-	var packed: PackedScene = load(scene_path)
-	if not packed:
-		push_error("[FullscreenScene] Could not load character scene: " + scene_path)
-		return
-
-	current_dancer = packed.instantiate()
-	character_slot.add_child(current_dancer)
-
-	# Restore animation state from GameManager
 	if GameManager.selected_animation != "":
 		current_dancer.apply_playback_state({
 			"animation": GameManager.selected_animation,
@@ -104,5 +74,10 @@ func _on_exit_requested() -> void:
 # ----------------------------
 func _on_character_requested(scene_path: String) -> void:
 	GameManager.chosen_character = scene_path
-	set_dancer(null)
+
+	# Save state from current dancer BEFORE freeing it
+	if current_dancer != null:
+		GameManager.save_playback_state(current_dancer)
+
+	await set_dancer(null)
 	emit_signal("character_changed", scene_path)

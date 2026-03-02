@@ -1,6 +1,17 @@
 [gd_scene load_steps=2 format=3 uid="uid://b1ub0nlnoaaey"]
 
-[ext_resource type="Script" path="res://Scripts/test_key_scene.gd" id="1_xto6n"]
+[sub_resource type="GDScript" id="GDScript_6yf0l"]
+script/source = "extends Control
+
+func _input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	print(\"Physical keycode:\", event.physical_keycode)
+	print(\"Keycode:\", event.keycode)
+	print(\"Key label:\", event.key_label)
+	print(\"Unicode:\", event.unicode)
+	print(\"---\")
+"
 
 [node name="TestKeyScene" type="Control"]
 layout_mode = 3
@@ -9,4 +20,4 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_xto6n")
+script = SubResource("GDScript_6yf0l")

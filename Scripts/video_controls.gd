@@ -61,7 +61,7 @@ var home_vertical_offset: float = 0.0
 # Ready
 # ----------------------------
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_PASS
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	focus_mode = Control.FOCUS_ALL
 
 	# Wire up buttons
@@ -80,6 +80,15 @@ func _ready() -> void:
 	scrub_slider.drag_ended.connect(_on_scrub_ended)
 	scrub_slider.min_value = 0.0
 	scrub_slider.value = 0.0
+
+	# DEBUG — confirm buttons are found and signals wired
+	print("[VideoControls] pause_button node:", pause_button)
+	print("[VideoControls] exit_button node:", exit_button)
+	print("[VideoControls] male_button node:", male_button)
+
+	pause_button.pressed.connect(func(): print("[VideoControls] PAUSE PRESSED"))
+	exit_button.pressed.connect(func(): print("[VideoControls] EXIT PRESSED"))
+	male_button.pressed.connect(func(): print("[VideoControls] MALE PRESSED"))
 
 
 # ----------------------------
@@ -150,6 +159,7 @@ func _on_scrub_ended(_value_changed: bool = false) -> void:
 # Playback button handlers
 # ----------------------------
 func _on_pause_pressed() -> void:
+	print("[VideoControls] _on_pause_pressed fired, dancer:", dancer)
 	if dancer != null:
 		dancer.pause_animation()
 
@@ -173,6 +183,7 @@ func _on_stop_pressed() -> void:
 		scrub_slider.value = 0.0
 
 func _on_exit_pressed() -> void:
+	print("[VideoControls] _on_exit_pressed fired")
 	emit_signal("exit_requested")
 
 
@@ -274,32 +285,40 @@ func _input(event: InputEvent) -> void:
 	if not GameManager.is_fullscreen:
 		return
 
-	# Consume left/right so GameManager nav doesn't fire in fullscreen
 	if event.is_action("ui_left") or event.is_action("ui_right"):
 		get_viewport().set_input_as_handled()
 
-	if Input.is_action_just_pressed("camera_reset"):
+	if event.is_action_pressed("camera_reset", false):
+		get_viewport().set_input_as_handled()
 		reset_camera()
 
-	if Input.is_action_just_pressed("exit_fullscreen"):
+	if event.is_action_pressed("exit_fullscreen", false):
+		get_viewport().set_input_as_handled()
 		emit_signal("exit_requested")
 
 	if dancer == null:
 		return
 
-	if Input.is_action_just_pressed("replay_animation"):
+	if event.is_action_pressed("replay_animation", false):
+		get_viewport().set_input_as_handled()
 		dancer.replay_last_animation()
-	if Input.is_action_just_pressed("pause_animation"):
+	if event.is_action_pressed("pause_animation", false):
+		get_viewport().set_input_as_handled()
 		dancer.pause_animation()
-	if Input.is_action_just_pressed("play_animation"):
+	if event.is_action_pressed("play_animation", false):
+		get_viewport().set_input_as_handled()
 		dancer.resume_animation()
-	if Input.is_action_just_pressed("loop_animation"):
+	if event.is_action_pressed("loop_animation", false):
+		get_viewport().set_input_as_handled()
 		dancer.loop_current_animation()
-	if Input.is_action_just_pressed("stop_animation"):
+	if event.is_action_pressed("stop_animation", false):
+		get_viewport().set_input_as_handled()
 		dancer.stop_animation()
-	if Input.is_action_just_pressed("male_button"):
+	if event.is_action_pressed("male_button", false):
+		get_viewport().set_input_as_handled()
 		_on_male_pressed()
-	if Input.is_action_just_pressed("female_button"):
+	if event.is_action_pressed("female_button", false):
+		get_viewport().set_input_as_handled()
 		_on_female_pressed()
 
 
