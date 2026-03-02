@@ -19,9 +19,9 @@ signal index_pressed
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
 @onready var fullscreen_container: Control = $CanvasLayer/FullscreenContainer
-@onready var fullscreen_button: TextureButton = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenButton
 @onready var back_button: TextureButton = $CanvasLayer/BackButtonContainer/MarginContainer/BackButton
 @onready var index_button: TextureButton = $CanvasLayer/IndexButtonContainer/Container/IndexButton
+@onready var fullscreen_button: Button = $CanvasLayer/FullscreenContainer/FullscreenButton
 
 # ----------------------------
 # Resources
@@ -260,3 +260,7 @@ func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	print("[MainSceneUI] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
+
+	if event.is_action_pressed("launch_fullscreen", false):
+		get_viewport().set_input_as_handled()
+		_on_fullscreen_key_pressed()

@@ -55,5 +55,5 @@ layout_mode = 1
 [editable path="SubViewportContainer/DancerViewport/Background"]
 [editable path="MainSceneUI"]
 [editable path="FullscreenScene"]
-[editable path="FullscreenScene/CanvasLayer/VideoControls"]
 [editable path="FullscreenScene/CanvasLayer/SubViewportContainer/DancerViewport/Background"]
+[editable path="FullscreenScene/CanvasLayer/VideoControls"]

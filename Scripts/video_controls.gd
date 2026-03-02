@@ -81,16 +81,6 @@ func _ready() -> void:
 	scrub_slider.min_value = 0.0
 	scrub_slider.value = 0.0
 
-	# DEBUG — confirm buttons are found and signals wired
-	print("[VideoControls] pause_button node:", pause_button)
-	print("[VideoControls] exit_button node:", exit_button)
-	print("[VideoControls] male_button node:", male_button)
-
-	pause_button.pressed.connect(func(): print("[VideoControls] PAUSE PRESSED"))
-	exit_button.pressed.connect(func(): print("[VideoControls] EXIT PRESSED"))
-	male_button.pressed.connect(func(): print("[VideoControls] MALE PRESSED"))
-
-
 # ----------------------------
 # Set active dancer
 # Called by FullscreenScene.set_dancer()
@@ -159,7 +149,6 @@ func _on_scrub_ended(_value_changed: bool = false) -> void:
 # Playback button handlers
 # ----------------------------
 func _on_pause_pressed() -> void:
-	print("[VideoControls] _on_pause_pressed fired, dancer:", dancer)
 	if dancer != null:
 		dancer.pause_animation()
 
@@ -183,7 +172,6 @@ func _on_stop_pressed() -> void:
 		scrub_slider.value = 0.0
 
 func _on_exit_pressed() -> void:
-	print("[VideoControls] _on_exit_pressed fired")
 	emit_signal("exit_requested")
 
 

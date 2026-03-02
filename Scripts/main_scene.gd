@@ -139,6 +139,7 @@ func _on_fullscreen_exit() -> void:
 	GameManager.is_fullscreen = false
 	fullscreen_scene.get_node("CanvasLayer").hide()
 	main_scene_ui.show()
+	main_scene_ui.hide_fullscreen_button()
 
 
 # ----------------------------
