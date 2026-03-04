@@ -51,6 +51,7 @@ var drag_axis: String = ""
 var last_mouse_pos: Vector2 = Vector2.ZERO
 var scrub_active: bool = false
 var was_playing_before_scrub: bool = false
+var is_first_dancer: bool = true
 
 # Home state for camera reset
 var home_distance: float = 5.0
@@ -88,24 +89,23 @@ func _ready() -> void:
 func set_dancer(dancer_node: Node3D) -> void:
 	dancer = dancer_node
 
-	# Find camera via known path in fullscreen scene
 	camera = get_node_or_null("../SubViewportContainer/DancerViewport/Background/Camera3D")
 
-	# Release focus from all child controls so Tab isn't consumed by buttons/slider
 	for child in get_children():
 		if child is Control:
 			child.release_focus()
 	grab_focus()
 
-	# Setup camera position
 	_update_pivot()
-	distance = default_distance
-	horizontal_angle = 0.0
-	vertical_offset = 0.0
-	_save_home_state()
-	_update_camera()
 
-	# Setup scrub slider from current animation state
+	if is_first_dancer:
+		is_first_dancer = false
+		distance = default_distance
+		horizontal_angle = 0.0
+		vertical_offset = 0.0
+		_save_home_state()
+
+	_update_camera()
 	_setup_scrub_slider()
 
 	print("[VideoControls] Dancer set:", dancer.name)

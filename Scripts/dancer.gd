@@ -195,12 +195,13 @@ func apply_playback_state(state: Dictionary) -> void:
 	if anim:
 		anim.loop_mode = Animation.LOOP_LINEAR if is_looping else Animation.LOOP_NONE
 
-	animation_player.stop()
+	# Must call play() first so AnimationPlayer has an active animation to seek into
+	animation_player.play(last_animation_name)
 	animation_player.seek(paused_time, true)
 
-	if not is_paused:
-		animation_player.play(last_animation_name)
-		animation_player.seek(paused_time, true)
+	# Now pause if needed — play() then immediate pause() holds the frame
+	if is_paused:
+		animation_player.pause()
 
 
 # ----------------------------

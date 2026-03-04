@@ -95,6 +95,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bxpsy")
+vertical_min = -0.4
+vertical_max = 1.5
 metadata/_edit_vertical_guides_ = [961.0, 1685.0]
 metadata/_edit_horizontal_guides_ = [99.0]
 

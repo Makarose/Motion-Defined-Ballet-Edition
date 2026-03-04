@@ -83,5 +83,33 @@ func _on_character_requested(scene_path: String) -> void:
 	if current_dancer != null:
 		GameManager.save_playback_state(current_dancer)
 
-	await set_dancer(null)
+	print("[FullscreenScene] Saved state — animation:", GameManager.selected_animation, " time:", GameManager.playback_time, " is_paused:", GameManager.is_paused, " is_looping:", GameManager.is_looping)
+
+	# Free old dancer
+	if current_dancer and current_dancer.is_inside_tree():
+		current_dancer.queue_free()
+		current_dancer = null
+
+	# Load new dancer — hide it until state is applied
+	var char_packed: PackedScene = load(scene_path)
+	if not char_packed:
+		push_error("[FullscreenScene] Could not load character scene: " + scene_path)
+		return
+
+	current_dancer = char_packed.instantiate()
+	current_dancer.visible = false
+	character_slot.add_child(current_dancer)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	if GameManager.selected_animation != "":
+		current_dancer.apply_playback_state({
+			"animation": GameManager.selected_animation,
+			"time": GameManager.playback_time,
+			"is_paused": GameManager.is_paused,
+			"is_looping": GameManager.is_looping
+		})
+
+	current_dancer.visible = true
+	video_controls.set_dancer(current_dancer)
 	emit_signal("character_changed", scene_path)

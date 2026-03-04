@@ -54,12 +54,10 @@ func _ready() -> void:
 # Replaces any existing dancer
 # ----------------------------
 func _spawn_dancer(scene_path: String) -> void:
-	# Remove existing dancer
 	if current_dancer and current_dancer.is_inside_tree():
 		current_dancer.queue_free()
 		current_dancer = null
 
-	# Load and instantiate
 	var packed: PackedScene = load(scene_path)
 	if not packed:
 		push_error("[MainScene] Could not load character scene: " + scene_path)
@@ -69,8 +67,9 @@ func _spawn_dancer(scene_path: String) -> void:
 	dancer_viewport.add_child(current_dancer)
 	print("[MainScene] Spawned dancer:", scene_path)
 
-	# Put dancer in starting pose
-	current_dancer.play_idle()
+	# Only play idle if no term is selected
+	if GameManager.selected_animation == "":
+		current_dancer.play_idle()
 
 
 # ----------------------------
@@ -152,14 +151,8 @@ func _on_character_changed(scene_path: String) -> void:
 	print("[MainScene] Character changed to:", scene_path)
 	GameManager.chosen_character = scene_path
 
-	# Save current playback state before swapping
-	if current_dancer:
-		GameManager.save_playback_state(current_dancer)
-
-	# Spawn new dancer
 	_spawn_dancer(scene_path)
 
-	# Restore animation state on new dancer if a term was selected
 	if GameManager.selected_animation != "":
 		var resolved: String = _resolve_animation_name(GameManager.selected_animation)
 		if resolved != "":
