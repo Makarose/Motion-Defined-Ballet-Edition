@@ -69,6 +69,10 @@ func set_dancer(_dancer: Node3D) -> void:
 func _on_exit_requested() -> void:
 	emit_signal("exit_requested")
 
+func request_exit() -> void:
+	emit_signal("exit_requested")
+	
+	
 # ----------------------------
 # Character swap requested from VideoControls
 # ----------------------------

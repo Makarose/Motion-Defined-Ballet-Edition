@@ -125,8 +125,10 @@ func _on_term_selected(term: String, anim_name: String, definition: String) -> v
 # ----------------------------
 func _on_fullscreen_requested() -> void:
 	GameManager.is_fullscreen = true
+	print("[MainScene] is_fullscreen set to:", GameManager.is_fullscreen)
 	if current_dancer:
 		GameManager.save_playback_state(current_dancer)
+	main_scene_ui.process_mode = Node.PROCESS_MODE_DISABLED
 	main_scene_ui.hide()
 	fullscreen_scene.get_node("CanvasLayer").show()
 	await fullscreen_scene.set_dancer(current_dancer)
@@ -138,6 +140,7 @@ func _on_fullscreen_requested() -> void:
 func _on_fullscreen_exit() -> void:
 	GameManager.is_fullscreen = false
 	fullscreen_scene.get_node("CanvasLayer").hide()
+	main_scene_ui.process_mode = Node.PROCESS_MODE_INHERIT
 	main_scene_ui.show()
 	main_scene_ui.hide_fullscreen_button()
 
@@ -189,6 +192,12 @@ func _input(event: InputEvent) -> void:
 		return
 	print("[MainScene] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
 
+	if GameManager.is_fullscreen:
+		if event.is_action("exit_fullscreen") or event.is_action("ui_focus_next"):
+			get_viewport().set_input_as_handled()
+			fullscreen_scene.request_exit()
+		return
+		
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return

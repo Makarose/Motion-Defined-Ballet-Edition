@@ -91,6 +91,12 @@ func set_dancer(dancer_node: Node3D) -> void:
 	# Find camera via known path in fullscreen scene
 	camera = get_node_or_null("../SubViewportContainer/DancerViewport/Background/Camera3D")
 
+	# Release focus from all child controls so Tab isn't consumed by buttons/slider
+	for child in get_children():
+		if child is Control:
+			child.release_focus()
+	grab_focus()
+
 	# Setup camera position
 	_update_pivot()
 	distance = default_distance
@@ -269,7 +275,10 @@ func _gui_input(event: InputEvent) -> void:
 # ----------------------------
 # Keyboard input
 # ----------------------------
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		print("[VideoControls] _unhandled_input TOP keycode:", event.keycode)
+
 	if not GameManager.is_fullscreen:
 		return
 

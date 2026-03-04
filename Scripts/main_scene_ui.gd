@@ -259,7 +259,12 @@ func _on_search_confirmed() -> void:
 func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	print("[MainSceneUI] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
+	print("[MainSceneUI] _input keycode:", event.keycode, " ctrl:", event.ctrl_pressed, " is_fullscreen:", GameManager.is_fullscreen, " handled:", get_viewport().is_input_handled())
+
+	if GameManager.is_fullscreen:
+		if event.is_action("exit_fullscreen") or event.is_action("ui_focus_next"):
+			get_viewport().set_input_as_handled()
+		return
 
 	if event.is_action_pressed("launch_fullscreen", false):
 		get_viewport().set_input_as_handled()
