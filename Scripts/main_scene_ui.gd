@@ -39,12 +39,15 @@ var clear_timer: Timer
 # ----------------------------
 func _ready() -> void:
 	print("[MainSceneUI] Ready")
+	await get_tree().process_frame
+	search_bar.grab_focus()
 	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
-	search_bar.release_focus()
-	grab_focus()
 
-	# Hide fullscreen button until a term is selected
-	fullscreen_container.visible = false
+	# Only hide fullscreen button if no term is selected
+	if GameManager.selected_term == "":
+		fullscreen_container.visible = false
+	else:
+		fullscreen_container.visible = true
 
 	# Load database if not set in inspector
 	if not database:
@@ -216,9 +219,11 @@ func _clear_search_now() -> void:
 # ----------------------------
 func show_fullscreen_button() -> void:
 	fullscreen_container.visible = true
+	print("[MainSceneUI] Fullscreen button SHOWN")
 
 func hide_fullscreen_button() -> void:
 	fullscreen_container.visible = false
+	print("[MainSceneUI] Fullscreen button HIDDEN")
 
 
 # ----------------------------

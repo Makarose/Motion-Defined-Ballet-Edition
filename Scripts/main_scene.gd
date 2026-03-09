@@ -47,7 +47,7 @@ func _ready() -> void:
 	if GameManager.selected_term != "":
 		_play_term(GameManager.selected_term, GameManager.selected_animation)
 		main_scene_ui.restore_term(GameManager.selected_term, GameManager.selected_definition)
-
+		main_scene_ui.show_fullscreen_button()  # Show button since animation is playing
 
 # ----------------------------
 # Spawn a dancer into the SubViewport
@@ -66,11 +66,18 @@ func _spawn_dancer(scene_path: String) -> void:
 	current_dancer = packed.instantiate()
 	dancer_viewport.add_child(current_dancer)
 	print("[MainScene] Spawned dancer:", scene_path)
+	
+	# Connect animation finished signal
+	current_dancer.animation_finished.connect(_on_animation_finished)
 
 	# Only play idle if no term is selected
 	if GameManager.selected_animation == "":
 		current_dancer.play_idle()
 
+
+func _on_animation_finished(anim_name: String) -> void:
+	print("[MainScene] Animation finished:", anim_name)
+	main_scene_ui.hide_fullscreen_button()
 
 # ----------------------------
 # Find exact animation clip name on dancer
@@ -141,7 +148,9 @@ func _on_fullscreen_exit() -> void:
 	fullscreen_scene.get_node("CanvasLayer").hide()
 	main_scene_ui.process_mode = Node.PROCESS_MODE_INHERIT
 	main_scene_ui.show()
-	main_scene_ui.hide_fullscreen_button()
+	# Re-focus search bar
+	await get_tree().process_frame
+	main_scene_ui.search_bar.grab_focus()
 
 
 # ----------------------------
