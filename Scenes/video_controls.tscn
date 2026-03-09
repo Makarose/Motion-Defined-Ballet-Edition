@@ -297,7 +297,9 @@ texture_hover = ExtResource("21_dvm2q")
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 40
-text = "EXIT [TAB]"
+text = "EXIT 
+FULLSCREEN 
+[TAB]"
 label_settings = SubResource("LabelSettings_wx6hk")
 horizontal_alignment = 1
 vertical_alignment = 2

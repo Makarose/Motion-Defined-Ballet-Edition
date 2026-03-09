@@ -20,20 +20,27 @@ var current_index: int = -1
 # ----------------------------
 func _ready() -> void:
 	print("[Index] Ready")
-
 	# Load and sort all terms from database
 	terms = GameManager.get_terms()
 	terms.sort_custom(func(a, b): return GameManager.normalize(a) < GameManager.normalize(b))
 	_populate_list(terms)
-
+	
 	# Search bar signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
 	search_bar.grab_focus()
-
+	
 	# Item list signal
 	term_list.item_activated.connect(_on_term_activated)
-
+	
+	# Connect navigation buttons
+	var back_button = get_node_or_null("Back/MarginContainer/BackButton")
+	if back_button:
+		back_button.pressed.connect(_on_back_button_pressed)
+	var home_button = get_node_or_null("Home/MarginContainer/HomeButton")
+	if home_button:
+		home_button.pressed.connect(_on_home_button_pressed)
+	
 	# GameManager nav signals
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
@@ -115,6 +122,7 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 # Navigation
 # ----------------------------
 func _on_nav_left() -> void:
+	GameManager.clear_term_state()  # Clear since we're not selecting anything
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
 func _on_nav_right() -> void:
