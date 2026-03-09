@@ -9,17 +9,19 @@ extends Node
 signal nav_left
 signal nav_right
 
+
+var quit_dialog: ConfirmationDialog = null
+
 # ----------------------------
 # Persistent state
-# All cross-scene state lives here and nowhere else
 # ----------------------------
-var chosen_character: String = ""       # Scene path e.g. "res://Scenes/male.tscn"
-var selected_term: String = ""          # Display name e.g. "Arabesque"
-var selected_animation: String = ""     # Animation clip name e.g. "arabesque"
-var selected_definition: String = ""    # Definition text for the selected term
-var playback_time: float = 0.0          # Where in the animation we were
-var is_paused: bool = false             # Was it paused when we left?
-var is_looping: bool = false            # Was it looping?
+var chosen_character: String = ""
+var selected_term: String = ""
+var selected_animation: String = ""
+var selected_definition: String = ""
+var playback_time: float = 0.0
+var is_paused: bool = false
+var is_looping: bool = false
 var is_fullscreen: bool = false
 
 # ----------------------------
@@ -32,7 +34,32 @@ var is_fullscreen: bool = false
 # ----------------------------
 func _ready() -> void:
 	set_process_unhandled_input(true)
-
+	
+	# Create quit confirmation dialog
+	quit_dialog = ConfirmationDialog.new()
+	quit_dialog.dialog_text = "Are you sure you want to quit?"
+	quit_dialog.title = "Quit Application"
+	quit_dialog.min_size = Vector2(500, 200)
+	quit_dialog.confirmed.connect(_on_quit_confirmed)
+	quit_dialog.canceled.connect(_on_quit_canceled)
+	add_child(quit_dialog)
+	
+# Add white border only (transparent background)
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0, 0, 0, 0)  # Transparent background
+	style_box.set_border_width_all(3)
+	style_box.border_color = Color(1, 1, 1, 1)  # White border
+	style_box.content_margin_bottom = 20  # Reduce bottom margin to move buttons up
+	quit_dialog.add_theme_stylebox_override("panel", style_box)
+	
+	# Center the text horizontally and vertically + increase font size
+	await get_tree().process_frame
+	var label = quit_dialog.get_label()
+	if label:
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 24)
+		
 # ----------------------------
 # Database helpers
 # ----------------------------
@@ -89,7 +116,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_right")
 	elif event.is_action("quit_app"):
-		get_tree().quit()
+		get_viewport().set_input_as_handled()
+		quit_dialog.popup_centered()
 
 # ----------------------------
 # Normalization utilities
@@ -115,3 +143,13 @@ func strip_accents(text: String) -> String:
 
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
+	
+	
+# ----------------------------
+# Quit Warnings
+# ----------------------------	
+func _on_quit_confirmed() -> void:
+	get_tree().quit()
+
+func _on_quit_canceled() -> void:
+	pass  # Just close the dialog
