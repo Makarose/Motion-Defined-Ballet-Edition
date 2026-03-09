@@ -10,13 +10,18 @@
 [ext_resource type="Texture2D" uid="uid://dvd8voictywof" path="res://UI Buttons/home_selected_button.png" id="8_ka0yk"]
 [ext_resource type="Texture2D" uid="uid://cos3cyr6eott2" path="res://UI Buttons/home_highlight_button.png" id="9_55g2m"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_35u1d"]
-bg_color = Color(0.643137, 0.729412, 0.776471, 1)
-
 [sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
 font = ExtResource("3_eq036")
 font_size = 50
+outline_size = 15
+outline_color = Color(0.317647, 0.34902, 0.368627, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_v4wgd"]
+font = ExtResource("3_eq036")
+font_size = 100
 outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="Index" type="Control"]
 layout_mode = 3
@@ -26,37 +31,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_37t3u")
-metadata/_edit_horizontal_guides_ = [1000.0, 904.0]
+metadata/_edit_horizontal_guides_ = [1000.0, 904.0, 50.0, 150.0, 163.0, 875.0]
+metadata/_edit_vertical_guides_ = [100.0, 1821.0]
 
-[node name="PanelContainer" type="Panel" parent="."]
+[node name="PanelContainer" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 theme = ExtResource("1_vndco")
-theme_override_styles/panel = SubResource("StyleBoxFlat_35u1d")
-
-[node name="MainTitle" type="PanelContainer" parent="PanelContainer"]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -1820.0
-offset_top = 48.0
-offset_right = -100.0
-offset_bottom = 128.0
-grow_horizontal = 0
-scale = Vector2(0.998309, 2.28343)
-theme = ExtResource("1_vndco")
-
-[node name="Title" type="RichTextLabel" parent="PanelContainer/MainTitle"]
-layout_mode = 2
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/normal_font_size = 70
-bbcode_enabled = true
-text = "[center]Index[/center]"
-scroll_active = false
+color = Color(0.643137, 0.729412, 0.776471, 1)
+metadata/_edit_group_ = true
 
 [node name="Back" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(75, 75)
@@ -139,21 +124,50 @@ vertical_alignment = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(1720, 600)
 layout_mode = 0
-offset_left = 105.0
-offset_top = 268.0
-offset_right = 1825.0
-offset_bottom = 868.0
+offset_left = 100.0
+offset_top = 163.0
+offset_right = 1820.0
+offset_bottom = 763.0
+scale = Vector2(1.00074, 1.18736)
 theme = ExtResource("1_vndco")
 theme_override_constants/separation = 0
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
+size_flags_vertical = 4
 theme = ExtResource("1_vndco")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
 
 [node name="ItemList" type="ItemList" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 550)
 layout_mode = 2
+size_flags_vertical = 4
 theme = ExtResource("1_vndco")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 40
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_left = 100.0
+offset_top = 50.0
+offset_right = 100.0
+offset_bottom = 162.0
+grow_horizontal = 2
+scale = Vector2(0.896355, 0.892692)
+metadata/_edit_group_ = true
+
+[node name="MainTitle" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_vndco")
+
+[node name="Index" type="Label" parent="MarginContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_eq036")
+text = "INDEX"
+label_settings = SubResource("LabelSettings_v4wgd")
+horizontal_alignment = 1
+vertical_alignment = 1

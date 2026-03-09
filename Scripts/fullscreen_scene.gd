@@ -111,5 +111,5 @@ func _on_character_requested(scene_path: String) -> void:
 		})
 
 	current_dancer.visible = true
-	video_controls.set_dancer(current_dancer)
+	video_controls.set_dancer(current_dancer, false)
 	emit_signal("character_changed", scene_path)

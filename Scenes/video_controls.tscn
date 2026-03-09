@@ -98,14 +98,14 @@ script = ExtResource("1_bxpsy")
 vertical_min = -0.4
 vertical_max = 1.5
 metadata/_edit_vertical_guides_ = [961.0, 1685.0]
-metadata/_edit_horizontal_guides_ = [99.0]
+metadata/_edit_horizontal_guides_ = [48.0]
 
 [node name="VideoControlsButtonContainer" type="MarginContainer" parent="."]
 z_index = 100
 layout_mode = 1
-offset_top = 96.0
+offset_top = 48.0
 offset_right = 401.0
-offset_bottom = 1443.0
+offset_bottom = 1420.0
 scale = Vector2(0.65, 0.65)
 mouse_filter = 0
 theme = ExtResource("1_6w5i7")
@@ -306,10 +306,10 @@ vertical_alignment = 2
 
 [node name="CharacterButtonContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
-offset_left = 1707.0
-offset_top = 99.0
-offset_right = 2731.0
-offset_bottom = 2475.0
+offset_left = 1685.0
+offset_top = 48.0
+offset_right = 2755.0
+offset_bottom = 2424.0
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.15, 0.15)
@@ -318,6 +318,7 @@ size_flags_vertical = 4
 size_flags_stretch_ratio = 0.0
 mouse_filter = 0
 theme_override_constants/separation = 200
+metadata/_edit_group_ = true
 
 [node name="MaleButton" type="HBoxContainer" parent="CharacterButtonContainer"]
 layout_mode = 2
@@ -338,6 +339,7 @@ size_flags_vertical = 8
 mouse_filter = 0
 theme = ExtResource("1_6w5i7")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.317647, 0.34902, 0.368627, 1)
 theme_override_constants/line_spacing = 0
 theme_override_fonts/font = ExtResource("3_qru45")
 theme_override_font_sizes/font_size = 250

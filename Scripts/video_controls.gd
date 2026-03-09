@@ -29,7 +29,7 @@ signal character_requested(scene_path: String)
 @export var vertical_speed: float = 1.5
 @export var mouse_orbit_speed: float = 0.015
 @export var mouse_vertical_speed: float = 0.015
-@export var zoom_speed: float = 1.5
+@export var zoom_speed: float = 3.0
 @export var mouse_zoom_step: float = 0.6
 @export var zoom_min: float = 2.0
 @export var zoom_max: float = 10.0
@@ -96,7 +96,7 @@ func _ready() -> void:
 # Set active dancer
 # Called by FullscreenScene.set_dancer()
 # ----------------------------
-func set_dancer(dancer_node: Node3D) -> void:
+func set_dancer(dancer_node: Node3D, reset_camera_position: bool = true) -> void:
 	dancer = dancer_node
 
 	camera = get_node_or_null("../SubViewportContainer/DancerViewport/Background/Camera3D")
@@ -108,11 +108,11 @@ func set_dancer(dancer_node: Node3D) -> void:
 
 	_update_pivot()
 
-	if is_first_dancer:
-		is_first_dancer = false
-		distance = default_distance
+	# Only reset camera if requested (new term, not character swap)
+	if reset_camera_position:
+		distance = 6.0
 		horizontal_angle = 0.0
-		vertical_offset = 0.0
+		vertical_offset = 0.3
 		_save_home_state()
 
 	_update_camera()
@@ -236,7 +236,7 @@ func _save_home_state() -> void:
 func reset_camera() -> void:
 	distance = home_distance
 	horizontal_angle = home_horizontal_angle
-	home_vertical_offset = vertical_offset
+	vertical_offset = home_vertical_offset
 	_update_camera()
 
 
@@ -252,6 +252,11 @@ func _gui_input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventMouseButton:
+		# Right click to reset camera
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			reset_camera()
+			return
+		
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			dragging = event.pressed
 			drag_axis = ""
