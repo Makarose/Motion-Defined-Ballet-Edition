@@ -10,6 +10,7 @@ signal term_selected(term: String, anim_name: String, definition: String)
 signal fullscreen_requested
 signal back_pressed
 signal index_pressed
+signal replay_requested
 
 # ----------------------------
 # Nodes
@@ -18,10 +19,13 @@ signal index_pressed
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-@onready var fullscreen_container: Control = $CanvasLayer/FullscreenContainer
 @onready var back_button: TextureButton = $CanvasLayer/BackButtonContainer/MarginContainer/BackButton
 @onready var index_button: TextureButton = $CanvasLayer/IndexButtonContainer/Container/IndexButton
-@onready var fullscreen_button: Button = $CanvasLayer/FullscreenContainer/FullscreenButton
+@onready var replay_container: MarginContainer = $CanvasLayer/ReplayContainer
+@onready var replay_button: TextureButton = $CanvasLayer/ReplayContainer/HBoxContainer/ReplayButton
+@onready var fullscreen_container: MarginContainer = $CanvasLayer/FullscreenContainer
+@onready var fullscreen_button: TextureButton = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenButton
+
 
 # ----------------------------
 # Resources
@@ -48,6 +52,14 @@ func _ready() -> void:
 		fullscreen_container.visible = false
 	else:
 		fullscreen_container.visible = true
+		
+	# Hide replay button initially
+	if replay_container:
+		replay_container.visible = false
+		
+	# Replay button
+	if replay_button:
+		replay_button.pressed.connect(_on_replay_pressed)
 
 	# Load database if not set in inspector
 	if not database:
@@ -232,7 +244,25 @@ func hide_fullscreen_button() -> void:
 func _on_fullscreen_key_pressed() -> void:
 	if fullscreen_container.visible:
 		emit_signal("fullscreen_requested")
+		
+		
+# ----------------------------
+# Replay Button Visibility
+# ----------------------------		
+func show_replay_button() -> void:
+	if replay_container:
+		replay_container.visible = true
+	hide_fullscreen_button()
 
+func hide_replay_button() -> void:
+	if replay_container:
+		replay_container.visible = false
+		
+# ----------------------------
+# Replay button pressed
+# ----------------------------
+func _on_replay_pressed() -> void:
+	emit_signal("replay_requested")
 
 # ----------------------------
 # Navigation — emit signals up, never change scene directly
@@ -283,3 +313,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("launch_fullscreen", false):
 		get_viewport().set_input_as_handled()
 		_on_fullscreen_key_pressed()
+		
+	if event.is_action_pressed("replay_from_main", false):
+		get_viewport().set_input_as_handled()
+		_on_replay_pressed()

@@ -32,6 +32,7 @@ func _ready() -> void:
 	main_scene_ui.fullscreen_requested.connect(_on_fullscreen_requested)
 	main_scene_ui.back_pressed.connect(_on_nav_left)
 	main_scene_ui.index_pressed.connect(_on_nav_right)
+	main_scene_ui.replay_requested.connect(_on_replay_requested)
 
 	# Wire up FullscreenScene signals
 	fullscreen_scene.exit_requested.connect(_on_fullscreen_exit)
@@ -77,7 +78,7 @@ func _spawn_dancer(scene_path: String) -> void:
 
 func _on_animation_finished(anim_name: String) -> void:
 	print("[MainScene] Animation finished:", anim_name)
-	main_scene_ui.hide_fullscreen_button()
+	main_scene_ui.show_replay_button()
 
 # ----------------------------
 # Find exact animation clip name on dancer
@@ -123,6 +124,7 @@ func _on_term_selected(term: String, anim_name: String, definition: String) -> v
 	print("[MainScene] Term selected:", term)
 	GameManager.selected_definition = definition
 	_play_term(term, anim_name)
+	main_scene_ui.hide_replay_button()
 	main_scene_ui.show_fullscreen_button()
 
 
@@ -151,6 +153,15 @@ func _on_fullscreen_exit() -> void:
 	# Re-focus search bar
 	await get_tree().process_frame
 	main_scene_ui.search_bar.grab_focus()
+	
+# ----------------------------
+# Replay requested
+# ----------------------------
+func _on_replay_requested() -> void:
+	if current_dancer:
+		current_dancer.replay_last_animation()
+		main_scene_ui.hide_replay_button()
+		main_scene_ui.show_fullscreen_button()
 
 
 # ----------------------------

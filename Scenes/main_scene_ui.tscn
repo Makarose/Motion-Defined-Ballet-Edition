@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://btkmkmqv4x7r6"]
+[gd_scene load_steps=20 format=3 uid="uid://btkmkmqv4x7r6"]
 
 [ext_resource type="Script" path="res://Scripts/main_scene_ui.gd" id="1_kdlrg"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_5chal"]
@@ -6,11 +6,15 @@
 [ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_qcv70"]
 [ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="5_8xnki"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="6_k4h06"]
+[ext_resource type="Texture2D" uid="uid://d1utahd06e8al" path="res://UI Buttons/2.png" id="7_4dh48"]
 [ext_resource type="Texture2D" uid="uid://m7lpnticn8bw" path="res://UI Buttons/5.png" id="7_g5m7v"]
 [ext_resource type="Texture2D" uid="uid://myav0h3tsxl0" path="res://UI Buttons/index_selected_button.png" id="8_g1di3"]
+[ext_resource type="Texture2D" uid="uid://b68jgbun7v6o8" path="res://UI Buttons/replay_selected_button.png" id="8_g74qh"]
 [ext_resource type="Texture2D" uid="uid://dydr5wiqss10u" path="res://UI Buttons/index_highlight_button.png" id="9_o8m5u"]
+[ext_resource type="Texture2D" uid="uid://dhxuxv0riqku2" path="res://UI Buttons/replay_highlight_button.png" id="9_t8oak"]
 [ext_resource type="Texture2D" uid="uid://dwwyxsih8n68u" path="res://UI Buttons/20.png" id="10_lmvg8"]
-[ext_resource type="FontFile" uid="uid://g4troxv2sunt" path="res://Fonts/Tinos-Bold.ttf" id="10_q6sqb"]
+[ext_resource type="Texture2D" uid="uid://vnwwsbv0mckb" path="res://UI Buttons/fullscreen_select_button.png" id="11_cob2b"]
+[ext_resource type="Texture2D" uid="uid://coqs1kq51lxuf" path="res://UI Buttons/fullscreen_highlight_button.png" id="12_h21d2"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_d2ish"]
 font = ExtResource("6_k4h06")
@@ -27,24 +31,6 @@ shadow_size = 0
 [sub_resource type="LabelSettings" id="LabelSettings_djaeu"]
 font = ExtResource("6_k4h06")
 font_size = 50
-outline_size = 10
-outline_color = Color(0.317647, 0.34902, 0.368627, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l6koy"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.180392, 0.968627, 0.0392157, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jos6f"]
-bg_color = Color(0.6, 0.6, 0.6, 0.0117647)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.180392, 0.968627, 0.0392157, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
@@ -218,6 +204,76 @@ label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ReplayContainer" type="MarginContainer" parent="CanvasLayer"]
+z_index = 10
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 734.0
+offset_top = -545.0
+offset_right = 1351.0
+offset_bottom = -298.0
+grow_vertical = 0
+scale = Vector2(0.511553, 0.49862)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ReplayContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="ReplayButton" type="TextureButton" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("7_4dh48")
+texture_pressed = ExtResource("8_g74qh")
+texture_hover = ExtResource("9_t8oak")
+
+[node name="Label" type="Label" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "REPLAY [F2]"
+label_settings = SubResource("LabelSettings_djaeu")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FullscreenContainer" type="MarginContainer" parent="CanvasLayer"]
+z_index = 10
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 734.0
+offset_top = -545.0
+offset_right = 1351.0
+offset_bottom = -298.0
+grow_vertical = 0
+scale = Vector2(0.511553, 0.49862)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FullscreenContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="FullscreenButton" type="TextureButton" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("10_lmvg8")
+texture_pressed = ExtResource("11_cob2b")
+texture_hover = ExtResource("12_h21d2")
+
+[node name="Label" type="Label" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "FULLSCREEN [F1]"
+label_settings = SubResource("LabelSettings_djaeu")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="IndexButtonContainer" type="MarginContainer" parent="CanvasLayer"]
 custom_minimum_size = Vector2(75, 75)
 anchors_preset = 3
@@ -258,38 +314,6 @@ text = "INDEX
 label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 2
-
-[node name="FullscreenContainer" type="MarginContainer" parent="CanvasLayer"]
-custom_minimum_size = Vector2(75, 75)
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -1211.0
-offset_top = -528.0
-offset_right = -541.0
-offset_bottom = -348.0
-grow_horizontal = 0
-grow_vertical = 0
-scale = Vector2(0.5, 0.493487)
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
-
-[node name="FullscreenButton" type="Button" parent="CanvasLayer/FullscreenContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("10_q6sqb")
-theme_override_font_sizes/font_size = 50
-theme_override_styles/focus = SubResource("StyleBoxFlat_l6koy")
-theme_override_styles/hover = SubResource("StyleBoxFlat_jos6f")
-text = "FULLSCREEN [F1]"
-icon = ExtResource("10_lmvg8")
 
 [node name="BackgroundColourPanel" type="Panel" parent="."]
 z_index = -100
