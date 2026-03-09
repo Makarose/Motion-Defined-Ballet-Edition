@@ -28,9 +28,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_dxerr")
+metadata/_edit_horizontal_guides_ = [875.0, 163.0]
+metadata/_edit_vertical_guides_ = [99.0, 1816.0]
 
 [node name="PanelContainer" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 theme = ExtResource("2_vj8j2")
@@ -46,7 +49,7 @@ offset_top = 50.0
 offset_right = 100.0
 offset_bottom = 162.0
 grow_horizontal = 2
-scale = Vector2(0.896355, 0.892692)
+scale = Vector2(0.893817, 0.892692)
 metadata/_edit_group_ = true
 
 [node name="MainTitle" type="PanelContainer" parent="MarginContainer"]
@@ -102,3 +105,42 @@ text = "HOME
 label_settings = SubResource("LabelSettings_hd13h")
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 99.0
+offset_top = 163.0
+offset_right = 1816.0
+offset_bottom = 875.0
+color = Color(0.233926, 0.233925, 0.233925, 1)
+
+[node name="TextEdit" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 163.0
+offset_right = 1815.0
+offset_bottom = 875.0
+theme_override_font_sizes/normal_font_size = 30
+bbcode_enabled = true
+text = "
+[center]Choose an animation by typing a term in the searchbar,
+or by selecting one from the index page. 
+
+Once a term has been selected, a fullscreen button will appear, select it to access more features.
+
+Navigate the camera in fullscreen using the arrow keys.
+Press the + and - keys to zoom in and out. 
+Select the home key to return to the default position. 
+
+The camera can also be moved with the mouse. 
+
+Click and hold the left mouse button while scrolling left or right to rotate horizontally. 
+Click and hold the left mouse button while scrolling up or down to move vertically. 
+Use the mouse wheel to zoom in and out. 
+Click the right mouse button to return to the default position. 
+
+Left click and drag on the video bar below the animation to move the animation forward or backwards. 
+
+Hit ESC at anytime to close the program.
+"
+autowrap_mode = 2

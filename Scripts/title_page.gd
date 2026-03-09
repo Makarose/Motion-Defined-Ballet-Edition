@@ -5,6 +5,7 @@ extends Control
 
 @onready var music_button: TextureButton = $MarginContainer/HBoxContainer/MusicContainer/HBoxContainer/MusicButton
 @onready var instructions_button: TextureButton = $MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
+@onready var exit_button: TextureButton = $MarginContainer/HBoxContainer/ExitContainer/HBoxContainer/ExitButton
 
 # ----------------------------
 # Ready
@@ -34,6 +35,17 @@ func _ready() -> void:
 		print("[TitlePage] Instructions button connected!")
 	else:
 		print("[TitlePage] ERROR: instructions_button is null!")
+		
+	# Connect exit button
+	if exit_button:
+		print("[TitlePage] Exit button found, connecting...")
+		exit_button.pressed.connect(func():
+			print("[TitlePage] Exit button CLICKED!")
+			_on_exit_pressed()
+		)
+		print("[TitlePage] Exit button connected!")
+	else:
+		print("[TitlePage] ERROR: exit_button is null!")
 
 
 # ----------------------------
@@ -54,6 +66,12 @@ func _on_female_pressed() -> void:
 # ----------------------------
 func _on_instructions_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
+	
+# ----------------------------
+# Exit
+# ----------------------------
+func _on_exit_pressed() -> void:
+	GameManager.quit_dialog.popup_centered()
 
 # ----------------------------
 # Keyboard shortcuts

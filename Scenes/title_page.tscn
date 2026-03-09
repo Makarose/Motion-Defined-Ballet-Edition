@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://ccwvu0vry3nfd"]
+[gd_scene load_steps=24 format=3 uid="uid://ccwvu0vry3nfd"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_k3hol"]
 [ext_resource type="Script" path="res://Scripts/title_page.gd" id="1_ybhyw"]
@@ -11,6 +11,9 @@
 [ext_resource type="Texture2D" uid="uid://digw4nhjq1tnd" path="res://UI Buttons/23.png" id="9_k24v0"]
 [ext_resource type="Texture2D" uid="uid://lk4awiw5nwlq" path="res://UI Buttons/question_select_button.png" id="10_wfmks"]
 [ext_resource type="Texture2D" uid="uid://3vmogbf8sxb1" path="res://UI Buttons/question_highlight_button.png" id="11_dsfuj"]
+[ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="12_y5oyt"]
+[ext_resource type="Texture2D" uid="uid://dj05fyuer3itm" path="res://UI Buttons/exit_select_button.png" id="13_omdh2"]
+[ext_resource type="Texture2D" uid="uid://41h2mvauywyd" path="res://UI Buttons/exit_highlight_button.png" id="14_vht4l"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0d775"]
 bg_color = Color(0.643137, 0.729412, 0.776471, 1)
@@ -247,6 +250,34 @@ texture_hover = ExtResource("11_dsfuj")
 layout_mode = 2
 size_flags_horizontal = 4
 text = "INSTRUCTIONS [F4]"
+label_settings = SubResource("LabelSettings_jdrat")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExitContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/ExitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="ExitButton" type="TextureButton" parent="MarginContainer/HBoxContainer/ExitContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("12_y5oyt")
+texture_pressed = ExtResource("13_omdh2")
+texture_hover = ExtResource("14_vht4l")
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/ExitContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
+theme_override_constants/outline_size = 10
+text = "EXIT [ESC]"
 label_settings = SubResource("LabelSettings_jdrat")
 horizontal_alignment = 1
 vertical_alignment = 1
