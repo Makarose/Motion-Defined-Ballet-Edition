@@ -129,6 +129,15 @@ func _on_search_changed(new_text: String) -> void:
 			item_list.add_item(move.name)
 
 	item_list.visible = item_list.get_item_count() > 0
+	
+	# Auto-select exact match
+	if item_list.get_item_count() > 0:
+		for i in range(item_list.get_item_count()):
+			if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
+				current_index = i
+				item_list.select(i)
+				item_list.ensure_current_is_visible()
+				break
 
 
 # ----------------------------

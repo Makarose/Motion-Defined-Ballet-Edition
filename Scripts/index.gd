@@ -66,6 +66,15 @@ func _on_search_changed(new_text: String) -> void:
 		if normalized == "" or GameManager.normalize(t).begins_with(normalized):
 			filtered.append(t)
 	_populate_list(filtered)
+	
+	# Auto-select exact match
+	if term_list.get_item_count() > 0:
+		for i in range(term_list.get_item_count()):
+			if GameManager.normalize(term_list.get_item_text(i)) == normalized:
+				current_index = i
+				term_list.select(i)
+				term_list.ensure_current_is_visible()
+				break
 
 
 # ----------------------------
