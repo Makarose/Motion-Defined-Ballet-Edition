@@ -1,0 +1,104 @@
+[gd_scene load_steps=9 format=3 uid="uid://iaqbchp0hodd"]
+
+[ext_resource type="Script" path="res://Scripts/instructions.gd" id="1_dxerr"]
+[ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_vj8j2"]
+[ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_peq0w"]
+[ext_resource type="Texture2D" uid="uid://c70g6jkijl6yl" path="res://UI Buttons/18.png" id="4_tq2sl"]
+[ext_resource type="Texture2D" uid="uid://dvd8voictywof" path="res://UI Buttons/home_selected_button.png" id="5_htnsp"]
+[ext_resource type="Texture2D" uid="uid://cos3cyr6eott2" path="res://UI Buttons/home_highlight_button.png" id="6_k2i7n"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_vxh4s"]
+font = ExtResource("3_peq0w")
+font_size = 100
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hd13h"]
+font = ExtResource("3_peq0w")
+font_size = 50
+outline_size = 15
+outline_color = Color(0.317647, 0.34902, 0.368627, 1)
+
+[node name="Instructions" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dxerr")
+
+[node name="PanelContainer" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme = ExtResource("2_vj8j2")
+color = Color(0.643137, 0.729412, 0.776471, 1)
+metadata/_edit_group_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_left = 100.0
+offset_top = 50.0
+offset_right = 100.0
+offset_bottom = 162.0
+grow_horizontal = 2
+scale = Vector2(0.896355, 0.892692)
+metadata/_edit_group_ = true
+
+[node name="MainTitle" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("2_vj8j2")
+
+[node name="Index" type="Label" parent="MarginContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_peq0w")
+text = "INSTRUCTIONS
+"
+label_settings = SubResource("LabelSettings_vxh4s")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Home" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1822.0
+offset_top = -176.0
+offset_right = -1399.0
+offset_bottom = 71.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 0
+
+[node name="MarginContainer" type="VBoxContainer" parent="Home"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HomeButton" type="TextureButton" parent="Home/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_tq2sl")
+texture_pressed = ExtResource("5_htnsp")
+texture_hover = ExtResource("6_k2i7n")
+
+[node name="Label" type="Label" parent="Home/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "HOME
+[CTRL+L]"
+label_settings = SubResource("LabelSettings_hd13h")
+horizontal_alignment = 1
+vertical_alignment = 2

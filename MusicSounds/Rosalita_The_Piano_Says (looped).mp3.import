@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d2v5dxhuq7k8p"
+path="res://.godot/imported/Rosalita_The_Piano_Says (looped).mp3-eb9ddc125de58576a174a8c782492509.mp3str"
+
+[deps]
+
+source_file="res://MusicSounds/Rosalita_The_Piano_Says (looped).mp3"
+dest_files=["res://.godot/imported/Rosalita_The_Piano_Says (looped).mp3-eb9ddc125de58576a174a8c782492509.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

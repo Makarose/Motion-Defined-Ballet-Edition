@@ -1,10 +1,16 @@
-[gd_scene load_steps=14 format=3 uid="uid://ccwvu0vry3nfd"]
+[gd_scene load_steps=21 format=3 uid="uid://ccwvu0vry3nfd"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_k3hol"]
 [ext_resource type="Script" path="res://Scripts/title_page.gd" id="1_ybhyw"]
 [ext_resource type="Texture2D" uid="uid://cctx36p3ddvom" path="res://Characters/male.png" id="3_xmies"]
 [ext_resource type="Texture2D" uid="uid://bfgbxmoappbvn" path="res://Characters/female.png" id="4_hu7ph"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="5_ix5ab"]
+[ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="6_5qx5v"]
+[ext_resource type="Texture2D" uid="uid://cbj25vc3nr1uq" path="res://UI Buttons/music_select_button.png" id="7_b5kya"]
+[ext_resource type="Texture2D" uid="uid://ceiehxh5124ow" path="res://UI Buttons/music_highlight_button.png" id="8_4mofw"]
+[ext_resource type="Texture2D" uid="uid://digw4nhjq1tnd" path="res://UI Buttons/23.png" id="9_k24v0"]
+[ext_resource type="Texture2D" uid="uid://lk4awiw5nwlq" path="res://UI Buttons/question_select_button.png" id="10_wfmks"]
+[ext_resource type="Texture2D" uid="uid://3vmogbf8sxb1" path="res://UI Buttons/question_highlight_button.png" id="11_dsfuj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0d775"]
 bg_color = Color(0.643137, 0.729412, 0.776471, 1)
@@ -58,6 +64,10 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_jdrat"]
+font = ExtResource("5_ix5ab")
+font_size = 50
+
 [node name="TitlePage" type="Control" groups=["blocks_nav"]]
 layout_mode = 3
 anchors_preset = 15
@@ -67,7 +77,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ybhyw")
 metadata/_edit_vertical_guides_ = [960.0]
-metadata/_edit_horizontal_guides_ = [900.0]
+metadata/_edit_horizontal_guides_ = [875.0]
 
 [node name="PanelContainer" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
@@ -105,10 +115,10 @@ anchor_top = 0.0583333
 anchor_right = 0.0338542
 anchor_bottom = 0.0583333
 offset_left = 473.0
-offset_top = 339.0
+offset_top = 355.0
 offset_right = 2179.0
-offset_bottom = 1427.0
-scale = Vector2(0.5, 0.5)
+offset_bottom = 1443.0
+scale = Vector2(0.5, 0.42)
 theme_override_constants/separation = 250
 
 [node name="Male" type="Button" parent="HBoxContainer"]
@@ -158,13 +168,97 @@ label_settings = SubResource("LabelSettings_27k02")
 [node name="ChooseYourDancer" type="Label" parent="."]
 layout_mode = 0
 offset_left = 340.0
-offset_top = 230.0
+offset_top = 231.0
 offset_right = 1586.0
-offset_bottom = 397.0
+offset_bottom = 398.0
 text = "Choose Your Dancer"
 label_settings = SubResource("LabelSettings_q4hbm")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -582.0
+offset_top = 404.0
+offset_right = 766.0
+offset_bottom = 526.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.896355, 0.892692)
+metadata/_edit_group_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 150
+
+[node name="MusicContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MusicContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="MusicButton" type="TextureButton" parent="MarginContainer/HBoxContainer/MusicContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("6_5qx5v")
+texture_pressed = ExtResource("7_b5kya")
+texture_hover = ExtResource("8_4mofw")
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
+theme_override_constants/outline_size = 10
+text = "MUSIC ON/OFF [F3]"
+label_settings = SubResource("LabelSettings_jdrat")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/InstructionsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="InstructionsButton" type="TextureButton" parent="MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("9_k24v0")
+texture_pressed = ExtResource("10_wfmks")
+texture_hover = ExtResource("11_dsfuj")
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INSTRUCTIONS [F4]"
+label_settings = SubResource("LabelSettings_jdrat")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_top = 916.0
+offset_right = 40.0
+offset_bottom = 956.0
+scale = Vector2(48.0006, 4.07938)
+mouse_filter = 2
+color = Color(0.482353, 0.635294, 0.721569, 1)
 
 [connection signal="pressed" from="HBoxContainer/Male" to="." method="_on_male_pressed"]
 [connection signal="pressed" from="HBoxContainer/Female" to="." method="_on_female_pressed"]

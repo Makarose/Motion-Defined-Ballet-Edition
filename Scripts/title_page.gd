@@ -3,13 +3,37 @@
 # ----------------------------
 extends Control
 
+@onready var music_button: TextureButton = $MarginContainer/HBoxContainer/MusicContainer/HBoxContainer/MusicButton
+@onready var instructions_button: TextureButton = $MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
+
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
 	print("[TitlePage] Ready")
-	# Clear any leftover term state from a previous session
 	GameManager.clear_term_state()
+	
+	# Connect music button
+	if music_button:
+		print("[TitlePage] Music button found, connecting...")
+		music_button.pressed.connect(func(): 
+			print("[TitlePage] Music button CLICKED!")
+			GameManager.toggle_music()
+		)
+		print("[TitlePage] Music button connected!")
+	else:
+		print("[TitlePage] ERROR: music_button is null!")
+	
+	# Connect instructions button
+	if instructions_button:
+		print("[TitlePage] Instructions button found, connecting...")
+		instructions_button.pressed.connect(func():
+			print("[TitlePage] Instructions button CLICKED!")
+			_on_instructions_pressed()
+		)
+		print("[TitlePage] Instructions button connected!")
+	else:
+		print("[TitlePage] ERROR: instructions_button is null!")
 
 
 # ----------------------------
@@ -24,7 +48,12 @@ func _on_female_pressed() -> void:
 	print("[TitlePage] Female selected")
 	GameManager.chosen_character = "res://Scenes/female.tscn"
 	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
-
+	
+# ----------------------------
+# Instructions Selected
+# ----------------------------
+func _on_instructions_pressed() -> void:
+	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
 
 # ----------------------------
 # Keyboard shortcuts
@@ -32,6 +61,23 @@ func _on_female_pressed() -> void:
 func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
+	
+	print("[TitlePage] Key pressed:", event.keycode)
+	
+	# Check for music toggle first
+	if event.is_action_pressed("music_toggle"):
+		print("[TitlePage] Music toggle detected!")
+		get_viewport().set_input_as_handled()
+		GameManager.toggle_music()
+		return
+		
+	# Check for instructions
+	if event.is_action_pressed("open_instructions"):
+		print("[TitlePage] Instructions detected!")
+		get_viewport().set_input_as_handled()
+		_on_instructions_pressed()
+		return
+	
 	match event.keycode:
 		KEY_1, KEY_KP_1:
 			_on_male_pressed()

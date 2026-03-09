@@ -23,6 +23,8 @@ var playback_time: float = 0.0
 var is_paused: bool = false
 var is_looping: bool = false
 var is_fullscreen: bool = false
+var music_player: AudioStreamPlayer = null
+var music_enabled: bool = true
 
 # ----------------------------
 # Database
@@ -59,6 +61,13 @@ func _ready() -> void:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", 24)
+		
+	# Create music player
+	music_player = AudioStreamPlayer.new()
+	music_player.stream = preload("res://MusicSounds/Rosalita_The_Piano_Says (looped).mp3")  # Change to your music file path
+	music_player.autoplay = true
+	add_child(music_player)
+	music_player.play()
 		
 # ----------------------------
 # Database helpers
@@ -144,6 +153,17 @@ func strip_accents(text: String) -> String:
 func normalize(text: String) -> String:
 	return strip_accents(text).to_lower()
 	
+
+# ----------------------------
+# Music Toggle
+# ----------------------------		
+func toggle_music() -> void:
+	print("[GameManager] toggle_music() called!")
+	music_enabled = !music_enabled
+	if music_enabled:
+		music_player.play()
+	else:
+		music_player.stop()
 	
 # ----------------------------
 # Quit Warnings
