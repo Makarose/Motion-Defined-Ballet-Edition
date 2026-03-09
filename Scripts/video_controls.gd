@@ -74,6 +74,16 @@ func _ready() -> void:
 	exit_button.pressed.connect(_on_exit_pressed)
 	male_button.pressed.connect(_on_male_pressed)
 	female_button.pressed.connect(_on_female_pressed)
+	
+	# Disable focus on all buttons so they don't capture Enter/Space
+	pause_button.focus_mode = Control.FOCUS_NONE
+	play_button.focus_mode = Control.FOCUS_NONE
+	replay_button.focus_mode = Control.FOCUS_NONE
+	loop_button.focus_mode = Control.FOCUS_NONE
+	stop_button.focus_mode = Control.FOCUS_NONE
+	exit_button.focus_mode = Control.FOCUS_NONE
+	male_button.focus_mode = Control.FOCUS_NONE
+	female_button.focus_mode = Control.FOCUS_NONE
 
 	# Wire up scrub slider
 	scrub_slider.drag_started.connect(_on_scrub_started)
