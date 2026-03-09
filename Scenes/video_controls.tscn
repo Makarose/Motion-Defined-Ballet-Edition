@@ -386,6 +386,9 @@ layout_mode = 2
 max_value = 1.0
 step = 0.001
 
+[node name="TimeLabel" type="Label" parent="SliderContainer"]
+layout_mode = 2
+
 [connection signal="pressed" from="VideoControlsButtonContainer/VContainerButtons/PauseContainer/Pause/PauseButton" to="." method="_on_pause_button_pressed"]
 [connection signal="pressed" from="VideoControlsButtonContainer/VContainerButtons/PlayContainer/Play/PlayButton" to="." method="_on_play_button_pressed"]
 [connection signal="pressed" from="VideoControlsButtonContainer/VContainerButtons/ReplayContainer/Replay/ReplayButton" to="." method="_on_replay_button_pressed"]

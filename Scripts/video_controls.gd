@@ -21,6 +21,7 @@ signal character_requested(scene_path: String)
 @onready var male_button: Button = $CharacterButtonContainer/MaleButton/MaleButton
 @onready var female_button: Button = $CharacterButtonContainer/FemaleButton/FemaleButton
 @onready var scrub_slider: HSlider = $SliderContainer/ScrubSlider
+@onready var time_label: Label = $SliderContainer/TimeLabel
 
 # ----------------------------
 # Camera tunables
@@ -91,6 +92,52 @@ func _ready() -> void:
 	scrub_slider.drag_ended.connect(_on_scrub_ended)
 	scrub_slider.min_value = 0.0
 	scrub_slider.value = 0.0
+	
+	# Style the scrub slider - red filled bar
+	var grabber_area = StyleBoxFlat.new()
+	grabber_area.bg_color = Color(1, 0, 0, 1)  # Red
+	scrub_slider.add_theme_stylebox_override("grabber_area", grabber_area)
+	scrub_slider.add_theme_stylebox_override("grabber_area_highlight", grabber_area)
+	
+	
+# ----------------------------
+# Process — camera controls and scrub bar update
+# ----------------------------
+func _process(delta: float) -> void:
+	if not visible or camera == null or dancer == null:
+		return
+
+	# Keyboard camera controls
+	if Input.is_action_pressed("camera_left"):
+		horizontal_angle += orbit_speed * delta
+	if Input.is_action_pressed("camera_right"):
+		horizontal_angle -= orbit_speed * delta
+	if Input.is_action_pressed("camera_up"):
+		vertical_offset += vertical_speed * delta
+	if Input.is_action_pressed("camera_down"):
+		vertical_offset -= vertical_speed * delta
+	if Input.is_action_pressed("zoom_in"):
+		distance -= zoom_speed * delta
+	if Input.is_action_pressed("zoom_out"):
+		distance += zoom_speed * delta
+
+	distance = clamp(distance, zoom_min, zoom_max)
+	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
+	_update_camera()
+
+	# Update scrub slider position in real time
+	if not scrub_active:
+		var state = dancer.get_playback_state()
+		var current_time = state.get("time", 0.0)
+		var length = state.get("length", 0.0)
+		if length > 0.0 and scrub_slider.max_value != length:
+			scrub_slider.max_value = length
+		scrub_slider.value = current_time
+		
+		# Update time label
+		if time_label:
+			time_label.text = "%0.1f / %0.1f" % [current_time, length]
+
 
 # ----------------------------
 # Set active dancer
@@ -154,11 +201,16 @@ func _on_scrub_started() -> void:
 func _on_scrub_changed(value: float) -> void:
 	if dancer != null and scrub_active:
 		dancer.seek_to_time(value)
+		# Update time label while scrubbing
+		if time_label:
+			var state = dancer.get_playback_state()
+			var length = state.get("length", 0.0)
+			time_label.text = "%0.1f / %0.1f" % [value, length]
 
 func _on_scrub_ended(_value_changed: bool = false) -> void:
 	scrub_active = false
-	if dancer != null and was_playing_before_scrub:
-		dancer.resume_animation()
+	# Don't auto-resume - keep it paused after scrubbing
+	# User must manually press play to continue
 
 
 # ----------------------------
@@ -332,38 +384,3 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("female_button", false):
 		get_viewport().set_input_as_handled()
 		_on_female_pressed()
-
-
-# ----------------------------
-# Process — camera controls and scrub bar update
-# ----------------------------
-func _process(delta: float) -> void:
-	if not visible or camera == null or dancer == null:
-		return
-
-	# Keyboard camera controls
-	if Input.is_action_pressed("camera_left"):
-		horizontal_angle += orbit_speed * delta
-	if Input.is_action_pressed("camera_right"):
-		horizontal_angle -= orbit_speed * delta
-	if Input.is_action_pressed("camera_up"):
-		vertical_offset += vertical_speed * delta
-	if Input.is_action_pressed("camera_down"):
-		vertical_offset -= vertical_speed * delta
-	if Input.is_action_pressed("zoom_in"):
-		distance -= zoom_speed * delta
-	if Input.is_action_pressed("zoom_out"):
-		distance += zoom_speed * delta
-
-	distance = clamp(distance, zoom_min, zoom_max)
-	vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
-	_update_camera()
-
-	# Update scrub slider position in real time
-	if not scrub_active:
-		var state = dancer.get_playback_state()
-		var current_time = state.get("time", 0.0)
-		var length = state.get("length", 0.0)
-		if length > 0.0 and scrub_slider.max_value != length:
-			scrub_slider.max_value = length
-		scrub_slider.value = current_time
