@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://btkmkmqv4x7r6"]
+[gd_scene load_steps=33 format=3 uid="uid://btkmkmqv4x7r6"]
 
 [ext_resource type="Script" path="res://Scripts/main_scene_ui.gd" id="1_kdlrg"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_5chal"]
@@ -12,9 +12,12 @@
 [ext_resource type="Texture2D" uid="uid://b68jgbun7v6o8" path="res://UI Buttons/replay_selected_button.png" id="8_g74qh"]
 [ext_resource type="Texture2D" uid="uid://dydr5wiqss10u" path="res://UI Buttons/index_highlight_button.png" id="9_o8m5u"]
 [ext_resource type="Texture2D" uid="uid://dhxuxv0riqku2" path="res://UI Buttons/replay_highlight_button.png" id="9_t8oak"]
+[ext_resource type="Texture2D" uid="uid://digw4nhjq1tnd" path="res://UI Buttons/23.png" id="10_71b5s"]
 [ext_resource type="Texture2D" uid="uid://dwwyxsih8n68u" path="res://UI Buttons/20.png" id="10_lmvg8"]
 [ext_resource type="Texture2D" uid="uid://vnwwsbv0mckb" path="res://UI Buttons/fullscreen_select_button.png" id="11_cob2b"]
+[ext_resource type="Texture2D" uid="uid://lk4awiw5nwlq" path="res://UI Buttons/question_select_button.png" id="11_n5017"]
 [ext_resource type="Texture2D" uid="uid://coqs1kq51lxuf" path="res://UI Buttons/fullscreen_highlight_button.png" id="12_h21d2"]
+[ext_resource type="Texture2D" uid="uid://3vmogbf8sxb1" path="res://UI Buttons/question_highlight_button.png" id="12_j6q0m"]
 [ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="13_weboj"]
 [ext_resource type="Texture2D" uid="uid://cbj25vc3nr1uq" path="res://UI Buttons/music_select_button.png" id="14_tb4d2"]
 [ext_resource type="Texture2D" uid="uid://ceiehxh5124ow" path="res://UI Buttons/music_highlight_button.png" id="15_s0j6n"]
@@ -56,6 +59,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kdlrg")
+replay_timeout_seconds = 3.0
 metadata/_edit_vertical_guides_ = [1817.0, 692.0, 100.0, 679.0]
 metadata/_edit_horizontal_guides_ = [1000.0, 875.0, 904.0, 50.0, 150.0, 163.0]
 
@@ -246,6 +250,41 @@ texture_hover = ExtResource("12_h21d2")
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FULLSCREEN [F1]"
+label_settings = SubResource("LabelSettings_djaeu")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RandomContainer" type="MarginContainer" parent="CanvasLayer"]
+z_index = 10
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 734.0
+offset_top = -545.0
+offset_right = 1351.0
+offset_bottom = -298.0
+grow_vertical = 0
+scale = Vector2(0.511553, 0.49862)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/RandomContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="RandomButton" type="TextureButton" parent="CanvasLayer/RandomContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("10_71b5s")
+texture_pressed = ExtResource("11_n5017")
+texture_hover = ExtResource("12_j6q0m")
+
+[node name="Label" type="Label" parent="CanvasLayer/RandomContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "RANDOM [F5]"
 label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 1
