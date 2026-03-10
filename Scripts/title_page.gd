@@ -65,6 +65,7 @@ func _on_female_pressed() -> void:
 # Instructions Selected
 # ----------------------------
 func _on_instructions_pressed() -> void:
+	GameManager.previous_scene = "res://Scenes/title_page.tscn"
 	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
 	
 # ----------------------------

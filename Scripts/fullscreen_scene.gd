@@ -19,6 +19,7 @@ signal character_changed(scene_path: String)
 # Runtime state
 # ----------------------------
 var current_dancer: Node3D = null
+var instructions_overlay: Control = null
 
 # ----------------------------
 # Ready
@@ -27,6 +28,7 @@ func _ready() -> void:
 	$CanvasLayer.hide()
 	video_controls.exit_requested.connect(_on_exit_requested)
 	video_controls.character_requested.connect(_on_character_requested)
+	video_controls.instructions_requested.connect(_on_instructions_requested)
 
 # ----------------------------
 # Called by MainScene when fullscreen is shown
@@ -113,3 +115,35 @@ func _on_character_requested(scene_path: String) -> void:
 	current_dancer.visible = true
 	video_controls.set_dancer(current_dancer, false)
 	emit_signal("character_changed", scene_path)
+
+
+
+# ----------------------------
+# Instructions Overlay
+# ----------------------------
+func _on_instructions_requested() -> void:
+	# Load and show instructions as an overlay
+	var instructions_scene = load("res://Scenes/instructions.tscn")
+	instructions_overlay = instructions_scene.instantiate()
+	$CanvasLayer.add_child(instructions_overlay)
+	
+	# Hide video controls while instructions are showing
+	video_controls.hide()
+	
+	# Wait a frame for the instructions scene to initialize
+	await get_tree().process_frame
+	
+	# Disconnect the original back button signal and connect to our overlay close
+	var back_button = instructions_overlay.get_node_or_null("MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton")
+	if back_button:
+		# Disconnect all existing connections
+		for connection in back_button.pressed.get_connections():
+			back_button.pressed.disconnect(connection["callable"])
+		# Connect to our function
+		back_button.pressed.connect(_on_instructions_back_pressed)
+
+func _on_instructions_back_pressed() -> void:
+	if instructions_overlay:
+		instructions_overlay.queue_free()
+		instructions_overlay = null
+	video_controls.show()

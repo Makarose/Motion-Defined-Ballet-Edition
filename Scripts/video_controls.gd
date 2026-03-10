@@ -8,6 +8,7 @@ extends Control
 # ----------------------------
 signal exit_requested
 signal character_requested(scene_path: String)
+signal instructions_requested
 
 # ----------------------------
 # Nodes
@@ -22,6 +23,8 @@ signal character_requested(scene_path: String)
 @onready var female_button: Button = $CharacterButtonContainer/FemaleButton/FemaleButton
 @onready var scrub_slider: HSlider = $SliderContainer/ScrubSlider
 @onready var time_label: Label = $SliderContainer/TimeLabel
+@onready var music_button: TextureButton = $MarginContainer2/HBoxContainer/MusicContainer/HBoxContaine/MusicButton
+@onready var instructions_button: TextureButton = $MarginContainer2/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
 
 # ----------------------------
 # Camera tunables
@@ -75,6 +78,13 @@ func _ready() -> void:
 	exit_button.pressed.connect(_on_exit_pressed)
 	male_button.pressed.connect(_on_male_pressed)
 	female_button.pressed.connect(_on_female_pressed)
+	# Music button
+	if music_button:
+		music_button.pressed.connect(GameManager.toggle_music)
+	
+	# Instructions button
+	if instructions_button:
+		instructions_button.pressed.connect(_on_instructions_pressed)
 	
 	# Disable focus on all buttons so they don't capture Enter/Space
 	pause_button.focus_mode = Control.FOCUS_NONE
@@ -337,6 +347,13 @@ func _gui_input(event: InputEvent) -> void:
 
 		last_mouse_pos = event.position
 		_update_camera()
+		
+# ----------------------------
+# Instructions
+# ----------------------------
+func _on_instructions_pressed() -> void:
+	# Signal up to fullscreen_scene to show instructions overlay
+	emit_signal("instructions_requested")
 
 
 # ----------------------------
@@ -384,3 +401,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("female_button", false):
 		get_viewport().set_input_as_handled()
 		_on_female_pressed()
+	if event.is_action_pressed("music_toggle", false):
+		get_viewport().set_input_as_handled()
+		GameManager.toggle_music()
+	if event.is_action_pressed("open_instructions", false):
+		get_viewport().set_input_as_handled()
+		_on_instructions_pressed()

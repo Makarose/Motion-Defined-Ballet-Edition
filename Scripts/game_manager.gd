@@ -25,7 +25,7 @@ var is_looping: bool = false
 var is_fullscreen: bool = false
 var music_player: AudioStreamPlayer = null
 var music_enabled: bool = true
-
+var previous_scene: String = ""
 # ----------------------------
 # Database
 # ----------------------------
@@ -64,9 +64,13 @@ func _ready() -> void:
 		
 	# Create music player
 	music_player = AudioStreamPlayer.new()
-	music_player.stream = preload("res://MusicSounds/Rosalita_The_Piano_Says (looped).mp3")  # Change to your music file path
+	music_player.stream = preload("res://MusicSounds/Rosalita_The_Piano_Says (looped).mp3")
 	music_player.autoplay = true
 	add_child(music_player)
+	
+	# Connect finished signal to loop the music
+	music_player.finished.connect(func(): music_player.play())
+	
 	music_player.play()
 		
 # ----------------------------
@@ -98,6 +102,7 @@ func save_playback_state(dancer: Node3D) -> void:
 	playback_time = state.get("time", 0.0)
 	is_paused = state.get("is_paused", false)
 	is_looping = state.get("is_looping", false)
+	print("[GameManager] Saved state - time:", playback_time, " is_paused:", is_paused, " is_looping:", is_looping)
 
 # ----------------------------
 # Clear term state

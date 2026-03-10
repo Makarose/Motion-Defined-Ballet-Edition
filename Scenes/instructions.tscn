@@ -3,9 +3,9 @@
 [ext_resource type="Script" path="res://Scripts/instructions.gd" id="1_dxerr"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_vj8j2"]
 [ext_resource type="FontFile" uid="uid://1k6ydj6ghbuv" path="res://Fonts/Tinos-Regular.ttf" id="3_peq0w"]
-[ext_resource type="Texture2D" uid="uid://c70g6jkijl6yl" path="res://UI Buttons/18.png" id="4_tq2sl"]
-[ext_resource type="Texture2D" uid="uid://dvd8voictywof" path="res://UI Buttons/home_selected_button.png" id="5_htnsp"]
-[ext_resource type="Texture2D" uid="uid://cos3cyr6eott2" path="res://UI Buttons/home_highlight_button.png" id="6_k2i7n"]
+[ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="4_obl2u"]
+[ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="5_irfwe"]
+[ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="6_q6tis"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_vxh4s"]
 font = ExtResource("3_peq0w")
@@ -14,11 +14,9 @@ outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_hd13h"]
+[sub_resource type="LabelSettings" id="LabelSettings_y71sj"]
 font = ExtResource("3_peq0w")
 font_size = 50
-outline_size = 15
-outline_color = Color(0.317647, 0.34902, 0.368627, 1)
 
 [node name="Instructions" type="Control"]
 layout_mode = 3
@@ -29,7 +27,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_dxerr")
 metadata/_edit_horizontal_guides_ = [875.0, 163.0]
-metadata/_edit_vertical_guides_ = [99.0, 1816.0]
+metadata/_edit_vertical_guides_ = [99.0, 1816.0, 146.0]
 
 [node name="PanelContainer" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(1920, 1080)
@@ -64,47 +62,6 @@ text = "INSTRUCTIONS
 label_settings = SubResource("LabelSettings_vxh4s")
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="Home" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(75, 75)
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -1822.0
-offset_top = -176.0
-offset_right = -1399.0
-offset_bottom = 71.0
-grow_horizontal = 0
-grow_vertical = 0
-scale = Vector2(0.5, 0.5)
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 200
-theme_override_constants/margin_bottom = 0
-
-[node name="MarginContainer" type="VBoxContainer" parent="Home"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="HomeButton" type="TextureButton" parent="Home/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture_normal = ExtResource("4_tq2sl")
-texture_pressed = ExtResource("5_htnsp")
-texture_hover = ExtResource("6_k2i7n")
-
-[node name="Label" type="Label" parent="Home/MarginContainer"]
-layout_mode = 2
-size_flags_vertical = 8
-text = "HOME
-[CTRL+L]"
-label_settings = SubResource("LabelSettings_hd13h")
-horizontal_alignment = 1
-vertical_alignment = 2
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0
@@ -144,3 +101,54 @@ Left click and drag on the video bar below the animation to move the animation f
 Hit ESC at anytime to close the program.
 "
 autowrap_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1797.0
+offset_top = 364.0
+offset_right = 1480.0
+offset_bottom = 626.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.585875, 0.4837)
+metadata/_edit_group_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="BackButtonContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/BackButtonContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_obl2u")
+texture_pressed = ExtResource("5_irfwe")
+texture_hover = ExtResource("6_q6tis")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "BACK 
+[CTRL+L]"
+label_settings = SubResource("LabelSettings_y71sj")
+horizontal_alignment = 1
+vertical_alignment = 1

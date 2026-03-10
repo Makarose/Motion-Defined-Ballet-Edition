@@ -19,12 +19,12 @@ var current_dancer: Node3D = null
 # Ready
 # ----------------------------
 func _ready() -> void:
-	print("[MainScene] SubViewportContainer mouse filter:", $SubViewportContainer.mouse_filter)
 	print("[MainScene] Ready")
 	
-	print("[MainScene] SubViewportContainer mouse filter:", $SubViewportContainer.mouse_filter)
-	print("[MainScene] SubViewportContainer process mode:", $SubViewportContainer.process_mode)
-	print("[MainScene] SubViewport handle_input_locally:", $SubViewportContainer/DancerViewport.handle_input_locally)
+	# If returning to fullscreen, hide UI immediately to prevent flash
+	if GameManager.is_fullscreen:
+		main_scene_ui.hide()
+	
 	fullscreen_scene.hide()
 
 	# Wire up MainSceneUI signals
@@ -48,8 +48,15 @@ func _ready() -> void:
 	if GameManager.selected_term != "":
 		_play_term(GameManager.selected_term, GameManager.selected_animation)
 		main_scene_ui.restore_term(GameManager.selected_term, GameManager.selected_definition)
-		main_scene_ui.show_fullscreen_button()  # Show button since animation is playing
-
+		await get_tree().process_frame
+		main_scene_ui.show_fullscreen_button()
+		
+		# If we were in fullscreen before (e.g., returning from instructions), re-enter fullscreen
+		if GameManager.is_fullscreen:
+			await get_tree().process_frame
+			_on_fullscreen_requested()
+			
+			
 # ----------------------------
 # Spawn a dancer into the SubViewport
 # Replaces any existing dancer
@@ -134,8 +141,6 @@ func _on_term_selected(term: String, anim_name: String, definition: String) -> v
 func _on_fullscreen_requested() -> void:
 	GameManager.is_fullscreen = true
 	print("[MainScene] is_fullscreen set to:", GameManager.is_fullscreen)
-	if current_dancer:
-		GameManager.save_playback_state(current_dancer)
 	main_scene_ui.process_mode = Node.PROCESS_MODE_DISABLED
 	main_scene_ui.hide()
 	fullscreen_scene.get_node("CanvasLayer").show()

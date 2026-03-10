@@ -9,6 +9,10 @@ extends Control
 @onready var search_bar: LineEdit = $VBoxContainer/LineEdit
 @onready var term_list: ItemList = $VBoxContainer/ItemList
 
+@onready var music_button: TextureButton = $MarginContainer2/HBoxContainer/MusicContainer/VBoxContaine/MusicButton
+@onready var instructions_button: TextureButton = $MarginContainer2/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsButton
+@onready var exit_button: TextureButton = $MarginContainer2/HBoxContainer/ExitContainer/VBoxContainer/ExitButton
+
 # ----------------------------
 # Runtime state
 # ----------------------------
@@ -34,12 +38,24 @@ func _ready() -> void:
 	term_list.item_activated.connect(_on_term_activated)
 	
 	# Connect navigation buttons
-	var back_button = get_node_or_null("Back/MarginContainer/BackButton")
+	var back_button = get_node_or_null("MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton")
 	if back_button:
 		back_button.pressed.connect(_on_back_button_pressed)
-	var home_button = get_node_or_null("Home/MarginContainer/HomeButton")
+	var home_button = get_node_or_null("MarginContainer2/HBoxContainer/Home/MarginContainer/HomeButton")
 	if home_button:
 		home_button.pressed.connect(_on_home_button_pressed)
+	
+	# Music button
+	if music_button:
+		music_button.pressed.connect(GameManager.toggle_music)
+	
+	# Instructions button
+	if instructions_button:
+		instructions_button.pressed.connect(_on_instructions_pressed)
+	
+	# Exit button
+	if exit_button:
+		exit_button.pressed.connect(_on_exit_pressed)
 	
 	# GameManager nav signals
 	GameManager.nav_left.connect(_on_nav_left)
@@ -126,6 +142,24 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 						_on_term_activated(i)
 						return
 
+# ----------------------------
+# Keyboard shortcuts
+# ----------------------------
+func _input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	
+	if event.is_action_pressed("music_toggle", false):
+		get_viewport().set_input_as_handled()
+		GameManager.toggle_music()
+	
+	if event.is_action_pressed("open_instructions", false):
+		get_viewport().set_input_as_handled()
+		_on_instructions_pressed()
+	
+	if event.is_action_pressed("quit_app", false):
+		get_viewport().set_input_as_handled()
+		_on_exit_pressed()
 
 # ----------------------------
 # Navigation
@@ -142,3 +176,10 @@ func _on_back_button_pressed() -> void:
 
 func _on_home_button_pressed() -> void:
 	_on_nav_right()
+
+func _on_instructions_pressed() -> void:
+	GameManager.previous_scene = "res://Scenes/index.tscn"
+	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
+
+func _on_exit_pressed() -> void:
+	GameManager.quit_dialog.popup_centered()

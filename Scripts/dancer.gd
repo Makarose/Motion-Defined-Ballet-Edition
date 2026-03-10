@@ -64,10 +64,10 @@ func play_idle() -> void:
 # Pause at current frame
 # ----------------------------
 func pause_animation() -> void:
-	if animation_player.is_playing():
-		is_paused = true
+	if animation_player.is_playing() or animation_player.current_animation != "":
 		paused_time = animation_player.current_animation_position
 		animation_player.pause()
+		is_paused = true  # Set this AFTER pausing
 
 
 # ----------------------------
@@ -180,6 +180,7 @@ func get_playback_state() -> Dictionary:
 # Restore playback state (e.g. after character swap)
 # ----------------------------
 func apply_playback_state(state: Dictionary) -> void:
+	print("[Dancer] Applying state - animation:", state.get("animation"), " time:", state.get("time"), " is_paused:", state.get("is_paused"))
 	if not state.has("animation") or state["animation"] == "":
 		return
 	if not animation_player.has_animation(state["animation"]):

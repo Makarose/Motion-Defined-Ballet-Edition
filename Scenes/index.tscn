@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cllriydv8ru44"]
+[gd_scene load_steps=23 format=3 uid="uid://cllriydv8ru44"]
 
 [ext_resource type="Script" path="res://Scripts/index.gd" id="1_37t3u"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_vndco"]
@@ -7,14 +7,17 @@
 [ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_blvt4"]
 [ext_resource type="Texture2D" uid="uid://c70g6jkijl6yl" path="res://UI Buttons/18.png" id="4_j1bci"]
 [ext_resource type="Texture2D" uid="uid://7umwf3vepd24" path="res://UI Buttons/left_highlight_button.png" id="5_15t15"]
+[ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="7_aukla"]
+[ext_resource type="Texture2D" uid="uid://cbj25vc3nr1uq" path="res://UI Buttons/music_select_button.png" id="8_6rre2"]
 [ext_resource type="Texture2D" uid="uid://dvd8voictywof" path="res://UI Buttons/home_selected_button.png" id="8_ka0yk"]
 [ext_resource type="Texture2D" uid="uid://cos3cyr6eott2" path="res://UI Buttons/home_highlight_button.png" id="9_55g2m"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
-font = ExtResource("3_eq036")
-font_size = 50
-outline_size = 15
-outline_color = Color(0.317647, 0.34902, 0.368627, 1)
+[ext_resource type="Texture2D" uid="uid://ceiehxh5124ow" path="res://UI Buttons/music_highlight_button.png" id="9_lj1ui"]
+[ext_resource type="Texture2D" uid="uid://cpmrik1ia7ejs" path="res://UI Buttons/1.png" id="10_7xnwb"]
+[ext_resource type="Texture2D" uid="uid://du872uhngnysq" path="res://UI Buttons/info_selected_button.png" id="11_erh5a"]
+[ext_resource type="Texture2D" uid="uid://cekhm82fqdmv8" path="res://UI Buttons/info_highlighted_button.png" id="12_a28it"]
+[ext_resource type="Texture2D" uid="uid://cay2rvs5k2wfh" path="res://UI Buttons/6.png" id="13_pvccb"]
+[ext_resource type="Texture2D" uid="uid://dj05fyuer3itm" path="res://UI Buttons/exit_select_button.png" id="14_mpdlf"]
+[ext_resource type="Texture2D" uid="uid://41h2mvauywyd" path="res://UI Buttons/exit_highlight_button.png" id="15_52kyo"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_v4wgd"]
 font = ExtResource("3_eq036")
@@ -22,6 +25,18 @@ font_size = 100
 outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_rvfwo"]
+font = ExtResource("3_eq036")
+font_size = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_nyw46"]
+font = ExtResource("3_eq036")
+font_size = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
+font = ExtResource("3_eq036")
+font_size = 50
 
 [node name="Index" type="Control"]
 layout_mode = 3
@@ -58,68 +73,6 @@ theme_override_constants/margin_left = 200
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
-
-[node name="MarginContainer" type="VBoxContainer" parent="Back"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="BackButton" type="TextureButton" parent="Back/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture_normal = ExtResource("2_l3b18")
-texture_pressed = ExtResource("4_blvt4")
-texture_hover = ExtResource("5_15t15")
-
-[node name="Label" type="Label" parent="Back/MarginContainer"]
-layout_mode = 2
-size_flags_vertical = 8
-text = "BACK
-[CTRL+L]"
-label_settings = SubResource("LabelSettings_sreg4")
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="Home" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(75, 75)
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -193.0
-offset_top = -176.0
-offset_right = 193.0
-offset_bottom = 71.0
-grow_horizontal = 0
-grow_vertical = 0
-scale = Vector2(0.5, 0.5)
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 200
-theme_override_constants/margin_bottom = 0
-
-[node name="MarginContainer" type="VBoxContainer" parent="Home"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="HomeButton" type="TextureButton" parent="Home/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture_normal = ExtResource("4_j1bci")
-texture_pressed = ExtResource("8_ka0yk")
-texture_hover = ExtResource("9_55g2m")
-
-[node name="Label" type="Label" parent="Home/MarginContainer"]
-layout_mode = 2
-size_flags_vertical = 8
-text = "HOME
-[CTRL+R]"
-label_settings = SubResource("LabelSettings_sreg4")
-horizontal_alignment = 1
-vertical_alignment = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(1720, 600)
@@ -171,3 +124,169 @@ text = "INDEX"
 label_settings = SubResource("LabelSettings_v4wgd")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = 364.0
+offset_right = 2317.0
+offset_bottom = 626.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.585875, 0.4837)
+metadata/_edit_group_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 400
+
+[node name="BackButtonContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/BackButtonContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("2_l3b18")
+texture_pressed = ExtResource("4_blvt4")
+texture_hover = ExtResource("5_15t15")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "BACK 
+[CTRL+L]"
+label_settings = SubResource("LabelSettings_rvfwo")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/MusicContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MusicButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/MusicContainer/VBoxContaine"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("7_aukla")
+texture_pressed = ExtResource("8_6rre2")
+texture_hover = ExtResource("9_lj1ui")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/MusicContainer/VBoxContaine"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
+theme_override_constants/outline_size = 10
+text = "MUSIC ON/OFF
+[F3]"
+label_settings = SubResource("LabelSettings_nyw46")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/InstructionsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="InstructionsButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/InstructionsContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("10_7xnwb")
+texture_pressed = ExtResource("11_erh5a")
+texture_hover = ExtResource("12_a28it")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/InstructionsContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INSTRUCTIONS
+[F4]"
+label_settings = SubResource("LabelSettings_nyw46")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExitContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/ExitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+
+[node name="ExitButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/ExitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("13_pvccb")
+texture_pressed = ExtResource("14_mpdlf")
+texture_hover = ExtResource("15_52kyo")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/ExitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
+theme_override_constants/outline_size = 10
+text = "EXIT
+[ESC]"
+label_settings = SubResource("LabelSettings_nyw46")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Home" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(75, 75)
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 0
+
+[node name="MarginContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/Home"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HomeButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/Home/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_j1bci")
+texture_pressed = ExtResource("8_ka0yk")
+texture_hover = ExtResource("9_55g2m")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/Home/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "HOME
+[CTRL+R]"
+label_settings = SubResource("LabelSettings_sreg4")
+horizontal_alignment = 1
+vertical_alignment = 2

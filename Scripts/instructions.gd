@@ -3,7 +3,8 @@
 # ----------------------------
 extends Control
 
-@onready var home_button: TextureButton = $Home/MarginContainer/HomeButton
+@onready var back_button: TextureButton = $MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton
+
 
 # ----------------------------
 # Ready
@@ -11,8 +12,8 @@ extends Control
 func _ready() -> void:
 	
 	# Connect instructions button
-	if home_button:
-		home_button.pressed.connect(_on_home_button_pressed)
+	if back_button:
+		back_button.pressed.connect(_on_back_button_pressed)
 		
 		
 # ----------------------------
@@ -24,11 +25,14 @@ func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("nav_left"):
 		get_viewport().set_input_as_handled()
-		_on_home_button_pressed()	
+		_on_back_button_pressed()	
 		
 		
 # ----------------------------
 # Navigation
 # ----------------------------
-func _on_home_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
+func _on_back_button_pressed() -> void:
+	if GameManager.previous_scene != "":
+		get_tree().change_scene_to_file(GameManager.previous_scene)
+	else:
+		get_tree().change_scene_to_file("res://Scenes/title_page.tscn")  # Default fallback

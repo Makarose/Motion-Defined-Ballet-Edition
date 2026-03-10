@@ -19,12 +19,15 @@ signal replay_requested
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-@onready var back_button: TextureButton = $CanvasLayer/BackButtonContainer/MarginContainer/BackButton
-@onready var index_button: TextureButton = $CanvasLayer/IndexButtonContainer/Container/IndexButton
+@onready var back_button: TextureButton = $MarginContainer/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton
+@onready var index_button: TextureButton = $MarginContainer/HBoxContainer/IndexButtonContainer/VBoxContainer/IndexButton
 @onready var replay_container: MarginContainer = $CanvasLayer/ReplayContainer
 @onready var replay_button: TextureButton = $CanvasLayer/ReplayContainer/HBoxContainer/ReplayButton
 @onready var fullscreen_container: MarginContainer = $CanvasLayer/FullscreenContainer
 @onready var fullscreen_button: TextureButton = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenButton
+@onready var music_button: TextureButton = $MarginContainer/HBoxContainer/MusicContainer/VBoxContaine/MusicButton
+@onready var instructions_button: TextureButton = $MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsButton
+@onready var exit_button: TextureButton = $MarginContainer/HBoxContainer/ExitContainer/VBoxContainer/ExitButton
 
 
 # ----------------------------
@@ -89,10 +92,21 @@ func _ready() -> void:
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
 	
-	# Navigation buttons connected
+# Navigation buttons connected
 	back_button.pressed.connect(_on_nav_left)
 	index_button.pressed.connect(_on_nav_right)
 	
+	# Music button
+	if music_button:
+		music_button.pressed.connect(GameManager.toggle_music)
+	
+	# Instructions button
+	if instructions_button:
+		instructions_button.pressed.connect(_on_instructions_pressed)
+	
+	# Exit button
+	if exit_button:
+		exit_button.pressed.connect(_on_exit_pressed)
 	
 # ----------------------------
 # Search Bar Input
@@ -263,6 +277,19 @@ func hide_replay_button() -> void:
 # ----------------------------
 func _on_replay_pressed() -> void:
 	emit_signal("replay_requested")
+	
+# ----------------------------
+# Instructions
+# ----------------------------
+func _on_instructions_pressed() -> void:
+	GameManager.previous_scene = "res://Scenes/main_scene.tscn"
+	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
+
+# ----------------------------
+# Exit
+# ----------------------------
+func _on_exit_pressed() -> void:
+	GameManager.quit_dialog.popup_centered()
 
 # ----------------------------
 # Navigation — emit signals up, never change scene directly
@@ -317,3 +344,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("replay_from_main", false):
 		get_viewport().set_input_as_handled()
 		_on_replay_pressed()
+	
+	if event.is_action_pressed("music_toggle", false):
+		get_viewport().set_input_as_handled()
+		GameManager.toggle_music()
+	
+	if event.is_action_pressed("open_instructions", false):
+		get_viewport().set_input_as_handled()
+		_on_instructions_pressed()
+	
+	if event.is_action_pressed("quit_app", false):
+		get_viewport().set_input_as_handled()
+		_on_exit_pressed()

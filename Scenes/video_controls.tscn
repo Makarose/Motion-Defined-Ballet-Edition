@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=40 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
@@ -23,6 +23,12 @@
 [ext_resource type="Texture2D" uid="uid://q5kxojkgssxx" path="res://UI Buttons/stop_highlight_button.png" id="15_lxk1w"]
 [ext_resource type="Texture2D" uid="uid://dj05fyuer3itm" path="res://UI Buttons/exit_select_button.png" id="20_l8vmc"]
 [ext_resource type="Texture2D" uid="uid://41h2mvauywyd" path="res://UI Buttons/exit_highlight_button.png" id="21_dvm2q"]
+[ext_resource type="Texture2D" uid="uid://4najrf2cpxg4" path="res://UI Buttons/4.png" id="24_xmevv"]
+[ext_resource type="Texture2D" uid="uid://cbj25vc3nr1uq" path="res://UI Buttons/music_select_button.png" id="25_sa47n"]
+[ext_resource type="Texture2D" uid="uid://ceiehxh5124ow" path="res://UI Buttons/music_highlight_button.png" id="26_3uu2k"]
+[ext_resource type="Texture2D" uid="uid://cpmrik1ia7ejs" path="res://UI Buttons/1.png" id="27_aogsx"]
+[ext_resource type="Texture2D" uid="uid://du872uhngnysq" path="res://UI Buttons/info_selected_button.png" id="28_0vuug"]
+[ext_resource type="Texture2D" uid="uid://cekhm82fqdmv8" path="res://UI Buttons/info_highlighted_button.png" id="29_m3amn"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cy6n2"]
 font = ExtResource("3_qru45")
@@ -86,6 +92,10 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.180392, 0.968627, 0.0392157, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_nu6dv"]
+font = ExtResource("3_qru45")
+font_size = 50
+
 [node name="VideoControls" type="Control" groups=["blocks_nav"]]
 z_index = 100
 layout_mode = 3
@@ -98,7 +108,7 @@ script = ExtResource("1_bxpsy")
 vertical_min = -0.4
 vertical_max = 1.5
 metadata/_edit_vertical_guides_ = [961.0, 1685.0]
-metadata/_edit_horizontal_guides_ = [48.0]
+metadata/_edit_horizontal_guides_ = [48.0, 766.0]
 
 [node name="VideoControlsButtonContainer" type="MarginContainer" parent="."]
 z_index = 100
@@ -388,6 +398,83 @@ step = 0.001
 
 [node name="TimeLabel" type="Label" parent="SliderContainer"]
 layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 725.0
+offset_top = 537.0
+offset_right = 1074.0
+offset_bottom = 1140.0
+grow_horizontal = 2
+scale = Vector2(0.664887, 0.638286)
+theme_override_constants/margin_left = -30
+metadata/_edit_group_ = true
+
+[node name="HBoxContainer" type="VBoxContainer" parent="MarginContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 65
+
+[node name="MusicContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContaine" type="HBoxContainer" parent="MarginContainer2/HBoxContainer/MusicContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 20
+
+[node name="MusicButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/MusicContainer/HBoxContaine"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("24_xmevv")
+texture_pressed = ExtResource("25_sa47n")
+texture_hover = ExtResource("26_3uu2k")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/MusicContainer/HBoxContaine"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
+theme_override_constants/outline_size = 10
+text = "MUSIC
+ON/OFF
+[F3]"
+label_settings = SubResource("LabelSettings_nu6dv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer2/HBoxContainer/InstructionsContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="InstructionsButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/InstructionsContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("27_aogsx")
+texture_pressed = ExtResource("28_0vuug")
+texture_hover = ExtResource("29_m3amn")
+
+[node name="Label" type="Label" parent="MarginContainer2/HBoxContainer/InstructionsContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INFO
+[F4]"
+label_settings = SubResource("LabelSettings_nu6dv")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="pressed" from="VideoControlsButtonContainer/VContainerButtons/PauseContainer/Pause/PauseButton" to="." method="_on_pause_button_pressed"]
 [connection signal="pressed" from="VideoControlsButtonContainer/VContainerButtons/PlayContainer/Play/PlayButton" to="." method="_on_play_button_pressed"]
