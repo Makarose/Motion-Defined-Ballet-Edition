@@ -10,9 +10,13 @@ config_version=5
 
 [application]
 
-config/name="Motion Defined Ballet Edition"
+config/name="MoDe - Ballet Edition"
 run/main_scene="res://Scenes/title_page.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
+boot_splash/bg_color=Color(0.643137, 0.729412, 0.776471, 1)
+boot_splash/image="res://motion_defined_icon.svg"
+config/icon="res://motion_defined_icon.svg"
+boot_splash/minimum_display_time=1000
 
 [autoload]
 
@@ -177,3 +181,7 @@ random={
 [input_devices]
 
 pointing/emulate_mouse_from_touch=false
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true
