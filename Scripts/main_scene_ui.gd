@@ -58,8 +58,10 @@ func _ready() -> void:
 	# Only hide fullscreen button if no term is selected
 	if GameManager.selected_term == "":
 		fullscreen_container.visible = false
+		random_container.visible = true
 	else:
 		fullscreen_container.visible = true
+		random_container.visible = false
 	
 	# Hide replay button initially
 	if replay_container:

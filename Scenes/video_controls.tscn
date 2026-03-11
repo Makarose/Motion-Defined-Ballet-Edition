@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://bgixxv1jqc70l"]
+[gd_scene load_steps=42 format=3 uid="uid://bgixxv1jqc70l"]
 
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="1_6w5i7"]
 [ext_resource type="Script" path="res://Scripts/video_controls.gd" id="1_bxpsy"]
@@ -33,22 +33,32 @@
 [sub_resource type="LabelSettings" id="LabelSettings_cy6n2"]
 font = ExtResource("3_qru45")
 font_size = 40
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_n4g7o"]
 font = ExtResource("3_qru45")
 font_size = 40
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_col5w"]
 font = ExtResource("3_qru45")
 font_size = 40
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_jsis0"]
 font = ExtResource("3_qru45")
 font_size = 40
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_wx6hk"]
 font = ExtResource("3_qru45")
 font_size = 40
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty5wo"]
 bg_color = Color(0, 0, 0, 0)
@@ -71,6 +81,12 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.180392, 0.968627, 0.0392157, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_5hnvi"]
+font = ExtResource("3_qru45")
+font_size = 250
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7o72n"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -92,9 +108,17 @@ border_width_right = 4
 border_width_bottom = 4
 border_color = Color(0.180392, 0.968627, 0.0392157, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_hml87"]
+font = ExtResource("3_qru45")
+font_size = 250
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_nu6dv"]
 font = ExtResource("3_qru45")
 font_size = 50
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="VideoControls" type="Control" groups=["blocks_nav"]]
 z_index = 100
@@ -354,6 +378,7 @@ theme_override_constants/line_spacing = 0
 theme_override_fonts/font = ExtResource("3_qru45")
 theme_override_font_sizes/font_size = 250
 text = "[1]"
+label_settings = SubResource("LabelSettings_5hnvi")
 
 [node name="FemaleButton" type="HBoxContainer" parent="CharacterButtonContainer"]
 layout_mode = 2
@@ -376,6 +401,7 @@ theme_override_constants/line_spacing = 0
 theme_override_fonts/font = ExtResource("3_qru45")
 theme_override_font_sizes/font_size = 250
 text = "[2]"
+label_settings = SubResource("LabelSettings_hml87")
 
 [node name="SliderContainer" type="HBoxContainer" parent="."]
 layout_mode = 1

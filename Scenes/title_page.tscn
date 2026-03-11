@@ -70,6 +70,8 @@ shadow_color = Color(0, 0, 0, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_jdrat"]
 font = ExtResource("5_ix5ab")
 font_size = 50
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="TitlePage" type="Control" groups=["blocks_nav"]]
 layout_mode = 3
@@ -223,7 +225,6 @@ texture_hover = ExtResource("8_4mofw")
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
-theme_override_constants/outline_size = 10
 text = "MUSIC ON/OFF [F3]"
 label_settings = SubResource("LabelSettings_jdrat")
 horizontal_alignment = 1

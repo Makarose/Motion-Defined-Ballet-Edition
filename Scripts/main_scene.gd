@@ -50,6 +50,7 @@ func _ready() -> void:
 		main_scene_ui.restore_term(GameManager.selected_term, GameManager.selected_definition)
 		await get_tree().process_frame
 		main_scene_ui.show_fullscreen_button()
+		main_scene_ui.hide_random_button()
 		
 		# If we were in fullscreen before (e.g., returning from instructions), re-enter fullscreen
 		if GameManager.is_fullscreen:

@@ -29,14 +29,20 @@ shadow_color = Color(0, 0, 0, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_rvfwo"]
 font = ExtResource("3_eq036")
 font_size = 50
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_nyw46"]
 font = ExtResource("3_eq036")
 font_size = 50
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
 font = ExtResource("3_eq036")
 font_size = 50
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
 
 [node name="Index" type="Control"]
 layout_mode = 3
@@ -46,10 +52,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_37t3u")
-metadata/_edit_horizontal_guides_ = [1000.0, 904.0, 50.0, 150.0, 163.0, 875.0]
+metadata/_edit_horizontal_guides_ = [915.0, 1050.0, 50.0, 150.0, 163.0, 875.0]
 metadata/_edit_vertical_guides_ = [100.0, 1821.0]
 
 [node name="PanelContainer" type="ColorRect" parent="."]
+z_index = -2
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 0
 offset_right = 1920.0
@@ -133,9 +140,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -960.0
-offset_top = 364.0
-offset_right = 2317.0
-offset_bottom = 626.0
+offset_top = 375.0
+offset_right = 2318.0
+offset_bottom = 637.0
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.585875, 0.4837)
@@ -158,6 +165,7 @@ theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/BackButtonContainer"]
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/separation = 10
 
 [node name="BackButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
@@ -180,7 +188,6 @@ vertical_alignment = 1
 [node name="MusicContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
 z_index = 10
 layout_mode = 2
-size_flags_vertical = 4
 
 [node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/MusicContainer"]
 layout_mode = 2
@@ -208,8 +215,6 @@ vertical_alignment = 1
 [node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
 z_index = 10
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/InstructionsContainer"]
 layout_mode = 2
@@ -236,7 +241,6 @@ vertical_alignment = 1
 [node name="ExitContainer" type="MarginContainer" parent="MarginContainer2/HBoxContainer"]
 z_index = 10
 layout_mode = 2
-size_flags_vertical = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/ExitContainer"]
 layout_mode = 2
@@ -290,3 +294,13 @@ text = "HOME
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+z_index = -1
+offset_left = 100.0
+offset_top = 904.0
+offset_right = 3377.0
+offset_bottom = 1166.0
+scale = Vector2(0.52518, 0.557302)
+mouse_filter = 2
+color = Color(0.482353, 0.635294, 0.721569, 1)
