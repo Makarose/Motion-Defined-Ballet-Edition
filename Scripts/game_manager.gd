@@ -66,6 +66,7 @@ func _ready() -> void:
 	music_player = AudioStreamPlayer.new()
 	music_player.stream = preload("res://MusicSounds/Rosalita_The_Piano_Says (looped).mp3")
 	music_player.autoplay = true
+	music_player.volume_db = -10.0
 	add_child(music_player)
 	
 	# Connect finished signal to loop the music

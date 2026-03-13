@@ -251,18 +251,16 @@ func _select_item(index: int) -> void:
 	item_list.visible = false
 	search_bar.release_focus()
 
-	# Show fullscreen button
+	# Show fullscreen, hide random
 	fullscreen_container.visible = true
+	hide_random_button()  # ← ADD THIS
 
-	# Start timer to clear search bar
 	clear_timer.start()
 
-	# Emit up to MainScene with all three pieces of info
 	if move.animation_name.strip_edges() != "":
 		emit_signal("term_selected", move.name, move.animation_name, move.definition)
 	else:
 		push_warning("[MainSceneUI] No animation name set for move: " + move.name)
-
 
 # ----------------------------
 # Restore term when arriving from index page

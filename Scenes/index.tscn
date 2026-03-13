@@ -28,21 +28,23 @@ shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_rvfwo"]
 font = ExtResource("3_eq036")
-font_size = 50
+font_size = 65
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_nyw46"]
 font = ExtResource("3_eq036")
-font_size = 50
+font_size = 65
+outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_sreg4"]
 font = ExtResource("3_eq036")
-font_size = 50
-outline_size = 5
+font_size = 65
 outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="Index" type="Control"]
 layout_mode = 3
@@ -52,7 +54,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_37t3u")
-metadata/_edit_horizontal_guides_ = [915.0, 1050.0, 50.0, 150.0, 163.0, 875.0]
+metadata/_edit_horizontal_guides_ = [1050.0, 50.0, 150.0, 163.0, 875.0]
 metadata/_edit_vertical_guides_ = [100.0, 1821.0]
 
 [node name="PanelContainer" type="ColorRect" parent="."]
@@ -112,12 +114,12 @@ theme_override_font_sizes/font_size = 40
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
-offset_left = 100.0
+offset_left = 96.0
 offset_top = 50.0
 offset_right = 100.0
 offset_bottom = 162.0
 grow_horizontal = 2
-scale = Vector2(0.896355, 0.892692)
+scale = Vector2(0.89656, 0.892692)
 metadata/_edit_group_ = true
 
 [node name="MainTitle" type="PanelContainer" parent="MarginContainer"]
@@ -139,13 +141,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -960.0
-offset_top = 375.0
-offset_right = 2318.0
-offset_bottom = 637.0
+offset_left = -860.0
+offset_top = 364.0
+offset_right = 2580.0
+offset_bottom = 655.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(0.585875, 0.4837)
+scale = Vector2(0.5, 0.5)
+theme_override_constants/margin_top = 10
 metadata/_edit_group_ = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer2"]
@@ -158,14 +161,13 @@ theme_override_constants/separation = 400
 z_index = 10
 custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
-theme_override_constants/margin_left = 200
+theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/BackButtonContainer"]
 layout_mode = 2
-size_flags_vertical = 0
 theme_override_constants/separation = 10
 
 [node name="BackButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer"]
@@ -180,7 +182,7 @@ texture_hover = ExtResource("5_15t15")
 layout_mode = 2
 size_flags_vertical = 8
 text = "BACK 
-[CTRL+L]"
+[CTRL + ←]"
 label_settings = SubResource("LabelSettings_rvfwo")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -192,6 +194,7 @@ layout_mode = 2
 [node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/MusicContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 10
 
 [node name="MusicButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/MusicContainer/VBoxContaine"]
 layout_mode = 2
@@ -219,7 +222,7 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/InstructionsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 25
+theme_override_constants/separation = 10
 
 [node name="InstructionsButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/InstructionsContainer/VBoxContainer"]
 layout_mode = 2
@@ -245,7 +248,7 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/ExitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 25
+theme_override_constants/separation = 10
 
 [node name="ExitButton" type="TextureButton" parent="MarginContainer2/HBoxContainer/ExitContainer/VBoxContainer"]
 layout_mode = 2
@@ -271,7 +274,7 @@ custom_minimum_size = Vector2(75, 75)
 layout_mode = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 200
+theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
 [node name="MarginContainer" type="VBoxContainer" parent="MarginContainer2/HBoxContainer/Home"]
@@ -290,13 +293,14 @@ texture_hover = ExtResource("9_55g2m")
 layout_mode = 2
 size_flags_vertical = 8
 text = "HOME
-[CTRL+R]"
+[CTRL+ →]"
 label_settings = SubResource("LabelSettings_sreg4")
 horizontal_alignment = 1
 vertical_alignment = 2
 
 [node name="ColorRect" type="ColorRect" parent="."]
 z_index = -1
+layout_mode = 0
 offset_left = 100.0
 offset_top = 904.0
 offset_right = 3377.0
