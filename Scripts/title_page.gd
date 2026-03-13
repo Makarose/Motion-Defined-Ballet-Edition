@@ -11,6 +11,8 @@ extends Control
 # Ready
 # ----------------------------
 func _ready() -> void:
+	GameManager.load_settings()
+	
 	print("[TitlePage] Ready")
 	GameManager.clear_term_state()
 	
@@ -54,13 +56,22 @@ func _ready() -> void:
 func _on_male_pressed() -> void:
 	print("[TitlePage] Male selected")
 	GameManager.chosen_character = "res://Scenes/male.tscn"
-	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
+	if GameManager.show_instructions_on_startup and not GameManager.instructions_shown_this_session:
+		GameManager.instructions_shown_this_session = true
+		GameManager.instructions_auto_opened = true
+		_on_instructions_pressed()
+	else:
+		get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 
 func _on_female_pressed() -> void:
 	print("[TitlePage] Female selected")
 	GameManager.chosen_character = "res://Scenes/female.tscn"
-	get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
-	
+	if GameManager.show_instructions_on_startup and not GameManager.instructions_shown_this_session:
+		GameManager.instructions_shown_this_session = true
+		GameManager.instructions_auto_opened = true
+		_on_instructions_pressed()
+	else:
+		get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 # ----------------------------
 # Inst"res://Scripts/main_scene.gd"ructions Selected
 # ----------------------------

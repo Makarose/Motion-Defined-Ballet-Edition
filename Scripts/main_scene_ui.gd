@@ -50,26 +50,22 @@ var replay_timer: Timer
 # Ready
 # ----------------------------
 func _ready() -> void:
+	
+	# Hide all buttons immediately to prevent flicker
+	fullscreen_container.visible = false
+	replay_container.visible = false
+	random_container.visible = false
+	
 	print("[MainSceneUI] Ready")
 	await get_tree().process_frame
 	search_bar.grab_focus()
 	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
 	
-	# Only hide fullscreen button if no term is selected
+	# Show correct buttons based on state
 	if GameManager.selected_term == "":
-		fullscreen_container.visible = false
 		random_container.visible = true
 	else:
 		fullscreen_container.visible = true
-		random_container.visible = false
-	
-	# Hide replay button initially
-	if replay_container:
-		replay_container.visible = false
-	
-	# Show random button initially
-	if random_container:
-		random_container.visible = true
 	
 	# Load database if not set in inspector
 	if not database:

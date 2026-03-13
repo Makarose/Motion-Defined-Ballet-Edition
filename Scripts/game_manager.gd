@@ -26,6 +26,11 @@ var is_fullscreen: bool = false
 var music_player: AudioStreamPlayer = null
 var music_enabled: bool = true
 var previous_scene: String = ""
+var show_instructions_on_startup: bool = true
+var instructions_auto_opened: bool = false
+var instructions_shown_this_session: bool = false
+
+const SETTINGS_PATH = "user://settings.cfg"
 # ----------------------------
 # Database
 # ----------------------------
@@ -37,7 +42,7 @@ var previous_scene: String = ""
 func _ready() -> void:
 	set_process_unhandled_input(true)
 	
-	# Create quit confirmation dialog
+# Create quit confirmation dialog
 	quit_dialog = ConfirmationDialog.new()
 	quit_dialog.dialog_text = "Are you sure you want to quit?"
 	quit_dialog.title = "Quit Application"
@@ -179,3 +184,16 @@ func _on_quit_confirmed() -> void:
 
 func _on_quit_canceled() -> void:
 	pass  # Just close the dialog
+
+# ----------------------------
+# Settings
+# ----------------------------
+func load_settings() -> void:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) == OK:
+		show_instructions_on_startup = config.get_value("settings", "show_instructions_on_startup", true)
+
+func save_settings() -> void:
+	var config = ConfigFile.new()
+	config.set_value("settings", "show_instructions_on_startup", show_instructions_on_startup)
+	config.save(SETTINGS_PATH)

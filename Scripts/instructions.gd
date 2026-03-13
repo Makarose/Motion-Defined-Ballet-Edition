@@ -2,19 +2,24 @@
 # instructions.gd
 # ----------------------------
 extends Control
-
 @onready var back_button: TextureButton = $MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton
-
+@onready var dont_show_checkbox: CheckBox = $CheckBox
 
 # ----------------------------
 # Ready
 # ----------------------------
 func _ready() -> void:
 	
-	# Connect instructions button
+	# Connect back button
 	if back_button:
 		back_button.pressed.connect(_on_back_button_pressed)
-		
+	
+	# Set checkbox state and connect
+	dont_show_checkbox.button_pressed = !GameManager.show_instructions_on_startup
+	dont_show_checkbox.toggled.connect(func(checked):
+		GameManager.show_instructions_on_startup = !checked
+		GameManager.save_settings()
+	)
 		
 # ----------------------------
 # Inputs
@@ -32,7 +37,10 @@ func _input(event: InputEvent) -> void:
 # Navigation
 # ----------------------------
 func _on_back_button_pressed() -> void:
-	if GameManager.previous_scene != "":
+	if GameManager.instructions_auto_opened:
+		GameManager.instructions_auto_opened = false
+		get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
+	elif GameManager.previous_scene != "":
 		get_tree().change_scene_to_file(GameManager.previous_scene)
 	else:
-		get_tree().change_scene_to_file("res://Scenes/title_page.tscn")  # Default fallback
+		get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
