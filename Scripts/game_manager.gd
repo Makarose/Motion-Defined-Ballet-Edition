@@ -40,6 +40,7 @@ const SETTINGS_PATH = "user://settings.cfg"
 # Ready
 # ----------------------------
 func _ready() -> void:
+
 	set_process_unhandled_input(true)
 	
 # Create quit confirmation dialog
@@ -197,3 +198,33 @@ func save_settings() -> void:
 	var config = ConfigFile.new()
 	config.set_value("settings", "show_instructions_on_startup", show_instructions_on_startup)
 	config.save(SETTINGS_PATH)
+
+# ----------------------------
+# Platform Detection
+# ----------------------------
+func is_macos() -> bool:
+	return true  # TESTING - Force mac mode for testing
+	# return OS.get_name() == "macOS"  # Uncomment when done testing
+
+func get_shortcut_text(action_name: String) -> String:
+	match action_name:
+		"music_toggle":
+			return "CMD + C" if is_macos() else "F3"
+		"open_instructions":
+			return "CMD + V" if is_macos() else "F4"
+		"quit_app":
+			return "ESC" if is_macos() else "ESC"
+		"nav_left":
+			return "SHIFT + ←" if is_macos() else "Ctrl+←"
+		"nav_right":
+			return "SHIFT + →" if is_macos() else "Ctrl+→"
+		"random":
+			return "CMD + B" if is_macos() else "F5"
+		"launch_fullscreen":
+			return "CMD + Z" if is_macos() else "F1"
+		"replay_from_main":
+			return "CMD + X" if is_macos() else "F2"
+		"exit_fullscreen":
+			return "Tab" if is_macos() else "Tab"
+		_:
+			return ""

@@ -49,7 +49,7 @@ shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_veh81"]
 font = ExtResource("6_k4h06")
-font_size = 65
+font_size = 60
 outline_color = Color(0, 0, 0, 1)
 shadow_size = 5
 shadow_color = Color(0, 0, 0, 1)
@@ -67,7 +67,7 @@ grow_vertical = 2
 script = ExtResource("1_kdlrg")
 replay_timeout_seconds = 3.0
 metadata/_edit_vertical_guides_ = [1821.0, 692.0, 100.0, 679.0]
-metadata/_edit_horizontal_guides_ = [875.0, 904.0, 50.0, 150.0, 163.0, 1050.0]
+metadata/_edit_horizontal_guides_ = [875.0, 883.0, 50.0, 150.0, 163.0, 1050.0]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 0
@@ -217,7 +217,7 @@ texture_normal = ExtResource("7_4dh48")
 texture_pressed = ExtResource("8_g74qh")
 texture_hover = ExtResource("9_t8oak")
 
-[node name="Label" type="Label" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
+[node name="ReplayLabel" type="Label" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "REPLAY [F2]"
@@ -252,7 +252,7 @@ texture_normal = ExtResource("10_lmvg8")
 texture_pressed = ExtResource("11_cob2b")
 texture_hover = ExtResource("12_h21d2")
 
-[node name="Label" type="Label" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
+[node name="FullscreenLabel" type="Label" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FULLSCREEN [F1]"
@@ -287,7 +287,7 @@ texture_normal = ExtResource("10_71b5s")
 texture_pressed = ExtResource("11_n5017")
 texture_hover = ExtResource("12_j6q0m")
 
-[node name="Label" type="Label" parent="CanvasLayer/RandomContainer/HBoxContainer"]
+[node name="RandomLabel" type="Label" parent="CanvasLayer/RandomContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "RANDOM [F5]"
@@ -303,34 +303,30 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -860.0
-offset_top = 364.0
-offset_right = 2580.0
-offset_bottom = 655.0
+offset_top = 343.0
+offset_right = 2532.0
+offset_bottom = 644.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(0.5, 0.5)
-theme_override_constants/margin_top = 10
-metadata/_edit_group_ = true
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 400
-
-[node name="BackButtonContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
-z_index = 10
-custom_minimum_size = Vector2(75, 75)
-layout_mode = 2
-theme_override_constants/margin_left = 40
+scale = Vector2(0.507369, 0.55483)
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/BackButtonContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 4
+
+[node name="BackContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+z_index = 10
+layout_mode = 2
+
+[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer/HBoxContainer/BackContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="BackButton" type="TextureButton" parent="MarginContainer/HBoxContainer/BackButtonContainer/VBoxContainer"]
+[node name="BackButton" type="TextureButton" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -338,12 +334,13 @@ texture_normal = ExtResource("3_6830r")
 texture_pressed = ExtResource("4_qcv70")
 texture_hover = ExtResource("5_8xnki")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/BackButtonContainer/VBoxContainer"]
+[node name="BackLabel" type="Label" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-size_flags_vertical = 8
-text = "BACK 
+size_flags_horizontal = 4
+text = "BACK
 [CTRL + ←]"
-label_settings = SubResource("LabelSettings_djaeu")
+label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -364,11 +361,10 @@ texture_normal = ExtResource("13_weboj")
 texture_pressed = ExtResource("14_tb4d2")
 texture_hover = ExtResource("15_s0j6n")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine"]
+[node name="MusicLabel" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
-theme_override_constants/outline_size = 10
 text = "MUSIC ON/OFF
 [F3]"
 label_settings = SubResource("LabelSettings_veh81")
@@ -392,7 +388,8 @@ texture_normal = ExtResource("16_4t6fq")
 texture_pressed = ExtResource("17_m7knu")
 texture_hover = ExtResource("18_pdscm")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer"]
+[node name="InstructionsLabel" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "INSTRUCTIONS
@@ -418,30 +415,26 @@ texture_normal = ExtResource("19_vtaqf")
 texture_pressed = ExtResource("20_5uspn")
 texture_hover = ExtResource("21_5ajhf")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer"]
+[node name="ExitLabel" type="Label" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
-theme_override_constants/outline_size = 10
 text = "EXIT
 [ESC]"
 label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IndexButtonContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(75, 75)
+[node name="IndexContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+z_index = 10
 layout_mode = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/IndexButtonContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/IndexContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="IndexButton" type="TextureButton" parent="MarginContainer/HBoxContainer/IndexButtonContainer/VBoxContainer"]
+[node name="IndexButton" type="TextureButton" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -449,15 +442,15 @@ texture_normal = ExtResource("7_g5m7v")
 texture_pressed = ExtResource("8_g1di3")
 texture_hover = ExtResource("9_o8m5u")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/IndexButtonContainer/VBoxContainer"]
+[node name="IndexLabel" type="Label" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_horizontal = 4
 text = "INDEX
-[CTRL+ →]
-"
-label_settings = SubResource("LabelSettings_djaeu")
+[CTRL+ →]"
+label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
-vertical_alignment = 2
+vertical_alignment = 1
 
 [node name="BackgroundColourPanel" type="Panel" parent="."]
 z_index = -100
@@ -483,9 +476,9 @@ metadata/_edit_lock_ = true
 z_index = -1
 layout_mode = 2
 offset_left = 100.0
-offset_top = 904.0
+offset_top = 883.0
 offset_right = 3377.0
-offset_bottom = 1166.0
-scale = Vector2(0.525206, 0.557578)
+offset_bottom = 1145.0
+scale = Vector2(0.525178, 0.637422)
 mouse_filter = 2
 color = Color(0.482353, 0.635294, 0.721569, 1)

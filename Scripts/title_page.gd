@@ -6,6 +6,8 @@ extends Control
 @onready var music_button: TextureButton = $MarginContainer/HBoxContainer/MusicContainer/HBoxContainer/MusicButton
 @onready var instructions_button: TextureButton = $MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
 @onready var exit_button: TextureButton = $MarginContainer/HBoxContainer/ExitContainer/HBoxContainer/ExitButton
+@onready var music_shortcut_label: Label = $MarginContainer/HBoxContainer/MusicContainer/HBoxContainer/MusicLabel
+@onready var instructions_shortcut_label: Label = $MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsLabel
 
 # ----------------------------
 # Ready
@@ -48,8 +50,13 @@ func _ready() -> void:
 		print("[TitlePage] Exit button connected!")
 	else:
 		print("[TitlePage] ERROR: exit_button is null!")
-
-
+		
+	# Set shortcut labels based on platform
+	if music_shortcut_label:
+		music_shortcut_label.text = "MUSIC ON/OFF [" + GameManager.get_shortcut_text("music_toggle") + "]"
+	if instructions_shortcut_label:
+		instructions_shortcut_label.text = "INSTRUCTIONS [" + GameManager.get_shortcut_text("open_instructions") + "]"	
+	
 # ----------------------------
 # Character selection
 # ----------------------------

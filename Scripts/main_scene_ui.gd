@@ -21,8 +21,8 @@ signal replay_requested
 @onready var item_list: ItemList = $CanvasLayer/Search/MarginContainerText/VBoxContainer/ItemList
 @onready var definition_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText/DefinitionLabel
 @onready var title_label: RichTextLabel = $CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle/TitleLabel
-@onready var back_button: TextureButton = $MarginContainer/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton
-@onready var index_button: TextureButton = $MarginContainer/HBoxContainer/IndexButtonContainer/VBoxContainer/IndexButton
+@onready var back_button: TextureButton = $MarginContainer/HBoxContainer/BackContainer/VBoxContaine/BackButton
+@onready var index_button: TextureButton = $MarginContainer/HBoxContainer/IndexContainer/VBoxContainer/IndexButton
 @onready var replay_container: MarginContainer = $CanvasLayer/ReplayContainer
 @onready var replay_button: TextureButton = $CanvasLayer/ReplayContainer/HBoxContainer/ReplayButton
 @onready var fullscreen_container: MarginContainer = $CanvasLayer/FullscreenContainer
@@ -32,6 +32,15 @@ signal replay_requested
 @onready var exit_button: TextureButton = $MarginContainer/HBoxContainer/ExitContainer/VBoxContainer/ExitButton
 @onready var random_button: TextureButton = $CanvasLayer/RandomContainer/HBoxContainer/RandomButton
 @onready var random_container: MarginContainer = $CanvasLayer/RandomContainer
+
+@onready var replay_label: Label = $CanvasLayer/ReplayContainer/HBoxContainer/ReplayLabel
+@onready var fullscreen_label: Label = $CanvasLayer/FullscreenContainer/HBoxContainer/FullscreenLabel
+@onready var random_label: Label = $CanvasLayer/RandomContainer/HBoxContainer/RandomLabel
+@onready var back_label: Label = $MarginContainer/HBoxContainer/BackContainer/VBoxContaine/BackLabel
+@onready var instructions_label: Label = $MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsLabel
+@onready var index_label: Label = $MarginContainer/HBoxContainer/IndexContainer/VBoxContainer/IndexLabel
+@onready var music_label: Label = $MarginContainer/HBoxContainer/MusicContainer/VBoxContaine/MusicLabel
+@onready var exit_label: Label = $MarginContainer/HBoxContainer/ExitContainer/VBoxContainer/ExitLabel
 
 
 # ----------------------------
@@ -46,11 +55,7 @@ var current_index: int = -1
 var clear_timer: Timer
 var replay_timer: Timer
 
-# ----------------------------
-# Ready
-# ----------------------------
 func _ready() -> void:
-	
 	# Hide all buttons immediately to prevent flicker
 	fullscreen_container.visible = false
 	replay_container.visible = false
@@ -112,6 +117,53 @@ func _ready() -> void:
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
 	
+	# Set shortcut labels based on platform
+	replay_label.text = "REPLAY [" + GameManager.get_shortcut_text("replay_from_main") + "]"
+	fullscreen_label.text = "FULLSCREEN [" + GameManager.get_shortcut_text("launch_fullscreen") + "]"
+	random_label.text = "RANDOM [" + GameManager.get_shortcut_text("random") + "]"
+	back_label.text = "BACK\n[" + GameManager.get_shortcut_text("nav_left") + "]"
+	instructions_label.text = "INSTRUCTIONS\n[" + GameManager.get_shortcut_text("open_instructions") + "]"
+	index_label.text = "INDEX\n[" + GameManager.get_shortcut_text("nav_right") + "]"
+	music_label.text = "MUSIC ON/OFF\n[" + GameManager.get_shortcut_text("music_toggle") + "]"
+	exit_label.text = "EXIT\n[" + GameManager.get_shortcut_text("quit_app") + "]"
+	
+	# IMMEDIATELY set font sizes after text (do this for ALL platforms, not just Mac)
+	back_label.add_theme_font_size_override("font_size", 18)
+	music_label.add_theme_font_size_override("font_size", 18)
+	instructions_label.add_theme_font_size_override("font_size", 18)
+	exit_label.add_theme_font_size_override("font_size", 18)
+	index_label.add_theme_font_size_override("font_size", 18)
+	replay_label.add_theme_font_size_override("font_size", 18)
+	fullscreen_label.add_theme_font_size_override("font_size", 18)
+	random_label.add_theme_font_size_override("font_size", 18)
+	
+	# Debug - print actual font sizes
+	print("back_label font:", back_label.get_theme_font_size("font_size"))
+	print("music_label font:", music_label.get_theme_font_size("font_size"))
+	print("index_label font:", index_label.get_theme_font_size("font_size"))
+	print("exit_label font:", exit_label.get_theme_font_size("font_size"))
+	
+	# Debug - print actual sizes and scales
+	await get_tree().process_frame  # Wait for layout
+	print("back_label size:", back_label.size, " scale:", back_label.scale)
+	print("music_label size:", music_label.size, " scale:", music_label.scale)
+	print("index_label size:", index_label.size, " scale:", index_label.scale)
+	print("exit_label size:", exit_label.size, " scale:", exit_label.scale)
+	
+	# Double-check index label specifically
+	print("[MainSceneUI] Index label font size after override:", index_label.get_theme_font_size("font_size"))
+		
+	# Set button spacing and center layout
+	var hbox = $MarginContainer/HBoxContainer
+	
+	if hbox:
+		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		
+		if GameManager.is_macos():
+			hbox.add_theme_constant_override("separation", 350)  # MacOS
+		else:
+			hbox.add_theme_constant_override("separation", 400)  # Windows
+				
 # ----------------------------
 # Search Bar Input
 # ----------------------------

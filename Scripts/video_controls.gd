@@ -14,7 +14,6 @@ signal instructions_requested
 # Nodes
 # ----------------------------
 @onready var pause_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/PauseContainer/Pause/PauseButton
-@onready var play_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/PlayContainer/Play/PlayButton
 @onready var replay_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/ReplayContainer/Replay/ReplayButton
 @onready var loop_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/LoopContainer/Loop/LoopButton
 @onready var stop_button: TextureButton = $VideoControlsButtonContainer/VContainerButtons/StopContainer/Stop/StopButton
@@ -70,8 +69,7 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_ALL
 
 	# Wire up buttons
-	pause_button.pressed.connect(_on_pause_pressed)
-	play_button.pressed.connect(_on_play_pressed)
+	pause_button.pressed.connect(_on_pause_toggle)
 	replay_button.pressed.connect(_on_replay_pressed)
 	loop_button.pressed.connect(_on_loop_pressed)
 	stop_button.pressed.connect(_on_stop_pressed)
@@ -88,7 +86,6 @@ func _ready() -> void:
 	
 	# Disable focus on all buttons so they don't capture Enter/Space
 	pause_button.focus_mode = Control.FOCUS_NONE
-	play_button.focus_mode = Control.FOCUS_NONE
 	replay_button.focus_mode = Control.FOCUS_NONE
 	loop_button.focus_mode = Control.FOCUS_NONE
 	stop_button.focus_mode = Control.FOCUS_NONE
@@ -226,13 +223,13 @@ func _on_scrub_ended(_value_changed: bool = false) -> void:
 # ----------------------------
 # Playback button handlers
 # ----------------------------
-func _on_pause_pressed() -> void:
+func _on_pause_toggle() -> void:
 	if dancer != null:
-		dancer.pause_animation()
-
-func _on_play_pressed() -> void:
-	if dancer != null:
-		dancer.resume_animation()
+		var state = dancer.get_playback_state()
+		if state.get("is_paused", false):
+			dancer.resume_animation()
+		else:
+			dancer.pause_animation()
 
 func _on_replay_pressed() -> void:
 	if dancer != null:
@@ -385,10 +382,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		dancer.replay_last_animation()
 	if event.is_action_pressed("pause_animation", false):
 		get_viewport().set_input_as_handled()
-		dancer.pause_animation()
-	if event.is_action_pressed("play_animation", false):
-		get_viewport().set_input_as_handled()
-		dancer.resume_animation()
+		_on_pause_toggle()
 	if event.is_action_pressed("loop_animation", false):
 		get_viewport().set_input_as_handled()
 		dancer.loop_current_animation()

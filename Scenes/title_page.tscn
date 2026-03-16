@@ -221,7 +221,7 @@ texture_normal = ExtResource("6_5qx5v")
 texture_pressed = ExtResource("7_b5kya")
 texture_hover = ExtResource("8_4mofw")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/HBoxContainer"]
+[node name="MusicLabel" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_outline_color = Color(0.25098, 0.25098, 0.25098, 1)
@@ -249,7 +249,7 @@ texture_normal = ExtResource("9_35glm")
 texture_pressed = ExtResource("10_xjfy0")
 texture_hover = ExtResource("11_xawwf")
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer"]
+[node name="InstructionsLabel" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "INSTRUCTIONS [F4]"
