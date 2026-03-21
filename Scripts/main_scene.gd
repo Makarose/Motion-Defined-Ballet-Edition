@@ -86,6 +86,18 @@ func _spawn_dancer(scene_path: String) -> void:
 
 func _on_animation_finished(anim_name: String) -> void:
 	print("[MainScene] Animation finished:", anim_name)
+	
+	# Only show replay if a real term animation finished, not idle
+	if anim_name == "" or GameManager.normalize(anim_name) == GameManager.normalize("idle"):
+		return
+	
+	# Guard against stale signals — only react if this matches what we selected
+	if GameManager.selected_animation == "":
+		return
+	
+	if GameManager.normalize(anim_name) != GameManager.normalize(GameManager.selected_animation):
+		return
+	
 	main_scene_ui.show_replay_button()
 
 # ----------------------------

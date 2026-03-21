@@ -60,64 +60,55 @@ func _ready() -> void:
 	fullscreen_container.visible = false
 	replay_container.visible = false
 	random_container.visible = false
-	
+
 	print("[MainSceneUI] Ready")
-	await get_tree().process_frame
-	search_bar.grab_focus()
-	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
-	
-	# Show correct buttons based on state
-	if GameManager.selected_term == "":
-		random_container.visible = true
-	else:
-		fullscreen_container.visible = true
-	
+
 	# Load database if not set in inspector
 	if not database:
 		database = load("res://Definition Resources/ballet_moves_database.tres")
-	
+
 	# Search bar signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.text_submitted.connect(_on_text_submitted)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
-	
+
 	# Item list signals
 	item_list.item_selected.connect(_on_item_selected)
 	item_list.visible = false
-	
+
 	# Button connections
 	fullscreen_button.pressed.connect(_on_fullscreen_key_pressed)
 	replay_button.pressed.connect(_on_replay_pressed)
 	random_button.pressed.connect(_on_random_pressed)
 	back_button.pressed.connect(_on_nav_left)
 	index_button.pressed.connect(_on_nav_right)
-	
+
 	if music_button:
 		music_button.pressed.connect(GameManager.toggle_music)
 	if instructions_button:
 		instructions_button.pressed.connect(_on_instructions_pressed)
 	if exit_button:
 		exit_button.pressed.connect(_on_exit_pressed)
-	
-	# Clear timer — clears search bar shortly after selection
+
+	# Clear timer
 	clear_timer = Timer.new()
 	clear_timer.one_shot = true
 	clear_timer.wait_time = 0.8
 	clear_timer.timeout.connect(_clear_search_now)
 	add_child(clear_timer)
-	
-	# Replay timer - switches back to random after delay
+
+	# Replay timer
 	replay_timer = Timer.new()
 	replay_timer.one_shot = true
 	replay_timer.wait_time = replay_timeout_seconds
 	replay_timer.timeout.connect(_on_replay_timeout)
 	add_child(replay_timer)
-	
+
 	# GameManager nav signals
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
-	
-	# Set shortcut labels based on platform
+
+	# Shortcut labels
 	replay_label.text = "REPLAY [" + GameManager.get_shortcut_text("replay_from_main") + "]"
 	fullscreen_label.text = "FULLSCREEN [" + GameManager.get_shortcut_text("launch_fullscreen") + "]"
 	random_label.text = "RANDOM [" + GameManager.get_shortcut_text("random") + "]"
@@ -126,8 +117,8 @@ func _ready() -> void:
 	index_label.text = "INDEX\n[" + GameManager.get_shortcut_text("nav_right") + "]"
 	music_label.text = "MUSIC ON/OFF\n[" + GameManager.get_shortcut_text("music_toggle") + "]"
 	exit_label.text = "EXIT\n[" + GameManager.get_shortcut_text("quit_app") + "]"
-	
-	# IMMEDIATELY set font sizes after text (do this for ALL platforms, not just Mac)
+
+	# Font sizes
 	back_label.add_theme_font_size_override("font_size", 18)
 	music_label.add_theme_font_size_override("font_size", 18)
 	instructions_label.add_theme_font_size_override("font_size", 18)
@@ -136,52 +127,52 @@ func _ready() -> void:
 	replay_label.add_theme_font_size_override("font_size", 18)
 	fullscreen_label.add_theme_font_size_override("font_size", 18)
 	random_label.add_theme_font_size_override("font_size", 18)
-	
-	# Debug - print actual font sizes
-	print("back_label font:", back_label.get_theme_font_size("font_size"))
-	print("music_label font:", music_label.get_theme_font_size("font_size"))
-	print("index_label font:", index_label.get_theme_font_size("font_size"))
-	print("exit_label font:", exit_label.get_theme_font_size("font_size"))
-	
-	# Debug - print actual sizes and scales
-	await get_tree().process_frame  # Wait for layout
-	print("back_label size:", back_label.size, " scale:", back_label.scale)
-	print("music_label size:", music_label.size, " scale:", music_label.scale)
-	print("index_label size:", index_label.size, " scale:", index_label.scale)
-	print("exit_label size:", exit_label.size, " scale:", exit_label.scale)
-	
-	# Double-check index label specifically
-	print("[MainSceneUI] Index label font size after override:", index_label.get_theme_font_size("font_size"))
-		
-	# Set button spacing and center layout
+
+	# HBox spacing
 	var hbox = $MarginContainer/HBoxContainer
-	
 	if hbox:
 		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-		
 		if GameManager.is_macos():
-			hbox.add_theme_constant_override("separation", 350)  # MacOS
+			hbox.add_theme_constant_override("separation", 350)
 		else:
-			hbox.add_theme_constant_override("separation", 400)  # Windows
-				
+			hbox.add_theme_constant_override("separation", 400)
+
+	# Wait for layout to settle, THEN do focus and show correct buttons
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	search_bar.grab_focus()
+
+	# Show correct buttons — only after both frames have passed
+	if GameManager.selected_term == "":
+		random_container.visible = true
+	else:
+		fullscreen_container.visible = true
+
+	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
+
+
 # ----------------------------
 # Search Bar Input
 # ----------------------------
 func _on_search_bar_gui_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-		
-	print("[SearchBar] keycode:", event.keycode, " ctrl:", event.ctrl_pressed)
-	
-	if event.ctrl_pressed:
-		if event.keycode == KEY_LEFT or event.physical_keycode == KEY_LEFT:
-			accept_event()
-			_on_nav_left()
-		elif event.keycode == KEY_RIGHT or event.physical_keycode == KEY_RIGHT:
-			accept_event()
-			_on_nav_right()
+
+	print("[SearchBar] keycode:", event.keycode, " ctrl:", event.ctrl_pressed, " shift:", event.shift_pressed)
+
+	var nav_left = event.is_action("nav_left") if not GameManager.is_macos() else (event.shift_pressed and event.physical_keycode == KEY_LEFT)
+	var nav_right = event.is_action("nav_right") if not GameManager.is_macos() else (event.shift_pressed and event.physical_keycode == KEY_RIGHT)
+
+	if nav_left:
+		accept_event()
+		_on_nav_left()
 		return
-	
+	elif nav_right:
+		accept_event()
+		_on_nav_right()
+		return
+
 	if event.keycode == KEY_UP:
 		accept_event()
 		_on_search_move_up()
@@ -194,8 +185,8 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_F1:
 		accept_event()
 		_on_fullscreen_key_pressed()
-
-
+		
+		
 # ----------------------------
 # Search bar text changed
 # Filters item list as user types

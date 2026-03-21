@@ -22,8 +22,10 @@ signal instructions_requested
 @onready var female_button: Button = $CharacterButtonContainer/FemaleButton/FemaleButton
 @onready var scrub_slider: HSlider = $SliderContainer/ScrubSlider
 @onready var time_label: Label = $SliderContainer/TimeLabel
-@onready var music_button: TextureButton = $MarginContainer2/HBoxContainer/MusicContainer/HBoxContaine/MusicButton
-@onready var instructions_button: TextureButton = $MarginContainer2/HBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
+@onready var music_button: TextureButton = $MarginContainer2/VBoxContainer/MusicContainer/HBoxContaine/MusicButton
+@onready var instructions_button: TextureButton = $MarginContainer2/VBoxContainer/InstructionsContainer/HBoxContainer/InstructionsButton
+@onready var instruction_label: Label = $MarginContainer2/VBoxContainer/InstructionsContainer/HBoxContainer/InstructionLabel
+@onready var music_label: Label = $MarginContainer2/VBoxContainer/MusicContainer/HBoxContaine/MusicLabel
 
 # ----------------------------
 # Camera tunables
@@ -106,7 +108,14 @@ func _ready() -> void:
 	scrub_slider.add_theme_stylebox_override("grabber_area", grabber_area)
 	scrub_slider.add_theme_stylebox_override("grabber_area_highlight", grabber_area)
 	
-	
+	# Set shortcut labels based on platform
+	if music_label:
+		music_label.text = "MUSIC ON/OFF\n[" + GameManager.get_shortcut_text("music_toggle") + "]"
+
+	if instruction_label:
+		instruction_label.text = "INSTRUCTIONS\n[" + GameManager.get_shortcut_text("open_instructions") + "]"
+		
+		
 # ----------------------------
 # Process — camera controls and scrub bar update
 # ----------------------------

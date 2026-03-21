@@ -9,9 +9,17 @@ extends Control
 @onready var search_bar: LineEdit = $VBoxContainer/LineEdit
 @onready var term_list: ItemList = $VBoxContainer/ItemList
 
-@onready var music_button: TextureButton = $MarginContainer2/HBoxContainer/MusicContainer/VBoxContaine/MusicButton
-@onready var instructions_button: TextureButton = $MarginContainer2/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsButton
-@onready var exit_button: TextureButton = $MarginContainer2/HBoxContainer/ExitContainer/VBoxContainer/ExitButton
+@onready var back_button: TextureButton = $BottomButtons/HBoxContainer/BackContainer/VBoxContaine/BackButton
+@onready var music_button: TextureButton = $BottomButtons/HBoxContainer/MusicContainer/VBoxContaine/MusicButton
+@onready var instructions_button: TextureButton = $BottomButtons/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsButton
+@onready var exit_button: TextureButton = $BottomButtons/HBoxContainer/ExitContainer/VBoxContainer/ExitButton
+@onready var home_button: TextureButton = $BottomButtons/HBoxContainer/HomeContainer/VBoxContainer/HomeButton
+
+@onready var back_label: Label = $BottomButtons/HBoxContainer/BackContainer/VBoxContaine/BackLabel
+@onready var music_label: Label = $BottomButtons/HBoxContainer/MusicContainer/VBoxContaine/MusicLabel
+@onready var instructions_label: Label = $BottomButtons/HBoxContainer/InstructionsContainer/VBoxContainer/InstructionsLabel
+@onready var exit_label: Label = $BottomButtons/HBoxContainer/ExitContainer/VBoxContainer/ExitLabel
+@onready var home_label: Label = $BottomButtons/HBoxContainer/HomeContainer/VBoxContainer/HomeLabel
 
 # ----------------------------
 # Runtime state
@@ -38,10 +46,8 @@ func _ready() -> void:
 	term_list.item_activated.connect(_on_term_activated)
 	
 	# Connect navigation buttons
-	var back_button = get_node_or_null("MarginContainer2/HBoxContainer/BackButtonContainer/VBoxContainer/BackButton")
 	if back_button:
 		back_button.pressed.connect(_on_back_button_pressed)
-	var home_button = get_node_or_null("MarginContainer2/HBoxContainer/Home/MarginContainer/HomeButton")
 	if home_button:
 		home_button.pressed.connect(_on_home_button_pressed)
 	
@@ -60,7 +66,31 @@ func _ready() -> void:
 	# GameManager nav signals
 	GameManager.nav_left.connect(_on_nav_left)
 	GameManager.nav_right.connect(_on_nav_right)
+	
+	# Set button spacing and center layout
+	var hbox = %HBoxContainer
+	
+	if hbox:
+		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		
+		if GameManager.is_macos():
+			hbox.add_theme_constant_override("separation", 350)  # MacOS
+		else:
+			hbox.add_theme_constant_override("separation", 400)  # Windows
 
+# Shortcut labels
+	back_label.text = "BACK\n[" + GameManager.get_shortcut_text("nav_left") + "]"
+	home_label.text = "HOME\n[" + GameManager.get_shortcut_text("nav_right") + "]"
+	music_label.text = "MUSIC ON/OFF\n[" + GameManager.get_shortcut_text("music_toggle") + "]"
+	instructions_label.text = "INSTRUCTIONS\n[" + GameManager.get_shortcut_text("open_instructions") + "]"
+	exit_label.text = "EXIT\n[" + GameManager.get_shortcut_text("quit_app") + "]"
+
+	# Font sizes
+	back_label.add_theme_font_size_override("font_size", 18)
+	home_label.add_theme_font_size_override("font_size", 18)
+	music_label.add_theme_font_size_override("font_size", 18)
+	instructions_label.add_theme_font_size_override("font_size", 18)
+	exit_label.add_theme_font_size_override("font_size", 18)
 
 # ----------------------------
 # Populate list
@@ -119,6 +149,20 @@ func _on_term_activated(index: int) -> void:
 # ----------------------------
 func _on_search_bar_gui_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed:
+		return
+
+	print("[Index SearchBar] keycode:", event.keycode, " ctrl:", event.ctrl_pressed, " shift:", event.shift_pressed)
+
+	var nav_left = event.is_action("nav_left") if not GameManager.is_macos() else (event.shift_pressed and event.physical_keycode == KEY_LEFT)
+	var nav_right = event.is_action("nav_right") if not GameManager.is_macos() else (event.shift_pressed and event.physical_keycode == KEY_RIGHT)
+
+	if nav_left:
+		accept_event()
+		_on_nav_left()
+		return
+	elif nav_right:
+		accept_event()
+		_on_nav_right()
 		return
 
 	match event.keycode:

@@ -130,10 +130,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	
-	if event.ctrl_pressed and event.physical_keycode == KEY_LEFT and not is_fullscreen:
+	var nav_left = event.is_action("nav_left") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_LEFT)
+	var nav_right = event.is_action("nav_right") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_RIGHT)
+	
+	if nav_left and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_left")
-	elif event.ctrl_pressed and event.physical_keycode == KEY_RIGHT and not is_fullscreen:
+	elif nav_right and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_right")
 	elif event.is_action("quit_app"):
