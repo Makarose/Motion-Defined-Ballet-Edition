@@ -42,6 +42,7 @@ const SETTINGS_PATH = "user://settings.cfg"
 func _ready() -> void:
 
 	set_process_unhandled_input(true)
+	load_settings()
 	
 # Create quit confirmation dialog
 	quit_dialog = ConfirmationDialog.new()
@@ -61,7 +62,10 @@ func _ready() -> void:
 	quit_dialog.add_theme_stylebox_override("panel", style_box)
 	
 	# Center the text horizontally and vertically + increase font size
-	await get_tree().process_frame
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.2).timeout
+	else:
+		await get_tree().process.frame
 	var label = quit_dialog.get_label()
 	if label:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -206,9 +210,8 @@ func save_settings() -> void:
 # Platform Detection
 # ----------------------------
 func is_macos() -> bool:
-	return true  # TESTING - Force mac mode for testing
-	# return OS.get_name() == "macOS"  # Uncomment when done testing
-
+	return OS.get_name() == "macOS"
+	
 func get_shortcut_text(action_name: String) -> String:
 	match action_name:
 		"music_toggle":
@@ -222,7 +225,7 @@ func get_shortcut_text(action_name: String) -> String:
 		"nav_right":
 			return "SHIFT + →" if is_macos() else "Ctrl+→"
 		"random":
-			return "CMD + B" if is_macos() else "F5"
+			return "CMD + A" if is_macos() else "F5"
 		"launch_fullscreen":
 			return "CMD + Z" if is_macos() else "F1"
 		"replay_from_main":

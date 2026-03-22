@@ -42,7 +42,6 @@ signal replay_requested
 @onready var music_label: Label = $MarginContainer/HBoxContainer/MusicContainer/VBoxContaine/MusicLabel
 @onready var exit_label: Label = $MarginContainer/HBoxContainer/ExitContainer/VBoxContainer/ExitLabel
 
-
 # ----------------------------
 # Resources
 # ----------------------------
@@ -55,6 +54,37 @@ var current_index: int = -1
 var clear_timer: Timer
 var replay_timer: Timer
 
+# ----------------------------
+# Button state enum
+# ----------------------------
+enum ButtonState { RANDOM, FULLSCREEN, REPLAY }
+
+# ----------------------------
+# Single source of truth for button visibility
+# ----------------------------
+func set_button_state(state: ButtonState) -> void:
+	# Always hide all first
+	random_container.visible = false
+	fullscreen_container.visible = false
+	replay_container.visible = false
+
+	match state:
+		ButtonState.RANDOM:
+			random_container.visible = true
+			if replay_timer:
+				replay_timer.stop()
+		ButtonState.FULLSCREEN:
+			fullscreen_container.visible = true
+			if replay_timer:
+				replay_timer.stop()
+		ButtonState.REPLAY:
+			replay_container.visible = true
+			if replay_timer:
+				replay_timer.start()
+
+# ----------------------------
+# Ready
+# ----------------------------
 func _ready() -> void:
 	# Hide all buttons immediately to prevent flicker
 	fullscreen_container.visible = false
@@ -137,21 +167,23 @@ func _ready() -> void:
 		else:
 			hbox.add_theme_constant_override("separation", 400)
 
-	# Wait for layout to settle, THEN do focus and show correct buttons
-	await get_tree().process_frame
-	await get_tree().process_frame
+	# Show correct buttons immediately
+	if GameManager.selected_term == "":
+		set_button_state(ButtonState.RANDOM)
+	else:
+		set_button_state(ButtonState.FULLSCREEN)
+
+	# Wait for layout to settle for focus only
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.2).timeout
+	else:
+		await get_tree().process_frame
+		await get_tree().process_frame
 
 	search_bar.grab_focus()
-
-	# Show correct buttons — only after both frames have passed
-	if GameManager.selected_term == "":
-		random_container.visible = true
-	else:
-		fullscreen_container.visible = true
-
 	print("[MainSceneUI] Focus owner after ready:", get_viewport().gui_get_focus_owner())
-
-
+	
+	
 # ----------------------------
 # Search Bar Input
 # ----------------------------
@@ -185,8 +217,8 @@ func _on_search_bar_gui_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_F1:
 		accept_event()
 		_on_fullscreen_key_pressed()
-		
-		
+
+
 # ----------------------------
 # Search bar text changed
 # Filters item list as user types
@@ -205,7 +237,7 @@ func _on_search_changed(new_text: String) -> void:
 			item_list.add_item(move.name)
 
 	item_list.visible = item_list.get_item_count() > 0
-	
+
 	# Auto-select exact match
 	if item_list.get_item_count() > 0:
 		for i in range(item_list.get_item_count()):
@@ -230,47 +262,54 @@ func _on_item_selected(index: int) -> void:
 func _on_text_submitted(_text: String) -> void:
 	if current_index >= 0:
 		_select_item(current_index)
-		
+
+
 # ----------------------------
 # Random term selection
-# ----------------------------
-# ----------------------------
-# Random term selection and button visibility
 # ----------------------------
 func _on_random_pressed() -> void:
 	if database.moves.size() == 0:
 		return
-	
-	# Pick a random move
+
 	var random_index = randi() % database.moves.size()
 	var random_move = database.moves[random_index]
-	
-	# Update UI
+
 	title_label.text = random_move.name
 	definition_label.text = random_move.definition
 	GameManager.selected_definition = random_move.definition
-	
-	# Hide random, show fullscreen
-	hide_random_button()
-	show_fullscreen_button()
-	hide_replay_button()
-	
-	# Emit signal to play animation
+
+	set_button_state(ButtonState.FULLSCREEN)
+
 	if random_move.animation_name.strip_edges() != "":
 		emit_signal("term_selected", random_move.name, random_move.animation_name, random_move.definition)
 
+
+# ----------------------------
+# Convenience wrappers — all route through set_button_state
+# ----------------------------
 func show_random_button() -> void:
-	if random_container:
-		random_container.visible = true
+	set_button_state(ButtonState.RANDOM)
 
 func hide_random_button() -> void:
-	if random_container:
-		random_container.visible = false
-		
-		
+	random_container.visible = false
+
+func show_fullscreen_button() -> void:
+	set_button_state(ButtonState.FULLSCREEN)
+
+func hide_fullscreen_button() -> void:
+	fullscreen_container.visible = false
+
+func show_replay_button() -> void:
+	set_button_state(ButtonState.REPLAY)
+
+func hide_replay_button() -> void:
+	replay_container.visible = false
+	if replay_timer:
+		replay_timer.stop()
+
+
 # ----------------------------
 # Core selection logic
-# Finds the move, updates UI, emits signal up to MainScene
 # ----------------------------
 func _select_item(index: int) -> void:
 	if index < 0 or index >= item_list.get_item_count():
@@ -283,16 +322,12 @@ func _select_item(index: int) -> void:
 		push_warning("[MainSceneUI] Move not found in database: " + selected_name)
 		return
 
-	# Update UI
 	title_label.text = move.name
 	definition_label.text = move.definition
 	search_bar.text = move.name
 	item_list.visible = false
-	search_bar.release_focus()
 
-	# Show fullscreen, hide random
-	fullscreen_container.visible = true
-	hide_random_button()  # ← ADD THIS
+	set_button_state(ButtonState.FULLSCREEN)
 
 	clear_timer.start()
 
@@ -301,14 +336,14 @@ func _select_item(index: int) -> void:
 	else:
 		push_warning("[MainSceneUI] No animation name set for move: " + move.name)
 
+
 # ----------------------------
 # Restore term when arriving from index page
-# Called by MainScene on _ready() if GameManager has a selected term
 # ----------------------------
 func restore_term(term: String, definition: String) -> void:
 	title_label.text = term
 	definition_label.text = definition
-	fullscreen_container.visible = true
+	set_button_state(ButtonState.FULLSCREEN)
 
 
 # ----------------------------
@@ -322,55 +357,29 @@ func _clear_search_now() -> void:
 
 
 # ----------------------------
-# Show / hide fullscreen button
-# ----------------------------
-func show_fullscreen_button() -> void:
-	fullscreen_container.visible = true
-	print("[MainSceneUI] Fullscreen button SHOWN")
-
-func hide_fullscreen_button() -> void:
-	fullscreen_container.visible = false
-	print("[MainSceneUI] Fullscreen button HIDDEN")
-
-
-# ----------------------------
 # Fullscreen button pressed
 # ----------------------------
 func _on_fullscreen_key_pressed() -> void:
 	if fullscreen_container.visible:
 		emit_signal("fullscreen_requested")
-		
-		
-# ----------------------------
-# Replay Button Visibility
-# ----------------------------		
-func show_replay_button() -> void:
-	if replay_container:
-		replay_container.visible = true
-	hide_fullscreen_button()
-	hide_random_button()
-	
-	# Start timer to switch back to random
-	replay_timer.start()
 
-func hide_replay_button() -> void:
-	if replay_container:
-		replay_container.visible = false
-		
+
+# ----------------------------
+# Replay timeout — switch back to random
+# ----------------------------
 func _on_replay_timeout() -> void:
-	hide_replay_button()
-	show_random_button()
-		
+	set_button_state(ButtonState.RANDOM)
+
+
 # ----------------------------
 # Replay button pressed
 # ----------------------------
 func _on_replay_pressed() -> void:
-	# Stop the timer when manually replaying
 	if replay_timer:
 		replay_timer.stop()
-	
 	emit_signal("replay_requested")
-	
+
+
 # ----------------------------
 # Instructions
 # ----------------------------
@@ -378,25 +387,28 @@ func _on_instructions_pressed() -> void:
 	GameManager.previous_scene = "res://Scenes/main_scene.tscn"
 	get_tree().change_scene_to_file("res://Scenes/instructions.tscn")
 
+
 # ----------------------------
 # Exit
 # ----------------------------
 func _on_exit_pressed() -> void:
 	GameManager.quit_dialog.popup_centered()
 
+
 # ----------------------------
-# Navigation — emit signals up, never change scene directly
+# Navigation
 # ----------------------------
 func _on_nav_left() -> void:
+	if replay_timer:
+		replay_timer.stop()
 	emit_signal("back_pressed")
 
 func _on_nav_right() -> void:
 	emit_signal("index_pressed")
-	
 
 
 # ----------------------------
-# Arrow key functions?
+# Search movement
 # ----------------------------
 func _on_search_move_up() -> void:
 	if current_index > 0:
@@ -419,7 +431,11 @@ func _on_search_confirmed() -> void:
 			if GameManager.normalize(item_list.get_item_text(i)) == normalized_input:
 				_select_item(i)
 				return
-				
+
+
+# ----------------------------
+# Input
+# ----------------------------
 func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
@@ -433,23 +449,23 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("launch_fullscreen", false):
 		get_viewport().set_input_as_handled()
 		_on_fullscreen_key_pressed()
-		
+
 	if event.is_action_pressed("replay_from_main", false):
 		get_viewport().set_input_as_handled()
 		_on_replay_pressed()
-	
+
 	if event.is_action_pressed("music_toggle", false):
 		get_viewport().set_input_as_handled()
 		GameManager.toggle_music()
-	
+
 	if event.is_action_pressed("open_instructions", false):
 		get_viewport().set_input_as_handled()
 		_on_instructions_pressed()
-	
+
 	if event.is_action_pressed("quit_app", false):
 		get_viewport().set_input_as_handled()
 		_on_exit_pressed()
-	
+
 	if event.is_action_pressed("random", false):
 		get_viewport().set_input_as_handled()
 		_on_random_pressed()

@@ -80,7 +80,7 @@ func _on_female_pressed() -> void:
 	else:
 		get_tree().change_scene_to_file("res://Scenes/main_scene.tscn")
 # ----------------------------
-# Inst"res://Scripts/main_scene.gd"ructions Selected
+# Instructions Selected
 # ----------------------------
 func _on_instructions_pressed() -> void:
 	GameManager.previous_scene = "res://Scenes/title_page.tscn"

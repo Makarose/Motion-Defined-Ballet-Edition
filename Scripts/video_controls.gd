@@ -225,8 +225,9 @@ func _on_scrub_changed(value: float) -> void:
 
 func _on_scrub_ended(_value_changed: bool = false) -> void:
 	scrub_active = false
-	# Don't auto-resume - keep it paused after scrubbing
-	# User must manually press play to continue
+	# Reset drag state in case mouse release was eaten by the slider
+	dragging = false
+	drag_axis = ""
 
 
 # ----------------------------
@@ -352,6 +353,13 @@ func _gui_input(event: InputEvent) -> void:
 			vertical_offset = clamp(vertical_offset, vertical_min, vertical_max)
 
 		last_mouse_pos = event.position
+		_update_camera()
+		
+	if event is InputEventPanGesture:
+		if event.delta.y > 0:
+			distance = clamp(distance + mouse_zoom_step, zoom_min, zoom_max)
+		elif event.delta.y < 0:
+			distance = clamp(distance - mouse_zoom_step, zoom_min, zoom_max)
 		_update_camera()
 		
 # ----------------------------

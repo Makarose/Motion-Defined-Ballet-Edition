@@ -16,15 +16,35 @@ extends Control
 var current_dancer: Node3D = null
 
 # ----------------------------
-# Ready
+# Ready & Inialize
 # ----------------------------
 func _ready() -> void:
-	print("[MainScene] Ready")
+	# Spawn dancer immediately — no delay needed for this
+	if GameManager.chosen_character != "":
+		_spawn_dancer(GameManager.chosen_character)
+	else:
+		push_warning("[MainScene] No character chosen — did you come from title page?")
+
+	# Then wait for UI to initialize
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.2).timeout
+	else:
+		await get_tree().process_frame
+		await get_tree().process_frame
 	
-	# If returning to fullscreen, hide UI immediately to prevent flash
+	_initialize()
+
+func _initialize() -> void:
+	print("[MainScene] chosen_character:", GameManager.chosen_character)
+
+	# Safety reset
+	if not GameManager.is_fullscreen:
+		main_scene_ui.show()
+		main_scene_ui.process_mode = Node.PROCESS_MODE_INHERIT
+
 	if GameManager.is_fullscreen:
 		main_scene_ui.hide()
-	
+
 	fullscreen_scene.hide()
 
 	# Wire up MainSceneUI signals
@@ -38,21 +58,14 @@ func _ready() -> void:
 	fullscreen_scene.exit_requested.connect(_on_fullscreen_exit)
 	fullscreen_scene.character_changed.connect(_on_character_changed)
 
-	# Spawn character — there should always be one from title page
-	if GameManager.chosen_character != "":
-		_spawn_dancer(GameManager.chosen_character)
-	else:
-		push_warning("[MainScene] No character chosen — did you come from title page?")
-
-	# If we arrived from index with a term already selected, auto-play it
+	# If we arrived with a term already selected, auto-play it
 	if GameManager.selected_term != "":
 		_play_term(GameManager.selected_term, GameManager.selected_animation)
 		main_scene_ui.restore_term(GameManager.selected_term, GameManager.selected_definition)
 		await get_tree().process_frame
 		main_scene_ui.show_fullscreen_button()
 		main_scene_ui.hide_random_button()
-		
-		# If we were in fullscreen before (e.g., returning from instructions), re-enter fullscreen
+
 		if GameManager.is_fullscreen:
 			await get_tree().process_frame
 			_on_fullscreen_requested()
@@ -99,6 +112,11 @@ func _on_animation_finished(anim_name: String) -> void:
 		return
 	
 	main_scene_ui.show_replay_button()
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.1).timeout
+	else:
+		await get_tree().process_frame
+	main_scene_ui.search_bar.grab_focus()
 
 # ----------------------------
 # Find exact animation clip name on dancer
@@ -168,8 +186,10 @@ func _on_fullscreen_exit() -> void:
 	fullscreen_scene.get_node("CanvasLayer").hide()
 	main_scene_ui.process_mode = Node.PROCESS_MODE_INHERIT
 	main_scene_ui.show()
-	# Re-focus search bar
-	await get_tree().process_frame
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.1).timeout
+	else:
+		await get_tree().process_frame
 	main_scene_ui.search_bar.grab_focus()
 	
 # ----------------------------
@@ -207,6 +227,7 @@ func _on_character_changed(scene_path: String) -> void:
 # ----------------------------
 func _on_nav_left() -> void:
 	GameManager.clear_term_state()
+	print("[MainScene] After clear - selected_term:", GameManager.selected_term)
 	get_tree().change_scene_to_file("res://Scenes/title_page.tscn")
 
 func _on_nav_right() -> void:

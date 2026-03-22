@@ -40,7 +40,6 @@ func _ready() -> void:
 	# Search bar signals
 	search_bar.text_changed.connect(_on_search_changed)
 	search_bar.gui_input.connect(_on_search_bar_gui_input)
-	search_bar.grab_focus()
 	
 	# Item list signal
 	term_list.item_activated.connect(_on_term_activated)
@@ -69,16 +68,14 @@ func _ready() -> void:
 	
 	# Set button spacing and center layout
 	var hbox = %HBoxContainer
-	
 	if hbox:
 		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-		
 		if GameManager.is_macos():
-			hbox.add_theme_constant_override("separation", 350)  # MacOS
+			hbox.add_theme_constant_override("separation", 350)
 		else:
-			hbox.add_theme_constant_override("separation", 400)  # Windows
+			hbox.add_theme_constant_override("separation", 400)
 
-# Shortcut labels
+	# Shortcut labels
 	back_label.text = "BACK\n[" + GameManager.get_shortcut_text("nav_left") + "]"
 	home_label.text = "HOME\n[" + GameManager.get_shortcut_text("nav_right") + "]"
 	music_label.text = "MUSIC ON/OFF\n[" + GameManager.get_shortcut_text("music_toggle") + "]"
@@ -92,6 +89,14 @@ func _ready() -> void:
 	instructions_label.add_theme_font_size_override("font_size", 18)
 	exit_label.add_theme_font_size_override("font_size", 18)
 
+	# Grab focus after layout settles
+	if OS.get_name() == "macOS":
+		await get_tree().create_timer(0.1).timeout
+	else:
+		await get_tree().process_frame
+	search_bar.grab_focus()
+	
+	
 # ----------------------------
 # Populate list
 # ----------------------------
