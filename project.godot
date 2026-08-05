@@ -8,15 +8,20 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="MoDe - Ballet Edition"
 run/main_scene="res://Scenes/title_page.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
-boot_splash/bg_color=Color(0.643137, 0.729412, 0.776471, 1)
-boot_splash/image="res://motion_defined_icon.svg"
+config/features=PackedStringArray("4.6", "Forward Plus")
+boot_splash/bg_color=Color(0.8352941, 0.9490196, 1, 1)
+boot_splash/stretch_mode=0
+boot_splash/image="uid://deroka5y1njw"
 config/icon="res://motion_defined_icon.svg"
-boot_splash/minimum_display_time=1000
+boot_splash/minimum_display_time=2500
 
 [autoload]
 

@@ -1,11 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://dyr2srv21e1ql"]
+[gd_scene format=3 uid="uid://dyr2srv21e1ql"]
 
-[ext_resource type="Script" path="res://Scripts/main_scene.gd" id="1_fcans"]
+[ext_resource type="Script" uid="uid://r1553u47puo6" path="res://Scripts/main_scene.gd" id="1_fcans"]
 [ext_resource type="PackedScene" uid="uid://btkmkmqv4x7r6" path="res://Scenes/main_scene_ui.tscn" id="2_n4he7"]
 [ext_resource type="PackedScene" uid="uid://c0opmlqorul1c" path="res://Scenes/background.tscn" id="3_h6s4l"]
 [ext_resource type="PackedScene" uid="uid://bel5h8cknb8rx" path="res://Scenes/fullscreen_scene.tscn" id="4_65qtm"]
 
-[node name="MainScene" type="Control"]
+[node name="MainScene" type="Control" unique_id=772297549]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +18,7 @@ script = ExtResource("1_fcans")
 metadata/_edit_vertical_guides_ = [692.0, 1816.0]
 metadata/_edit_horizontal_guides_ = [163.0, 1000.0]
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1041778383]
 layout_mode = 1
 offset_left = 692.0
 offset_top = 163.0
@@ -30,25 +30,51 @@ size_flags_stretch_ratio = 0.0
 mouse_filter = 2
 stretch = true
 
-[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="DancerViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1784019666]
 own_world_3d = true
 handle_input_locally = false
 size = Vector2i(1125, 500)
 render_target_update_mode = 4
 
-[node name="Background" parent="SubViewportContainer/DancerViewport" instance=ExtResource("3_h6s4l")]
+[node name="Background" parent="SubViewportContainer/DancerViewport" unique_id=1831611235 instance=ExtResource("3_h6s4l")]
 
 [node name="Camera3D" parent="SubViewportContainer/DancerViewport/Background" index="1"]
 current = true
 
-[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport"]
+[node name="CharacterSlot" type="Node3D" parent="SubViewportContainer/DancerViewport" unique_id=1121019222]
 
-[node name="MainSceneUI" parent="." instance=ExtResource("2_n4he7")]
+[node name="MainSceneUI" parent="." unique_id=66802818 instance=ExtResource("2_n4he7")]
 layout_mode = 1
 mouse_filter = 1
 
-[node name="FullscreenScene" parent="." instance=ExtResource("4_65qtm")]
+[node name="ColorRect" parent="MainSceneUI" index="3"]
+layout_mode = 0
+
+[node name="FullscreenScene" parent="." unique_id=272959287 instance=ExtResource("4_65qtm")]
 layout_mode = 1
+
+[node name="CharacterButtonContainer" parent="FullscreenScene/CanvasLayer/VideoControls" index="1"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -349.0
+offset_right = 721.0
+grow_horizontal = 0
+grow_vertical = 1
+
+[node name="MarginContainer2" parent="FullscreenScene/CanvasLayer/VideoControls" index="3"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -349.0
+offset_top = -603.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [connection signal="fullscreen_requested" from="MainSceneUI" to="." method="_on_fullscreen_button_pressed"]
 

@@ -1,6 +1,6 @@
-[gd_scene load_steps=33 format=3 uid="uid://btkmkmqv4x7r6"]
+[gd_scene format=3 uid="uid://btkmkmqv4x7r6"]
 
-[ext_resource type="Script" path="res://Scripts/main_scene_ui.gd" id="1_kdlrg"]
+[ext_resource type="Script" uid="uid://dsqlik0thu8pt" path="res://Scripts/main_scene_ui.gd" id="1_kdlrg"]
 [ext_resource type="Theme" uid="uid://bwkglkrll8mi0" path="res://ballet_theme.tres" id="2_5chal"]
 [ext_resource type="Texture2D" uid="uid://bxpuus4co7vx5" path="res://UI Buttons/10.png" id="3_6830r"]
 [ext_resource type="Texture2D" uid="uid://cckmhj4pqtfjd" path="res://UI Buttons/left_select_button.png" id="4_qcv70"]
@@ -57,7 +57,7 @@ shadow_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o433g"]
 bg_color = Color(0.642257, 0.730302, 0.777878, 1)
 
-[node name="MainSceneUI" type="Control"]
+[node name="MainSceneUI" type="Control" unique_id=84945491]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,10 +69,10 @@ replay_timeout_seconds = 3.0
 metadata/_edit_vertical_guides_ = [1821.0, 692.0, 100.0, 679.0]
 metadata/_edit_horizontal_guides_ = [875.0, 883.0, 50.0, 150.0, 163.0, 1050.0]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=422619804]
 layer = 0
 
-[node name="MainTitle" type="MarginContainer" parent="CanvasLayer"]
+[node name="MainTitle" type="MarginContainer" parent="CanvasLayer" unique_id=481999412]
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 100.0
@@ -84,11 +84,11 @@ scale = Vector2(0.894458, 0.892136)
 size_flags_horizontal = 3
 metadata/_edit_group_ = true
 
-[node name="MainTitle" type="PanelContainer" parent="CanvasLayer/MainTitle"]
+[node name="MainTitle" type="PanelContainer" parent="CanvasLayer/MainTitle" unique_id=520320624]
 layout_mode = 2
 theme = ExtResource("2_5chal")
 
-[node name="Index" type="Label" parent="CanvasLayer/MainTitle"]
+[node name="Index" type="Label" parent="CanvasLayer/MainTitle" unique_id=821672873]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("6_k4h06")
 text = "Motion Defined: Ballet Edition"
@@ -96,7 +96,7 @@ label_settings = SubResource("LabelSettings_d2ish")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Definitions" type="PanelContainer" parent="CanvasLayer"]
+[node name="Definitions" type="PanelContainer" parent="CanvasLayer" unique_id=1023915428]
 offset_left = 100.0
 offset_top = 163.0
 offset_right = 636.0
@@ -105,24 +105,24 @@ scale = Vector2(1.08034, 0.890039)
 size_flags_stretch_ratio = 0.0
 theme = ExtResource("2_5chal")
 
-[node name="MarginContainerTextMain" type="MarginContainer" parent="CanvasLayer/Definitions"]
+[node name="MarginContainerTextMain" type="MarginContainer" parent="CanvasLayer/Definitions" unique_id=951860139]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain" unique_id=1098004569]
 layout_mode = 2
 
-[node name="MarginContainerTitle" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
+[node name="MarginContainerTitle" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer" unique_id=1212392267]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="TitleLabel" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle"]
+[node name="TitleLabel" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerTitle" unique_id=850222093]
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 theme = ExtResource("2_5chal")
@@ -131,14 +131,14 @@ theme_override_font_sizes/normal_font_size = 40
 bbcode_enabled = true
 scroll_active = false
 
-[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer"]
+[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer" unique_id=623799290]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="DefinitionLabel" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText"]
+[node name="DefinitionLabel" type="RichTextLabel" parent="CanvasLayer/Definitions/MarginContainerTextMain/VBoxContainer/MarginContainerText" unique_id=647922958]
 custom_minimum_size = Vector2(500, 700)
 layout_mode = 2
 theme = ExtResource("2_5chal")
@@ -146,7 +146,7 @@ theme_override_font_sizes/normal_font_size = 40
 text = "Search for a move and the definition will be shown here."
 autowrap_mode = 2
 
-[node name="Search" type="PanelContainer" parent="CanvasLayer"]
+[node name="Search" type="PanelContainer" parent="CanvasLayer" unique_id=1563078563]
 offset_left = 692.0
 offset_top = 673.0
 offset_right = 1819.0
@@ -155,17 +155,17 @@ scale = Vector2(1.00189, 0.995842)
 size_flags_stretch_ratio = 0.0
 theme = ExtResource("2_5chal")
 
-[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Search"]
+[node name="MarginContainerText" type="MarginContainer" parent="CanvasLayer/Search" unique_id=28670936]
 layout_mode = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Search/MarginContainerText"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Search/MarginContainerText" unique_id=1600090364]
 layout_mode = 2
 
-[node name="Search" type="Label" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+[node name="Search" type="Label" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer" unique_id=1227056870]
 custom_minimum_size = Vector2(500, 40)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -177,20 +177,20 @@ text = "Search:"
 label_settings = SubResource("LabelSettings_u8jyh")
 autowrap_mode = 2
 
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer" unique_id=491203472]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 30
 
-[node name="ItemList" type="ItemList" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer"]
+[node name="ItemList" type="ItemList" parent="CanvasLayer/Search/MarginContainerText/VBoxContainer" unique_id=1763559423]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
 
-[node name="ReplayContainer" type="MarginContainer" parent="CanvasLayer"]
+[node name="ReplayContainer" type="MarginContainer" parent="CanvasLayer" unique_id=1685779293]
 z_index = 10
 anchors_preset = 2
 anchor_top = 1.0
@@ -204,12 +204,12 @@ scale = Vector2(0.511553, 0.49862)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ReplayContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ReplayContainer" unique_id=2032954211]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 25
 
-[node name="ReplayButton" type="TextureButton" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
+[node name="ReplayButton" type="TextureButton" parent="CanvasLayer/ReplayContainer/HBoxContainer" unique_id=1552579530]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -217,7 +217,7 @@ texture_normal = ExtResource("7_4dh48")
 texture_pressed = ExtResource("8_g74qh")
 texture_hover = ExtResource("9_t8oak")
 
-[node name="ReplayLabel" type="Label" parent="CanvasLayer/ReplayContainer/HBoxContainer"]
+[node name="ReplayLabel" type="Label" parent="CanvasLayer/ReplayContainer/HBoxContainer" unique_id=1404609815]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "REPLAY [F2]"
@@ -225,7 +225,7 @@ label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FullscreenContainer" type="MarginContainer" parent="CanvasLayer"]
+[node name="FullscreenContainer" type="MarginContainer" parent="CanvasLayer" unique_id=424037523]
 z_index = 10
 anchors_preset = 2
 anchor_top = 1.0
@@ -239,12 +239,12 @@ scale = Vector2(0.511553, 0.49862)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FullscreenContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FullscreenContainer" unique_id=688992196]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 25
 
-[node name="FullscreenButton" type="TextureButton" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
+[node name="FullscreenButton" type="TextureButton" parent="CanvasLayer/FullscreenContainer/HBoxContainer" unique_id=1078328000]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -252,7 +252,7 @@ texture_normal = ExtResource("10_lmvg8")
 texture_pressed = ExtResource("11_cob2b")
 texture_hover = ExtResource("12_h21d2")
 
-[node name="FullscreenLabel" type="Label" parent="CanvasLayer/FullscreenContainer/HBoxContainer"]
+[node name="FullscreenLabel" type="Label" parent="CanvasLayer/FullscreenContainer/HBoxContainer" unique_id=149960722]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "FULLSCREEN [F1]"
@@ -260,7 +260,7 @@ label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RandomContainer" type="MarginContainer" parent="CanvasLayer"]
+[node name="RandomContainer" type="MarginContainer" parent="CanvasLayer" unique_id=1374700416]
 z_index = 10
 anchors_preset = 2
 anchor_top = 1.0
@@ -274,12 +274,12 @@ scale = Vector2(0.511553, 0.49862)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/RandomContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/RandomContainer" unique_id=203111730]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 25
 
-[node name="RandomButton" type="TextureButton" parent="CanvasLayer/RandomContainer/HBoxContainer"]
+[node name="RandomButton" type="TextureButton" parent="CanvasLayer/RandomContainer/HBoxContainer" unique_id=2030697399]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -287,7 +287,7 @@ texture_normal = ExtResource("10_71b5s")
 texture_pressed = ExtResource("11_n5017")
 texture_hover = ExtResource("12_j6q0m")
 
-[node name="RandomLabel" type="Label" parent="CanvasLayer/RandomContainer/HBoxContainer"]
+[node name="RandomLabel" type="Label" parent="CanvasLayer/RandomContainer/HBoxContainer" unique_id=1303071316]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "RANDOM [F5]"
@@ -295,7 +295,7 @@ label_settings = SubResource("LabelSettings_djaeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=324651716]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -310,21 +310,21 @@ grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.507369, 0.55483)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1264912645]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="BackContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="BackContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=31664590]
 z_index = 10
 layout_mode = 2
 
-[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer/HBoxContainer/BackContainer"]
+[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer/HBoxContainer/BackContainer" unique_id=1026955993]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="BackButton" type="TextureButton" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine"]
+[node name="BackButton" type="TextureButton" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine" unique_id=1689453239]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -332,7 +332,7 @@ texture_normal = ExtResource("3_6830r")
 texture_pressed = ExtResource("4_qcv70")
 texture_hover = ExtResource("5_8xnki")
 
-[node name="BackLabel" type="Label" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine"]
+[node name="BackLabel" type="Label" parent="MarginContainer/HBoxContainer/BackContainer/VBoxContaine" unique_id=1502610350]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -342,16 +342,16 @@ label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MusicContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="MusicContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=1047885966]
 z_index = 10
 layout_mode = 2
 
-[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MusicContainer"]
+[node name="VBoxContaine" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MusicContainer" unique_id=150666744]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="MusicButton" type="TextureButton" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine"]
+[node name="MusicButton" type="TextureButton" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine" unique_id=1158418145]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -359,7 +359,7 @@ texture_normal = ExtResource("13_weboj")
 texture_pressed = ExtResource("14_tb4d2")
 texture_hover = ExtResource("15_s0j6n")
 
-[node name="MusicLabel" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine"]
+[node name="MusicLabel" type="Label" parent="MarginContainer/HBoxContainer/MusicContainer/VBoxContaine" unique_id=393754687]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -369,16 +369,16 @@ label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="InstructionsContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=227091672]
 z_index = 10
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/InstructionsContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/InstructionsContainer" unique_id=2045268213]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="InstructionsButton" type="TextureButton" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer"]
+[node name="InstructionsButton" type="TextureButton" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer" unique_id=1085057760]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -386,7 +386,7 @@ texture_normal = ExtResource("16_4t6fq")
 texture_pressed = ExtResource("17_m7knu")
 texture_hover = ExtResource("18_pdscm")
 
-[node name="InstructionsLabel" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer"]
+[node name="InstructionsLabel" type="Label" parent="MarginContainer/HBoxContainer/InstructionsContainer/VBoxContainer" unique_id=1420980734]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -396,16 +396,16 @@ label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ExitContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="ExitContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=1410509378]
 z_index = 10
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ExitContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ExitContainer" unique_id=717281102]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="ExitButton" type="TextureButton" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer"]
+[node name="ExitButton" type="TextureButton" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer" unique_id=1053821840]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -413,7 +413,7 @@ texture_normal = ExtResource("19_vtaqf")
 texture_pressed = ExtResource("20_5uspn")
 texture_hover = ExtResource("21_5ajhf")
 
-[node name="ExitLabel" type="Label" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer"]
+[node name="ExitLabel" type="Label" parent="MarginContainer/HBoxContainer/ExitContainer/VBoxContainer" unique_id=1777388568]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -423,16 +423,16 @@ label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IndexContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="IndexContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=1609944293]
 z_index = 10
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/IndexContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/IndexContainer" unique_id=200205876]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="IndexButton" type="TextureButton" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer"]
+[node name="IndexButton" type="TextureButton" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer" unique_id=610066491]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -440,7 +440,7 @@ texture_normal = ExtResource("7_g5m7v")
 texture_pressed = ExtResource("8_g1di3")
 texture_hover = ExtResource("9_o8m5u")
 
-[node name="IndexLabel" type="Label" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer"]
+[node name="IndexLabel" type="Label" parent="MarginContainer/HBoxContainer/IndexContainer/VBoxContainer" unique_id=263837614]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -450,7 +450,14 @@ label_settings = SubResource("LabelSettings_veh81")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BackgroundColourPanel" type="Panel" parent="."]
+[node name="ColorRect" type="ColorRect" parent="MarginContainer" unique_id=204355535]
+z_index = -1
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.482353, 0.635294, 0.721569, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="BackgroundColourPanel" type="Panel" parent="." unique_id=615820491]
 z_index = -100
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 1
@@ -469,14 +476,3 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_o433g")
 metadata/_edit_group_ = true
 metadata/_edit_lock_ = true
-
-[node name="ColorRect" type="ColorRect" parent="."]
-z_index = -1
-layout_mode = 2
-offset_left = 100.0
-offset_top = 883.0
-offset_right = 3377.0
-offset_bottom = 1145.0
-scale = Vector2(0.525178, 0.637422)
-mouse_filter = 2
-color = Color(0.482353, 0.635294, 0.721569, 1)

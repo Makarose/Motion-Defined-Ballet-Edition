@@ -65,7 +65,7 @@ func _ready() -> void:
 	if OS.get_name() == "macOS":
 		await get_tree().create_timer(0.2).timeout
 	else:
-		await get_tree().process.frame
+		await get_tree().process_frame
 	var label = quit_dialog.get_label()
 	if label:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -134,19 +134,19 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	
-	var nav_left = event.is_action("nav_left") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_LEFT)
-	var nav_right = event.is_action("nav_right") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_RIGHT)
+	var nav_left_pressed = event.is_action("nav_left") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_LEFT)
+	var nav_right_pressed = event.is_action("nav_right") if not is_macos() else (event.shift_pressed and event.physical_keycode == KEY_RIGHT)
 	
-	if nav_left and not is_fullscreen:
+	if nav_left_pressed and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_left")
-	elif nav_right and not is_fullscreen:
+	elif nav_right_pressed and not is_fullscreen:
 		get_viewport().set_input_as_handled()
 		emit_signal("nav_right")
 	elif event.is_action("quit_app"):
 		get_viewport().set_input_as_handled()
 		quit_dialog.popup_centered()
-
+		
 # ----------------------------
 # Normalization utilities
 # ----------------------------
